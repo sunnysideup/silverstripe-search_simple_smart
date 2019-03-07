@@ -1,2 +1,2 @@
-# silverstripe-search_simple_smart
+# silverstripe search simple smart
 see docs/en for more details
