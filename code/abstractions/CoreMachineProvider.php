@@ -17,7 +17,7 @@ interface SearchEngineCoreMachineProvider
      *
      * @var string
      */
-    private static $class_name_for_search_provision;
+    // private static $class_name_for_search_provision;
 
 
     /**
