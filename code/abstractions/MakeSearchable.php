@@ -7,8 +7,7 @@
  *
  */
 
-interface SearchEngineMakeSearchable
-{
+interface SearchEngineMakeSearchableInterface {
 
     /**
      * This array should look like this:
@@ -94,4 +93,5 @@ interface SearchEngineMakeSearchable
      * @return boolean
      */
     public function SearchEngineExcludeFromIndexProvider();
+
 }
