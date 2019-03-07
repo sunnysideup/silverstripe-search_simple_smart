@@ -7,16 +7,16 @@
  *
  */
 
-interface SearchEngineSearchEngineProvider {
+interface SearchEngineSearchEngineProvider
+{
 
-	/**
-	 * @param SearchEngineSearchRecord
-	 */
-	public function setSearchRecord(SearchEngineSearchRecord $searchRecord);
+    /**
+     * @param SearchEngineSearchRecord
+     */
+    public function setSearchRecord(SearchEngineSearchRecord $searchRecord);
 
-	/**
-	 * @return return DataList
-	 */
-	public function getRawResults();
-
+    /**
+     * @return return DataList
+     */
+    public function getRawResults();
 }

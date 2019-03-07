@@ -30,52 +30,56 @@
  *
  */
 
-class SearchEngineProvider_MYSQLFullText extends Object implements SearchEngineSearchEngineProvider {
+class SearchEngineProvider_MYSQLFullText extends Object implements SearchEngineSearchEngineProvider
+{
 
-	/*
-	 * @var array
-	 */
-	protected $searchRecord = null;
+    /*
+     * @var array
+     */
+    protected $searchRecord = null;
 
-	/**
-	 * @param SearchEngineSearchRecord
-	 */
-	public function setSearchRecord(SearchEngineSearchRecord $searchRecord){
-		$this->searchRecord = $searchRecord;
-	}
+    /**
+     * @param SearchEngineSearchRecord
+     */
+    public function setSearchRecord(SearchEngineSearchRecord $searchRecord)
+    {
+        $this->searchRecord = $searchRecord;
+    }
 
-	/**
-	 * @return DataList of SearchEngineDataObjects
-	 */
-	public function getRawResults() {
+    /**
+     * @return DataList of SearchEngineDataObjects
+     */
+    public function getRawResults()
+    {
 
-		//1. find keywords
-		$filterArray = array();
-		$keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('".$this->searchRecord->FinalPhrase."')");
-		$dataObjectArray = array();
-		$max = (substr_count($this->searchRecord->FinalPhrase, " ")+2);
-		for($i = 1; $i < $max; $i++) {
-			$keywordIDArray = array(0 => 0);
-			$rows = DB::query("
+        //1. find keywords
+        $filterArray = array();
+        $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('".$this->searchRecord->FinalPhrase."')");
+        $dataObjectArray = array();
+        $max = (substr_count($this->searchRecord->FinalPhrase, " ")+2);
+        for ($i = 1; $i < $max; $i++) {
+            $keywordIDArray = array(0 => 0);
+            $rows = DB::query(
+                "
 				SELECT \"SearchEngineKeywordID\"
 				FROM \"SearchEngineSearchRecord_SearchEngineKeywords\"
 				WHERE
 					\"KeywordPosition\" = $i
 					AND \"SearchEngineSearchRecordID\" = ".$this->searchRecord->ID
-			);
-			foreach($rows as $row) {
-				$keywordIDArray[$row["SearchEngineKeywordID"]] = $row["SearchEngineKeywordID"];
-			}
-			$rowsLevel1 = DB::query("
+            );
+            foreach ($rows as $row) {
+                $keywordIDArray[$row["SearchEngineKeywordID"]] = $row["SearchEngineKeywordID"];
+            }
+            $rowsLevel1 = DB::query("
 				SELECT \"SearchEngineDataObjectID\"
 				FROM SearchEngineKeyword_SearchEngineDataObjects_Level1
 				WHERE \"SearchEngineKeywordID\" IN (".implode(",", $keywordIDArray).")
 				GROUP BY \"SearchEngineDataObjectID\"");
-			$rowsLevel1Array = array(0 => 0);
-			foreach($rowsLevel1 as $row) {
-				$rowsLevel1Array[$row["SearchEngineDataObjectID"]] = $row["SearchEngineDataObjectID"];
-			}
-			$rowsLevel2 = DB::query("
+            $rowsLevel1Array = array(0 => 0);
+            foreach ($rowsLevel1 as $row) {
+                $rowsLevel1Array[$row["SearchEngineDataObjectID"]] = $row["SearchEngineDataObjectID"];
+            }
+            $rowsLevel2 = DB::query("
 				SELECT \"SearchEngineDataObjectID\"
 				FROM SearchEngineDataObject_SearchEngineKeywords_Level2
 				WHERE
@@ -83,20 +87,18 @@ class SearchEngineProvider_MYSQLFullText extends Object implements SearchEngineS
 					\"SearchEngineDataObjectID\" NOT IN (".implode(",", $rowsLevel1Array).")
 				GROUP BY \"SearchEngineDataObjectID\"
 			");
-			$rowsLevel2Array = array(0 => 0);
-			foreach($rowsLevel2 as $row) {
-				$rowsLevel2Array[$row["SearchEngineDataObjectID"]] = $row["SearchEngineDataObjectID"];
-			}
-			$dataObjectArray[$i] = array_merge($rowsLevel1Array, $rowsLevel2Array);
-		}
-		if(count($dataObjectArray) > 1) {
-			$finalArray = call_user_func_array('array_intersect',$dataObjectArray);
-		}
-		else {
-			$finalArray = $dataObjectArray[1];
-		}
+            $rowsLevel2Array = array(0 => 0);
+            foreach ($rowsLevel2 as $row) {
+                $rowsLevel2Array[$row["SearchEngineDataObjectID"]] = $row["SearchEngineDataObjectID"];
+            }
+            $dataObjectArray[$i] = array_merge($rowsLevel1Array, $rowsLevel2Array);
+        }
+        if (count($dataObjectArray) > 1) {
+            $finalArray = call_user_func_array('array_intersect', $dataObjectArray);
+        } else {
+            $finalArray = $dataObjectArray[1];
+        }
 
-		return SearchEngineDataObject::get()->filter(array("ID" => $finalArray));
-	}
-
+        return SearchEngineDataObject::get()->filter(array("ID" => $finalArray));
+    }
 }
