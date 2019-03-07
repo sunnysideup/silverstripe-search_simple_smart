@@ -1,0 +1,89 @@
+---
+Name: searchengine_extras
+After:
+  - 'framework/*'
+  - 'cms/*'
+  - 'searchengine/*'
+Before:
+  - 'mysite/*'
+---
+
+SearchEngineCoreSearchMachine:
+  class_name_for_search_provision: 'SearchEngineProvider_MYSQLFullText'
+
+
+SearchEngineKeyword:
+  remove_all_non_alpha_numeric: false
+  keyword_list_folder_name: "_searchengine_json"
+
+SearchEngineMakeSearchable:
+  default_level_one_fields:
+    - Title
+    - Name
+    - FirstName
+    - Surname
+    - MetaTitle
+    - MenuTitle
+    - Email
+  default_excluded_db_fields:
+    - Password
+
+SearchEngineFullContent:
+  remove_all_non_alpha_numeric: false
+
+SearchEngineKeywordFindAndRemove:
+  add_stop_words: true
+
+SearchEngineRemoveAll:
+  all_tables:
+    - SearchEngineDataObject
+    - SearchEngineDataObjectToBeIndexed
+    - SearchEngineFullContent
+    - SearchEngineKeyword
+
+SearchEngineDataObject:
+  classes_to_exclude:
+    - ErrorPage
+    - Image_Cached
+    - VirtualPage
+    - RedirectorPage
+    - Folder
+
+SearchEngineFullContent:
+  remove_all_non_alpha_numeric: false
+
+SearchEngineDataObjectToBeIndexed:
+  cron_job_running: true
+
+SearchEngineSortByDescriptor:
+  class_groups:
+    1:
+      - HomePage
+      - CoolPage
+    2:
+      - NotSoInterstingPage
+      - Page
+  class_group_limits:
+    1: 12
+    2: 20
+
+SearchEngineBasicForm:
+  jquery_source: "foo/bar/jquery.js"
+  full_results_page_type: "MySearchResultsPage"
+  sort_by_options:
+    - SearchEngineSortByRelevance
+    - SearchEngineSortByDate
+  filter_for_options:
+    - SearchEngineFilterForClassName
+    - SearchEngineFilterForRecent
+
+SearchEngineFilterForClassName:
+  classes_to_include:
+    - MyDataObjectFooBarThing
+    - MyOtherPage
+# OR !
+SearchEngineFilterForClassName:
+  classes_to_include:
+    MyDataObjectFooBarThing: 'Title goes here'
+    MyOtherPage: 'Title goes here'
+

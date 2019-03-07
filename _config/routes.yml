@@ -1,0 +1,7 @@
+---
+Name: searchengineroutes
+After: framework/routes#coreroutes
+---
+Director:
+  rules:
+    'searchenginerecordclick//$Action/$ID/$Name': 'SearchEngineRecordClick'

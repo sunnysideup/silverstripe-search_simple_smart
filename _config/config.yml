@@ -1,0 +1,29 @@
+---
+Name: searchengine
+After:
+  - 'framework/*'
+  - 'cms/*'
+Before:
+  - 'mysite/*'
+---
+
+Page:
+  extensions:
+    - SearchEngineMakeSearchable
+
+SiteConfig:
+  extensions:
+    - SearchEngineSiteConfigExtension
+
+ErrorPage:
+  search_engine_exclude_from_index: true
+
+ContentController:
+  extensions:
+    - SearchEngineContentControllerExtension
+
+LeftAndMain:
+  extra_requirements_css:
+    - "searchengine/css/SearchEngineCMS.css"
+  extra_requirements_javascript:
+    - "searchengine/javascript/CMS.js"

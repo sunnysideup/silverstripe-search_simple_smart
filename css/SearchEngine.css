@@ -1,0 +1,58 @@
+/**
+ * utils
+ */
+
+.loading, .infscr-loading { background-image: url(/searchengine/images/loading.gif); background-repeat: no-repeat; background-position: 95% 0; }
+.infscr-loading img {display: none; }
+
+/**
+ * form
+ */
+#SearchEngineHolder {display: none}
+.searchEngineFormForm .Actions {display: none;}
+#SearchEngineRetrievalMessage {display: none}
+
+.searchEngineFormForm {width: auto; max-width: 100%; background-color: #fff; clear: both; margin-left: auto; margin-right: auto; margin-bottom: 30px;}
+.searchEngineFormForm fieldset {width: auto; max-width: 100%; padding: 5%;}
+.searchEngineFormForm.searchEngineFormWithSideBar #SearchEngineResultsHolderOuter {width: 50%}
+.searchEngineFormForm div#FilterFor.field {float: right; clear: right; width: 30%}
+.searchEngineFormForm div#SortBy.field {float: right; clear: right; width: 30%}
+
+/**
+ * dormant vs awake
+ */
+.searchEngineDormant div#FilterFor.field,
+.searchEngineDormant div#SortBy.field,
+.searchEngineDormant #SearchEngineResultsHolderOuter {display: none;}
+
+.searchEngineAwake {
+	-webkit-box-shadow: 1px 1px 23px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 1px 1px 23px 0px rgba(0,0,0,0.75);
+	box-shadow: 1px 1px 23px 0px rgba(0,0,0,0.75);
+}
+/**
+ * Results
+ */
+#SearchEngineSearchResultsHolder {}
+#SearchEngineSearchResultsInner {}
+#SearchEngineSearchResultsInner h2{}
+#SearchEngineSearchResultsInner h2 em{}
+#SearchEngineSearchResultsInner p.message{}
+#SearchEngineSearchResultsInner ul.searchEngineResultsList{}
+#SearchEngineSearchResultsInner ul.searchEngineResultsList li.searchEngineResultItem{}
+
+/**
+ * awesomeplete fixes
+ */
+.searchEngineFormForm  .awesomplete ul, .searchEngineFormForm  .awesomplete li {list-style: none;}
+
+/**
+ * pagination
+ */
+#SearchEngineSearchResultsInner .searchEnginePageInfo{}
+#SearchEngineSearchResultsInner .searchEnginePageInfo a,
+#SearchEngineSearchResultsInner .searchEnginePageInfo a.prev,
+#SearchEngineSearchResultsInner .searchEnginePageInfo a.next{}
+
+
+

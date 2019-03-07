@@ -1,0 +1,22 @@
+#SearchEngineManifest ul, #SearchEngineManifest ul li {
+	list-style-type: none;
+	position: relative;
+	margin-left: 20px;
+}
+
+#SearchEngineManifest ul li span.plusMinus {
+	position: absolute;
+	left: 0;
+	top: 0;
+	margin-left: -20px;
+	display: line;
+	cursor: pointer;
+}
+
+#SearchEngineManifest .doesNotHaveEntries  * {
+	color: #999!important;
+}
+#SearchEngineManifest h3, #SearchEngineManifest h4 {
+	margin: 0;
+	padding: 0;
+}
