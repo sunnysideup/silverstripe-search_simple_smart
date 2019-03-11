@@ -21,12 +21,12 @@ class SearchEngineRemoveAll extends BuildTask
      * @var Array
      */
     private static $all_tables = array(
-        SearchEngineDataObject::class,
-        SearchEngineDataObjectToBeIndexed::class,
-        SearchEngineFullContent::class,
-        SearchEngineKeyword::class,
-        SearchEngineSearchRecord::class,
-        SearchEngineSearchRecordHistory::class,
+        'SearchEngineDataObject',
+        'SearchEngineDataObjectToBeIndexed',
+        'SearchEngineFullContent',
+        'SearchEngineKeyword',
+        'SearchEngineSearchRecord',
+        'SearchEngineSearchRecordHistory',
         "SearchEngineKeyword_SearchEngineDataObjects",
         "SearchEngineDataObject_SearchEngineKeywords_Level1",
         "SearchEngineDataObject_SearchEngineKeywords_Level2",

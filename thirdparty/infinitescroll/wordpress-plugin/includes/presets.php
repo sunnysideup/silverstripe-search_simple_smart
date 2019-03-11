@@ -91,7 +91,7 @@ class Infinite_Scroll_Presets {
 		$data = wp_remote_get( $this->preset_url );
 
 		if ( is_wp_error( $data ) )
-			return array();
+			return [];
 
 		$data = wp_remote_retrieve_body( $data );
 		
@@ -391,7 +391,7 @@ class Infinite_Scroll_Presets {
 		
 		$presets = $this->parse_csv( $data );
 				
-		$output = array();
+		$output = [];
 		
 		//convert Theme Name to stylesheet and stuff into output array
 		foreach( $presets as $theme ) {
@@ -427,7 +427,7 @@ class Infinite_Scroll_Presets {
 			$fh = tmpfile();
 			fwrite( $fh, implode( "\n", $data ) );
 			fseek( $fh, 0 );
-			$data = array();
+			$data = [];
 			
 			while( $line = fgetcsv( $fh ) )
 				$data[] = $line;
@@ -436,7 +436,7 @@ class Infinite_Scroll_Presets {
 			
 		}
 
-		$presets = array();
+		$presets = [];
 
 		//build preset objects and stuff into keyed array
 		foreach ( $data as &$line ) {
@@ -477,7 +477,7 @@ class Infinite_Scroll_Presets {
 	 */
 	function export( $all = false ) {
 	
-		$presets = array();
+		$presets = [];
 		
 		//if the current theme is not a known preset or they want all
 		if ( !$this->get_preset( ) || $all )
@@ -703,8 +703,8 @@ class Infinite_Scroll_Presets_Table extends WP_List_Table {
 		$per_page = 25;
 
 		$columns = $this->get_columns();
-		$hidden = array();
-		$sortable = array();
+		$hidden = [];
+		$sortable = [];
 
 		$this->_column_headers = array($columns, $hidden, $sortable);
 

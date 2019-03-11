@@ -224,7 +224,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         } else {
             $cleanedPhrase = SearchEngineFullContent::clean_content($this->Phrase);
             $keywords = explode(" ", $cleanedPhrase);
-            $finalKeyWordArray = array();
+            $finalKeyWordArray = [];
             foreach ($keywords as $keyword) {
                 if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || strlen($keyword) == 1) {
                     continue;
@@ -248,7 +248,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             $keywordsAfterFindReplace = explode(" ", SearchEngineKeywordFindAndReplace::find_replacements($keyword));
             $keywordsAfterFindReplace[] = $keyword;
             $keywordsAfterFindReplace = array_unique($keywordsAfterFindReplace);
-            $whereArray = array();
+            $whereArray = [];
             foreach ($keywordsAfterFindReplace as $innerPosition => $innerKeyword) {
                 $length = strlen($innerKeyword);
                 if ($length < 2) {

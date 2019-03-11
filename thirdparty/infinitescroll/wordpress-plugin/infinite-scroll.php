@@ -200,7 +200,7 @@ class Infinite_Scroll {
 			);
 
 			$old = get_option( 'infscr_options' );
-			$new = array();
+			$new = [];
 
 			//really old legacy options storage
 			//each option is stored as its own option in the options table

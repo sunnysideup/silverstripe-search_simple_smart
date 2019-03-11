@@ -1,0 +1,22 @@
+---
+Name: my_search_simple_smart_searcheableobjects
+---
+File:
+  extensions:
+    - SearchEngineMakeSearchable
+  search_engine_full_contents_fields_array:
+    1:
+      - Title
+    2:
+      - Content
+
+HomePage:
+  search_engine_full_contents_fields_array:
+    1:
+      - Title
+      - MenuTitle
+      - HeaderCustomHeading
+      - HeaderCustomSubHeading
+    2:
+      - Content
+      - MyThirdDataObject.Title

@@ -95,7 +95,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
             } else {
                 $jsLastChanged = "unknown";
             }
-            $printNice = array();
+            $printNice = [];
             $field = new FieldList(
                 new TabSet(
                     'Root',

@@ -50,7 +50,7 @@ class SearchEngineCoreSearchMachine
      *
      * @var array
      */
-    protected $debugArray = array();
+    protected $debugArray = [];
 
     /**
      *
@@ -120,7 +120,7 @@ class SearchEngineCoreSearchMachine
          */
         $listOfIDsSQL = $searchRecord->getListOfIDs("SQL");
         $filterStringForDebug = "";
-        $filterClassesWithValues = array();
+        $filterClassesWithValues = [];
         if (!$listOfIDsSQL) {
             if ($this->debug) {
                 $filterExecutedSQL = true;
@@ -129,7 +129,7 @@ class SearchEngineCoreSearchMachine
                 foreach ($filterProviders as $key => $dudd) {
                     list($filterClassName, $filterValue) = explode(".", $key);
                     if (!isset($filterClassesWithValues[$filterClassName])) {
-                        $filterClassesWithValues[$filterClassName] = array();
+                        $filterClassesWithValues[$filterClassName] = [];
                     }
                     $filterClassesWithValues[$filterClassName][] = $filterValue;
                 }
@@ -150,7 +150,7 @@ class SearchEngineCoreSearchMachine
                 ->sort("FIELD(\"ID\", ".implode(",", $listOfIDsRAW).")");
         }
         $hasCustomSort = false;
-        $sqlSort = array();
+        $sqlSort = [];
         if ($sortProvider) {
             $sortProviderObject = $sortProvider::create();
             $hasCustomSort = $sortProviderObject->hasCustomSort();
@@ -210,10 +210,10 @@ class SearchEngineCoreSearchMachine
             $this->debugArray[] = "Sorters: <pre>".print_r($sortProvider, 1)."</pre>";
             $this->debugArray[] = "Phrase Entered: <pre>".print_r($searchRecord->Phrase, 1)."</pre>";
             $this->debugArray[] = "Cleaned Searched: <pre>".print_r($searchRecord->FinalPhrase, 1)."</pre>";
-            $keywordArray = array();
+            $keywordArray = [];
             foreach ($searchRecord->SearchEngineKeywords() as $keyword) {
                 if (!isset($keywordArray[$keyword->KeywordPosition])) {
-                    $keywordArray[$keyword->KeywordPosition] = array();
+                    $keywordArray[$keyword->KeywordPosition] = [];
                 }
                 $keywordArray[$keyword->KeywordPosition][] = $keyword->Keyword;
             }

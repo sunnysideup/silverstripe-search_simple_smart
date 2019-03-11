@@ -193,7 +193,7 @@ class SearchEngineFullContent extends DataObject
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        $fullArray = array();
+        $fullArray = [];
         $item = $this->SearchEngineDataObject();
         if ($item) {
             //todo: turn Content into Keywords

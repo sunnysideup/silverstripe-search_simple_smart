@@ -75,7 +75,7 @@ class SearchEngineSearchHistoryFormField extends LiteralField
 		<div id=\"SearchHistoryTableForCMS\">
 			<h3>Search Phrases entered at least ".$this->minimumCount." times between ".date("Y-M-d", strtotime("-".$totalNumberOfDaysBack." days"))." and ".date("Y-M-d", strtotime("-".$this->endingDaysBack." days"))."</h3>
 			<table id=\"HighToLow\" style=\"width: 100%\">";
-        $list = array();
+        $list = [];
         foreach ($data as $key => $row) {
             //for the highest count, we work out a max-width
             if (!$key) {

@@ -118,7 +118,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         parent::onBeforeWrite();
         $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
         $replaceWithArray = $this->multiExplode(array(",", " "), $this->ReplaceWith);
-        $finalArray = array();
+        $finalArray = [];
         foreach ($replaceWithArray as $key => $keyword) {
             $keyword = SearchEngineKeyword::clean_keyword($keyword);
             if (strlen($keyword) > 1) {
@@ -144,7 +144,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      * making sure that we do not have infinite loops...
      * @var int
      */
-    private static $_words_used = array();
+    private static $_words_used = [];
 
     /**
      * this method is recursive...
@@ -155,11 +155,11 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     {
         $objects = SearchEngineKeywordFindAndReplace::get()
             ->filter(array("Keyword" => $keyword));
-        $wordsUsed = array();
+        $wordsUsed = [];
         self::$_words_used[$keyword] = $keyword;
         foreach ($objects as $object) {
             $newEntries = explode(",", $object->ReplaceWith);
-            $newerEntries = array();
+            $newerEntries = [];
             foreach ($newEntries as $newEntryKeyword) {
                 $newEntryKeyword = SearchEngineKeyword::clean_keyword($newEntryKeyword);
                 if (!isset(self::$_words_used[$newEntryKeyword])) {

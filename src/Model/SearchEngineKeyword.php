@@ -115,7 +115,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     /*
      * @var array
      */
-    private static $_add_keyword_cache = array();
+    private static $_add_keyword_cache = [];
 
     /*
      * @var array
@@ -173,7 +173,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
             //do nothing
             } else {
                 $rows = DB::query("SELECT \"Keyword\" FROM \"SearchEngineKeyword\" ORDER BY \"Keyword\";");
-                $array = array();
+                $array = [];
                 foreach ($rows as $row) {
                     $array[] = str_replace('"', "", Convert::raw2js($row["Keyword"]));
                 }
@@ -242,7 +242,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     /*
      * @var array
      */
-    private static $_clean_keyword_cache = array();
+    private static $_clean_keyword_cache = [];
 
     /**
      * cleans a string

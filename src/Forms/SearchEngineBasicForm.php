@@ -45,7 +45,7 @@ class SearchEngineBasicForm extends Form
      */
     private static $sort_by_options = array(
         //"SearchEngineSortByRelevance",
-        //"SearchEngineSortByDate"
+        //"SearchEngineSortByLastEdited"
     );
 
     /**
@@ -132,7 +132,7 @@ class SearchEngineBasicForm extends Form
      * for internal use...
      * @var array
      */
-    protected $customScript = array();
+    protected $customScript = [];
 
     /**
      * for internal use...
@@ -199,7 +199,7 @@ class SearchEngineBasicForm extends Form
             $filterFor = $this->FilterForProvider();
             if ($filterFor && count($filterFor) > 1) {
                 if ($this->includeFilter) {
-                    $defaults = isset($_GET["FilterFor"]) ? $_GET["FilterFor"] : array();
+                    $defaults = isset($_GET["FilterFor"]) ? $_GET["FilterFor"] : [];
                     $this->Fields()->insertAfter(
                         CheckboxSetField::create('FilterFor', _t("SearchEngineBasicForm.FILTER_FOR", "Filter for ..."), $filterFor)->setDefaultItems($defaults),
                         "SortBy"
@@ -221,9 +221,11 @@ class SearchEngineBasicForm extends Form
                 "<div id=\"SearchEngineResultsHolderOuter\">".$results."</div>"
             ));
             if ($this->Config()->jquery_source) {
-                Requirements::javascript('sunnysideup/search_simple_smart: silverstripe/admin: thirdparty/jquery/jquery.js');
+                Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
+                Requirements::javascript($this->Config()->jquery_source);
+            } else {
+                Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
             }
-            Requirements::javascript('sunnysideup/search_simple_smart: silverstripe/admin: thirdparty/jquery/jquery.js');
             Requirements::javascript("sunnysideup/search_simple_smart: searchengine/javascript/SearchEngineInitFunctions.js");
 
             if ($this->useInfiniteScroll) {
@@ -276,7 +278,7 @@ class SearchEngineBasicForm extends Form
             Requirements::clear();
             return $this->workOutResults($data);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -290,7 +292,7 @@ class SearchEngineBasicForm extends Form
         // Submitted data is available as a map.
         $searchMachine = Injector::inst()->create(SearchEngineCoreSearchMachine::class);
         //filter for is an array!
-        $filterForArray = array();
+        $filterForArray = [];
         $setLimitToZero = false;
         if (isset($data["FilterFor"])) {
             foreach ($data["FilterFor"] as $filterForClass => $notUsed) {
@@ -372,7 +374,7 @@ class SearchEngineBasicForm extends Form
     protected function SortByProvider()
     {
         $options = Config::inst()->get(SearchEngineBasicForm::class, "sort_by_options");
-        $array = array();
+        $array = [];
 
         foreach ($options as $key => $className) {
 
@@ -393,7 +395,7 @@ class SearchEngineBasicForm extends Form
     protected function FilterForProvider()
     {
         $options = Config::inst()->get(SearchEngineBasicForm::class, "filter_for_options");
-        $array = array();
+        $array = [];
 
         foreach ($options as $key => $className) {
 

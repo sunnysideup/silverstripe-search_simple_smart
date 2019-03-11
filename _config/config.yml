@@ -9,16 +9,22 @@ Before:
 Page:
   extensions:
     - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable
+
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineSiteConfigExtension
+
 SilverStripe\ErrorPage\ErrorPage:
   search_engine_exclude_from_index: true
-SilverStripe\CMS\Controllers\ContentController:
-  extensions:
-    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineContentControllerExtension
+
+SilverStripe\CMS\Model\VirtualPage:
+  search_engine_exclude_from_index: true
+
+SilverStripe\CMS\Model\RedirectorPage:
+  search_engine_exclude_from_index: true
+
 SilverStripe\Admin\LeftAndMain:
   extra_requirements_css:
-    - searchengine/css/SearchEngineCMS.css
+    - 'sunnysideup/search_simple_smart: client/css/CMS.css'
   extra_requirements_javascript:
-    - searchengine/javascript/CMS.js
+    - 'sunnysideup/search_simple_smart: client/javascript/CMS.js

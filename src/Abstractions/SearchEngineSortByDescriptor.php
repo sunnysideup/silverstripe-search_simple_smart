@@ -26,7 +26,7 @@ abstract class SearchEngineSortByDescriptor
      *
      * @var array
      */
-    private static $class_groups = array();
+    private static $class_groups = [];
 
     /**
      * set the total number of results per class_group
@@ -36,7 +36,7 @@ abstract class SearchEngineSortByDescriptor
      *
      * @var array
      */
-    private static $class_group_limits = array();
+    private static $class_group_limits = [];
 
     /**
      * returns the name - e.g. "Date", "Relevance"
@@ -88,11 +88,11 @@ abstract class SearchEngineSortByDescriptor
 
     protected function makeClassGroups($array, $debug = false)
     {
-        $classGroupCounts = array();
+        $classGroupCounts = [];
         $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups");
-        $classGroupLimits = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits");
         if (is_array($classGroups) && count($classGroups)) {
-            $newArray = array();
+            $classGroupLimits = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits");
+            $newArray = [];
             foreach ($classGroups as $key => $classGroupGroup) {
                 if (!isset($classGroupCounts[$key])) {
                     $classGroupCounts[$key] = 0;
@@ -117,12 +117,23 @@ abstract class SearchEngineSortByDescriptor
         }
     }
 
+    protected function hasClassGroups()
+    {
+        $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups");
+
+        return is_array($classGroups) && count($classGroups) ? true : false;
+    }
+
+    protected function hasNoClassGroups()
+    {
+        return $this->hasClassGroups() ? false : true;
+    }
 
     /**
      * retains debug information if turned on.
      * @var array
      */
-    protected $debugArray = array();
+    protected $debugArray = [];
 
     /**
      * @return string (html)
