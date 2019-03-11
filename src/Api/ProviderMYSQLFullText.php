@@ -42,7 +42,7 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
  use SilverStripe\Core\Injector\Injectable;
  use SilverStripe\Core\Extensible;
 
-class SearchEngineProvider_MYSQLFullText implements SearchEngineSearchEngineProvider
+class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvider
 {
 
     use Extensible;
