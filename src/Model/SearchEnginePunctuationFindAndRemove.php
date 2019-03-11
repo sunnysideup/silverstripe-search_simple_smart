@@ -16,12 +16,6 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     private static $table_name = 'SearchEnginePunctuationFindAndRemove';
 
     /**
-     * Defines the database table name
-     * @var string
-     */
-    private static $table_name = 'SearchEngineAdvancedSettings';
-
-    /**
      * @var string
      */
     private static $singular_name = "Punctuation to Remove";

@@ -20,9 +20,17 @@ namespace Sunnysideup\SearchSimpleSmart\Api;
 *
 * How easy is that?
 */
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Extensible;
 
 class SearchEngineStemming
 {
+
+   use Extensible;
+   use Injectable;
+   use Configurable;
+
     /**
     * Regex for matching a consonant
     * @var string

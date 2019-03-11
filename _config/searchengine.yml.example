@@ -1,11 +1,5 @@
 ---
-Name: my_search_simple_smart
-After:
-  - 'framework/*'
-  - 'cms/*'
-  - 'searchengine/*'
-Before:
-  - 'app/*'
+Name: my_search_simple_smart_example
 ---
 
 

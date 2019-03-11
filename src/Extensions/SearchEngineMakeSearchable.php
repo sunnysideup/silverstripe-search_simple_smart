@@ -71,7 +71,7 @@ class SearchEngineMakeSearchable extends DataExtension
             //clear search history
             SearchEngineSearchRecord::flush();
             $originalMode = Versioned::get_reading_mode();
-            Versioned::reading_stage("Live");
+            Versioned::set_stage("Live");
             $item = SearchEngineDataObject::find_or_make($this->owner);
             $fullContentArray = $this->owner->SearchEngineFullContentForIndexing();
             SearchEngineFullContent::add_data_object_array($item, $fullContentArray);
@@ -333,7 +333,7 @@ class SearchEngineMakeSearchable extends DataExtension
     public function onAfterWrite()
     {
         $exclude = false;
-        if(isset($this->_onAfterWriteCount[$this->owner->ID])) {
+        if(!isset($this->_onAfterWriteCount[$this->owner->ID])) {
             $this->_onAfterWriteCount[$this->owner->ID] = 0;
         }
         $exclude = $this->SearchEngineExcludeFromIndex();
@@ -527,14 +527,14 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private function searchEngineRelFields($object, $relType)
     {
-        if (!isset($this->_array_of_relations[$this->owner->ID])) {
+        if (! isset($this->_array_of_relations[$this->owner->ID])) {
             $this->_array_of_relations[$this->owner->ID] = [];
         }
         if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName])) {
             $this->_array_of_relations[$this->owner->ID][$object->ClassName] = [];
         }
         if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType])) {
-            $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType] = $object->$relType();
+            $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType] = $object->stat($relType);
         }
         return $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType];
     }
