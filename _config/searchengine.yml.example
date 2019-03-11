@@ -5,7 +5,7 @@ After:
   - 'cms/*'
   - 'searchengine/*'
 Before:
-  - 'mysite/*'
+  - 'app/*'
 ---
 
 SearchEngineCoreSearchMachine:

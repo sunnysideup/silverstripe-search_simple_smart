@@ -2,6 +2,6 @@
 Name: searchengineroutes
 After: framework/routes#coreroutes
 ---
-Director:
+SilverStripe\Control\Director:
   rules:
-    'searchenginerecordclick//$Action/$ID/$Name': 'SearchEngineRecordClick'
+    searchenginerecordclick//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\SearchEngineRecordClick
