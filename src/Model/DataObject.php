@@ -16,7 +16,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
-
+use Psr\SimpleCache\CacheInterface;
 /**
  * List of dataobjects that are indexed.
  */
@@ -202,77 +202,14 @@ class SearchEngineDataObject extends DataObject
     {
         $classes = ClassInfo::subclassesFor(DataObject::class);
         $array = array();
-
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         foreach ($classes as $className) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             if (!in_array($className, Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                 if ($className::has_extension(SearchEngineMakeSearchable::class)) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                     if (isset(self::$_object_class_name[$className])) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                         $objectClassName = $_object_class_name[$className];
                     } else {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                         $objectClassName = Injector::inst()->get($className)->singular_name();
                     }
-
-                    /**
-                      * ### @@@@ START REPLACEMENT @@@@ ###
-                      * WHY: upgrade to SS4
-                      * OLD: $className (case sensitive)
-                      * NEW: $className (COMPLEX)
-                      * EXP: Check if the class name can still be used as such
-                      * ### @@@@ STOP REPLACEMENT @@@@ ###
-                      */
                     $array[$className] = $objectClassName;
                 }
             }
@@ -300,58 +237,13 @@ class SearchEngineDataObject extends DataObject
      */
     public function getTitle()
     {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
         $className = $this->DataObjectClassName;
-
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         if (!class_exists($className)) {
             return "ERROR - class not found";
         }
-
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         if (isset(self::$_object_class_name[$className])) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $objectClassName = self::$_object_class_name[$className];
         } else {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $objectClassName = Injector::inst()->get($className)->singular_name();
         }
         $object = $this->SourceObject();
@@ -383,39 +275,17 @@ class SearchEngineDataObject extends DataObject
             $arrayOfTemplates = $obj->SearchEngineResultsTemplates($moreDetails);
             $cacheKey = 'SearchEngine_'.$obj->ClassName."_".abs($obj->ID)."_".($moreDetails ? "MOREDETAILS" : "NOMOREDETAILS");
 
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: Cache::factory( (case sensitive)
-              * NEW: SilverStripe\Core\Injector\Injector::inst()->get(Psr\SimpleCache\CacheInterface::class .  (COMPLEX)
-              * EXP: Check cache implementation - see: https://docs.silverstripe.org/en/4/changelogs/4.0.0#cache
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
-            $cache = SS_SilverStripe\Core\Injector\Injector::inst()->get(Psr\SimpleCache\CacheInterface::class . "SearchEngine");
+            $cache = Injector::inst()->get(CacheInterface::class . ".SearchEngine");
 
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: $cache->load( (case sensitive)
-              * NEW: $cache->has( (COMPLEX)
-              * EXP: See: https://docs.silverstripe.org/en/4/changelogs/4.0.0#cache
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
-            $templateRender = $cache->has($cacheKey);
+            $templateRender = null;
+            if($cache->has($cacheKey)) {
+                $templateRender = $cache->get($cacheKey);
+            }
             if ($templateRender) {
                 $templateRender = unserialize($templateRender);
             } else {
                 $templateRender = $obj->renderWith(($arrayOfTemplates));
-
-                /**
-                  * ### @@@@ START REPLACEMENT @@@@ ###
-                  * WHY: upgrade to SS4
-                  * OLD: $cache->save( (case sensitive)
-                  * NEW: $cache->set( (COMPLEX)
-                  * EXP: Cache key and value need to be swapped. Put key first. See: https://docs.silverstripe.org/en/4/changelogs/4.0.0#cache
-                  * ### @@@@ STOP REPLACEMENT @@@@ ###
-                  */
-                $cache->set(serialize($templateRender), $cacheKey);
+                $cache->set($cacheKey, serialize($templateRender));
             }
             return $templateRender;
         }
@@ -475,26 +345,8 @@ class SearchEngineDataObject extends DataObject
      */
     public function SourceObject()
     {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
         $className = $this->DataObjectClassName;
         $id = $this->DataObjectID;
-
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         return $className::get()->byID($id);
     }
 

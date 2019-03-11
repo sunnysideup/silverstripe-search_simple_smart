@@ -92,34 +92,11 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
             //do nothing
         } else {
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: Session:: (case sensitive)
-  * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
-  * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly.
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+
             Controller::curr()->getRequest()->getSession()->clear("SearchEngineSearchRecordHistoryID");
 
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: Session:: (case sensitive)
-              * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
-              * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly.
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             Controller::curr()->getRequest()->getSession()->set("SearchEngineSearchRecordHistoryID", 0);
 
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: Session:: (case sensitive)
-              * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
-              * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly.
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             Controller::curr()->getRequest()->getSession()->save();
         }
     }
@@ -127,6 +104,7 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
     public function SearchEngineKeywordsPhrase()
     {
         $val = isset($_GET["SearchEngineKeywords"]) ? $_GET["SearchEngineKeywords"] : "";
+        
         return DBField::create_field("Varchar", $val);
     }
 }

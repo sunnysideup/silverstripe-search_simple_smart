@@ -33,14 +33,7 @@ use SilverStripe\ORM\DataExtension;
  *
  */
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD:  extends DataExtension (ignore case)
-  * NEW:  extends DataExtension (COMPLEX)
-  * EXP: Check for use of $this->anyVar and replace with $this->anyVar[$this->owner->ID] or consider turning the class into a trait
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+
 class SearchEngineMakeSearchable extends DataExtension
 {
 
@@ -56,7 +49,7 @@ class SearchEngineMakeSearchable extends DataExtension
         "Surname",
         "MetaTitle",
         "MenuTitle",
-        Email::class
+        'Email'
     );
 
     /**
@@ -327,25 +320,8 @@ class SearchEngineMakeSearchable extends DataExtension
         if (is_array($alsoTrigger) && count($alsoTrigger)) {
             foreach ($alsoTrigger as $details) {
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                 $className = $details["ClassName"];
                 $id = $details["ID"];
-
-                /**
-                  * ### @@@@ START REPLACEMENT @@@@ ###
-                  * WHY: upgrade to SS4
-                  * OLD: $className (case sensitive)
-                  * NEW: $className (COMPLEX)
-                  * EXP: Check if the class name can still be used as such
-                  * ### @@@@ STOP REPLACEMENT @@@@ ###
-                  */
                 $obj = $className::get()->byID($id);
                 $obj->write();
             }
@@ -355,7 +331,7 @@ class SearchEngineMakeSearchable extends DataExtension
     /**
      * @var int
      */
-    private $_onAfterWriteCount = 0;
+    private $_onAfterWriteCount = [];
 
     /**
      *
@@ -364,13 +340,15 @@ class SearchEngineMakeSearchable extends DataExtension
     public function onAfterWrite()
     {
         $exclude = false;
-        $this->_onAfterWriteCount++;
+        if(isset($this->_onAfterWriteCount[$this->owner->ID])) {
+            $this->_onAfterWriteCount[$this->owner->ID] = 0;
+        }
         $exclude = $this->SearchEngineExcludeFromIndex();
         if ($exclude) {
             //do nothing...
         } else {
             $item = SearchEngineDataObject::find_or_make($this->owner);
-            if ($item && $this->_onAfterWriteCount++ < 2) {
+            if ($item && $this->_onAfterWriteCount[$this->owner->ID]++ < 2) {
                 $item->write();
                 DB::query("UPDATE \"SearchEngineDataObject\" SET LastEdited = NOW() WHERE ID = ".(intval($item->ID)-0).";");
                 SearchEngineDataObjectToBeIndexed::add($item);
@@ -556,12 +534,15 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private function searchEngineRelFields($object, $relType)
     {
-        if (!isset($this->_array_of_relations[$object->ClassName])) {
-            $this->_array_of_relations[$object->ClassName] = array();
+        if (!isset($this->_array_of_relations[$this->owner->ID])) {
+            $this->_array_of_relations[$this->owner->ID] = [];
         }
-        if (!isset($this->_array_of_relations[$object->ClassName][$relType])) {
-            $this->_array_of_relations[$object->ClassName][$relType] = $object->$relType();
+        if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName])) {
+            $this->_array_of_relations[$this->owner->ID][$object->ClassName] = array();
         }
-        return $this->_array_of_relations[$object->ClassName][$relType];
+        if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType])) {
+            $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType] = $object->$relType();
+        }
+        return $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType];
     }
 }

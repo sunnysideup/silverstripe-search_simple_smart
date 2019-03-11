@@ -55,77 +55,15 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
             $checkInclusion = true;
         }
 
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         foreach ($filterArray as $className => $title) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             if (!in_array($className, $exclude)) {
                 if ($checkInclusion) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                     if (in_array($className, $include)) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                         $array[$className] = $title;
-
-                    /**
-                      * ### @@@@ START REPLACEMENT @@@@ ###
-                      * WHY: upgrade to SS4
-                      * OLD: $className (case sensitive)
-                      * NEW: $className (COMPLEX)
-                      * EXP: Check if the class name can still be used as such
-                      * ### @@@@ STOP REPLACEMENT @@@@ ###
-                      */
                     } elseif (isset($inclusion[$className])) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                         $array[$className] = $inclusion[$className];
                     }
                 } else {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                     $array[$className] = $title;
                 }
             }
@@ -150,24 +88,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     {
         $array = array();
 
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         foreach ($filterArray as $className) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $array += ClassInfo::subclassesFor($className);
         }
         return array("DataObjectClassName" => $array);
