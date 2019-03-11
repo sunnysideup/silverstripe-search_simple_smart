@@ -11,7 +11,10 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Connect\MySQLSchemaManager;
 use SilverStripe\Core\Flushable;
+use SilverStripe\Control\Director;
+use SilverStripe\Security\Security;
 
 /**
  *
@@ -31,6 +34,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     {
         self::export_keyword_list();
     }
+
     /*
      * @var string
      */
@@ -124,7 +128,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         'SearchFields' => array(
             'type' => 'fulltext',
             'name' => 'SearchFields',
-            'value' => '"Keyword"'
+            'columns' => ['Keyword']
         )
     );
 
@@ -133,7 +137,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      * @var array
      */
     private static $create_table_options = array(
-        'MySQLDatabase' => 'ENGINE=MyISAM'
+        MySQLSchemaManager::ID => 'ENGINE=MyISAM'
     );
 
 
@@ -172,20 +176,22 @@ class SearchEngineKeyword extends DataObject implements Flushable
                 return "no new file created as the current one is less than 120 seconds old.";
             //do nothing
             } else {
-                $rows = DB::query("SELECT \"Keyword\" FROM \"SearchEngineKeyword\" ORDER BY \"Keyword\";");
-                $array = [];
-                foreach ($rows as $row) {
-                    $array[] = str_replace('"', "", Convert::raw2js($row["Keyword"]));
+                if(Security::database_is_ready() && 1 === 2) {
+                    $rows = DB::query("SELECT \"Keyword\" FROM \"SearchEngineKeyword\" ORDER BY \"Keyword\";");
+                    $array = [];
+                    foreach ($rows as $row) {
+                        $array[] = str_replace('"', "", Convert::raw2js($row["Keyword"]));
+                    }
+                    $written = null;
+                    if ($fh = fopen($fileName, 'w')) {
+                        $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = [\"".implode("\",\"", $array)."\"];");
+                        fclose($fh);
+                    }
+                    if (!$written) {
+                        user_error("Could not write keyword list to $fileName", E_USER_NOTICE);
+                    }
+                    return "Writting: <br />".implode("<br />", $array);
                 }
-                $written = null;
-                if ($fh = fopen($fileName, 'w')) {
-                    $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = [\"".implode("\",\"", $array)."\"];");
-                    fclose($fh);
-                }
-                if (!$written) {
-                    user_error("Could not write keyword list to $fileName", E_USER_NOTICE);
-                }
-                return "Writting: <br />".implode("<br />", $array);
             }
         } else {
             return "no file name specified";
@@ -206,7 +212,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         }
         $myFolder = Folder::find_or_make($myFolderName);
         if ($includeBase) {
-            return $myFolder->getFullPath().$fileName;
+            return Director::baseFolder().'/'.$myFolder->getFilename();
         } else {
             return $myFolder->FileName.$fileName;
         }

@@ -6,6 +6,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Connect\MySQLSchemaManager;
 
 /**
  * Full Content for each dataobject, separated by level of importance.
@@ -46,7 +47,7 @@ class SearchEngineFullContent extends DataObject
      */
     private static $db = array(
         "Level" => "Int(1)",
-        "Content" => "Text"
+        "Content" => "Varchar(3000)"
     );
 
     /*
@@ -64,7 +65,7 @@ class SearchEngineFullContent extends DataObject
         'SearchFields' => array(
             'type' => 'fulltext',
             'name' => 'SearchFields',
-            'value' => '"Content"'
+            'columns' => ['Content']
         )
     );
 
@@ -110,7 +111,7 @@ class SearchEngineFullContent extends DataObject
      * @var array
      */
     private static $create_table_options = array(
-        'MySQLDatabase' => 'ENGINE=MyISAM'
+        MySQLSchemaManager::ID => 'ENGINE=MyISAM'
     );
 
     /**

@@ -1,6 +1,5 @@
 ---
-Name: search_simple_smart_routs
-After: framework/routes#coreroutes
+Name: search_simple_smart_routes
 ---
 SilverStripe\Control\Director:
   rules:

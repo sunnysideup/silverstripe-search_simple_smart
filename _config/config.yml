@@ -1,10 +1,5 @@
 ---
 Name: search_simple_smart
-After:
-  - 'framework/*'
-  - 'cms/*'
-Before:
-  - 'app/*'
 ---
 Page:
   extensions:
@@ -27,4 +22,4 @@ SilverStripe\Admin\LeftAndMain:
   extra_requirements_css:
     - 'sunnysideup/search_simple_smart: client/css/CMS.css'
   extra_requirements_javascript:
-    - 'sunnysideup/search_simple_smart: client/javascript/CMS.js
+    - 'sunnysideup/search_simple_smart: client/javascript/CMS.js'

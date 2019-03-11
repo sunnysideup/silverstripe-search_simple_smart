@@ -116,10 +116,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
         //see: http://xpo6.com/download-stop-word-list/
         if (Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words") === true) {
             $size = Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words_length");
-            $stopwords = Config::inst()->get(SearchEngineStopWords::class, 'list_'.$size);
-            if(! ($stopwords && is_array($stopwords)) {
-                user_error('Stopword list specified is not correct, choose from short, medium, long, extra_long, your entry is: '.$size)
-            }
+            $stopwords = SearchEngineStopWords::get_list($size);
             foreach ($stopwords as $stopword) {
                 if (!self::is_listed($stopword)) {
                     DB::alteration_message("Creating stop word: $stopword", "created");
