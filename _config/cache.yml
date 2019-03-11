@@ -1,5 +1,5 @@
 ---
-Name: mycache
+Name: search_simple_smart_cache
 ---
 SilverStripe\Core\Injector\Injector:
   Psr\SimpleCache\CacheInterface.myCache:

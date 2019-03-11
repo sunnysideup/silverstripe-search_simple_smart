@@ -1,5 +1,5 @@
 ---
-Name: searchengine_extras
+Name: my_search_simple_smart
 After:
   - 'framework/*'
   - 'cms/*'

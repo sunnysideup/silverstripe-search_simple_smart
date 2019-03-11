@@ -1,5 +1,5 @@
 ---
-Name: searchengineroutes
+Name: search_simple_smart_routs
 After: framework/routes#coreroutes
 ---
 SilverStripe\Control\Director:
