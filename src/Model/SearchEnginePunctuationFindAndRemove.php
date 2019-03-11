@@ -9,6 +9,17 @@ use SilverStripe\ORM\DataObject;
 
 class SearchEnginePunctuationFindAndRemove extends DataObject
 {
+    /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEnginePunctuationFindAndRemove';
+
+    /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineAdvancedSettings';
 
     /**
      * @var string

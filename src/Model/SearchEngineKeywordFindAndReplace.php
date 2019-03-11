@@ -12,6 +12,11 @@ use SilverStripe\ORM\DataObject;
 
 class SearchEngineKeywordFindAndReplace extends DataObject
 {
+    /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineKeywordFindAndReplace';
 
     /**
      * @var string

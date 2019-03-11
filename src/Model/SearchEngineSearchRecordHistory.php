@@ -17,6 +17,13 @@ class SearchEngineSearchRecordHistory extends DataObject
 {
 
     /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineSearchRecordHistory';
+
+
+    /**
      * @var string
      */
     private static $singular_name = "Search History";
