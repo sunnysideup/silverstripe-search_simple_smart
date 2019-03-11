@@ -163,7 +163,7 @@ class SearchEngineDataObject extends DataObject
         Folder::class
     );
 
-    private static $_find_or_make_items = array();
+    private static $_find_or_make_items = [];
 
     /**
      *
@@ -207,7 +207,7 @@ class SearchEngineDataObject extends DataObject
     public static function searchable_class_names()
     {
         $classes = ClassInfo::subclassesFor(DataObject::class);
-        $array = array();
+        $array = [];
         foreach ($classes as $className) {
             if (!in_array($className, Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))) {
                 if ($className::has_extension(SearchEngineMakeSearchable::class)) {
@@ -235,7 +235,7 @@ class SearchEngineDataObject extends DataObject
      * used for caching...
      * @var array
      */
-    private static $_object_class_name = array();
+    private static $_object_class_name = [];
 
     /**
      * @casted variable
@@ -365,7 +365,7 @@ class SearchEngineDataObject extends DataObject
         return "searchenginerecordclick/add/".$this->ID."/";
     }
 
-    private static $_special_sort_group = array();
+    private static $_special_sort_group = [];
 
     /**
      * if there are special sorts groups this method helps to

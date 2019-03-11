@@ -2,7 +2,7 @@ mappings:
   SearchEngineProviderMYSQLFullText: Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText
   SearchEngineRecordClick: Sunnysideup\SearchSimpleSmart\Control\SearchEngineRecordClick
   SearchEngineSortByRelevance: Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance
-  SearchEngineSortByDate: Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByDate
+  SearchEngineSortByLastEdited: Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByLastEdited
   SearchEngineFilterForDescriptor: Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor
   SearchEngineSearchEngineProvider: Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider
   SearchEngineCoreMachineProvider: Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineCoreMachineProvider

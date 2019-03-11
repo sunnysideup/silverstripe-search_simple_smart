@@ -14,7 +14,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      * list of classes that should be "filterable"
      * @var array
      */
-    private static $classes_to_include = array();
+    private static $classes_to_include = [];
 
     /**
      * @return String
@@ -43,11 +43,11 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      */
     public function getFilterList()
     {
-        $array = array();
+        $array = [];
         $filterArray = SearchEngineDataObject::searchable_class_names();
         $exclude = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
         if (!is_array($exclude)) {
-            $exclude = array();
+            $exclude = [];
         }
         $checkInclusion = false;
         $include = $this->Config()->get("classes_to_include");
@@ -86,7 +86,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      */
     public function getSqlFilterArray($filterArray, $debug = false)
     {
-        $array = array();
+        $array = [];
 
         foreach ($filterArray as $className) {
             $array += ClassInfo::subclassesFor($className);

@@ -4,9 +4,10 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\ORM\FieldType\DBDate;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use SilverStripe\CMS\Model\VirtualPage;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 
-class SearchEngineSortByDate extends SearchEngineSortByDescriptor
+class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
 {
 
     /**
@@ -14,7 +15,7 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineSortByDate.TITLE", DBDate::class);
+        return _t("SearchEngineSortByLastEdited.TITLE", DBDate::class);
     }
 
     /**
@@ -66,14 +67,18 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
         if ($objects->count() < 2) {
             //do nothing
         } else {
-            $finalArray = $this->makeClassGroups(
-                $objects->Map("ID", "DataObjectClassName")->toArray(),
-                $debug
-            );
-            //retrieve objects
-            $objects = SearchEngineDataObject::get()
-                ->filter(array("ID" => array_keys($finalArray)))
-                ->sort("FIELD(\"ID\", ".implode(",", array_keys($finalArray)).")");
+            if($this->hasClassGroups()) {
+                $finalArray = $this->makeClassGroups(
+                    $objects->Map("ID", "DataObjectClassName")->toArray(),
+                    $debug
+                );
+                //retrieve objects
+                $keys = array_keys($finalArray);
+                //retrieve objects
+                $objects = SearchEngineDataObject::get()
+                    ->filter(array("ID" => $keys))
+                    ->sort("FIELD(\"ID\", ".implode(",", $keys).")");
+            }
         }
         return $objects;
     }

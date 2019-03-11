@@ -8,8 +8,13 @@ Before:
   - 'app/*'
 ---
 
+
+PageController:
+  extensions:
+    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineContentControllerExtension
+
 SearchEngineCoreSearchMachine:
-  class_name_for_search_provision: 'SearchEngineProviderMYSQLFullText'
+  class_name_for_search_provision: SearchEngineProviderMYSQLFullText
 
 
 SearchEngineKeyword:
@@ -34,23 +39,11 @@ SearchEngineFullContent:
 SearchEngineKeywordFindAndRemove:
   add_stop_words: true
 
-SearchEngineRemoveAll:
-  all_tables:
-    - SearchEngineDataObject
-    - SearchEngineDataObjectToBeIndexed
-    - SearchEngineFullContent
-    - SearchEngineKeyword
-
 SearchEngineDataObject:
   classes_to_exclude:
     - ErrorPage
-    - Image_Cached
-    - VirtualPage
     - RedirectorPage
-    - Folder
-
-SearchEngineFullContent:
-  remove_all_non_alpha_numeric: false
+    - VirtualPage
 
 SearchEngineDataObjectToBeIndexed:
   cron_job_running: true
@@ -72,7 +65,7 @@ SearchEngineBasicForm:
   full_results_page_type: "MySearchResultsPage"
   sort_by_options:
     - SearchEngineSortByRelevance
-    - SearchEngineSortByDate
+    - SearchEngineSortByLastEdited
   filter_for_options:
     - SearchEngineFilterForClassName
     - SearchEngineFilterForRecent

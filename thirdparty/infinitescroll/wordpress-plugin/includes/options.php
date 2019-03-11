@@ -8,7 +8,7 @@ class Infinite_Scroll_Options {
 
 	//default scope for options when called directly,
 	//choices: site, user, or global (user option across sites)
-	public $defaults = array();
+	public $defaults = [];
 	private $parent;
 
 	/**

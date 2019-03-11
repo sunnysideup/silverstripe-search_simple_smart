@@ -1,6 +1,6 @@
 en_US:
   #sort
-  SearchEngineSortByDate:
+  SearchEngineSortByLastEdited:
     TITLE: 'Date'
   SearchEngineSortByRelevance:
     TITLE: 'Relevance'

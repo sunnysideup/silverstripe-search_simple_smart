@@ -40,17 +40,10 @@ class SearchEngineMakeSearchable extends DataExtension
 
     /**
      * List of FIelds that are level one (most important)
+     * e.g. Title, Name, etc...
      * @var Array
      */
-    private static $default_level_one_fields = array(
-        "Title",
-        "Name",
-        "FirstName",
-        "Surname",
-        "MetaTitle",
-        "MenuTitle",
-        'Email'
-    );
+    private static $default_level_one_fields = [];
 
     /**
      * List of fields that should not be included by default
@@ -128,7 +121,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     return array($template);
                 }
             } else {
-                $arrayOfTemplates = array();
+                $arrayOfTemplates = [];
                 $parentClasses = class_parents($this->owner);
                 $firstTemplate = "SearchEngineResultItem_".$this->owner->ClassName;
                 if ($moreDetails) {
@@ -442,7 +435,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineFullContentForIndexing()
     {
-        $finalArray = array();
+        $finalArray = [];
         if ($this->owner->hasMethod("SearchEngineFullContentForIndexingProvider")) {
             $finalArray = $this->owner->SearchEngineFullContentForIndexingProvider();
         } else {
@@ -521,7 +514,7 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @var array
      */
-    private $_array_of_relations = array();
+    private $_array_of_relations = [];
 
     /**
      * returns db, has_one, has_many, many_many, or belongs_many_many fields
@@ -538,7 +531,7 @@ class SearchEngineMakeSearchable extends DataExtension
             $this->_array_of_relations[$this->owner->ID] = [];
         }
         if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName])) {
-            $this->_array_of_relations[$this->owner->ID][$object->ClassName] = array();
+            $this->_array_of_relations[$this->owner->ID][$object->ClassName] = [];
         }
         if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType])) {
             $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType] = $object->$relType();

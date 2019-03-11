@@ -48,7 +48,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      */
     public function getSqlSortArray($debug = false)
     {
-        return array();
+        return [];
     }
 
     /**
@@ -81,19 +81,19 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //and further upfront in text as second sort by.
             if (count(explode(" ", $searchRecord->Phrase) > 1)) {
                 $sql = '
-					SELECT
-						"SearchEngineDataObjectID" AS ItemID,
-						"DataObjectClassName" AS ItemClassName,
-						LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content") AS FIRSTPOSITION
-					FROM "SearchEngineFullContent"
-						INNER JOIN "SearchEngineDataObject"
-							ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
-					WHERE
-						"Content" LIKE \'%'.Convert::raw2sql($searchRecord->Phrase).'%\'
-						AND "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-					ORDER BY
-						"Level" ASC,
-						FIRSTPOSITION ASC;';
+                    SELECT
+                        "SearchEngineDataObjectID" AS ItemID,
+                        "DataObjectClassName" AS ItemClassName,
+                        LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content") AS FIRSTPOSITION
+                    FROM "SearchEngineFullContent"
+                        INNER JOIN "SearchEngineDataObject"
+                            ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
+                    WHERE
+                        "Content" LIKE \'%'.Convert::raw2sql($searchRecord->Phrase).'%\'
+                        AND "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
+                    ORDER BY
+                        "Level" ASC,
+                        FIRSTPOSITION ASC;';
                 $rows = DB::query($sql);
                 foreach ($rows as $row) {
                     if (!isset($array[$row["ItemID"]])) {
@@ -103,27 +103,32 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             }
             //fulltext using relevance, level 1 first.
             $sql = '
-				SELECT "SearchEngineDataObjectID" AS ItemID,"DataObjectClassName" AS ItemClassName, MATCH ("Content") AGAINST (\''.$searchRecord->FinalPhrase.'\') AS RELEVANCE
-				FROM "SearchEngineFullContent"
-						INNER JOIN "SearchEngineDataObject"
-							ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
-				WHERE "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-					AND "SearchEngineDataObjectID" NOT IN ('.implode(",", array_keys($array)).')
-				ORDER BY "Level", RELEVANCE DESC';
+                SELECT "SearchEngineDataObjectID" AS ItemID,"DataObjectClassName" AS ItemClassName, MATCH ("Content") AGAINST (\''.$searchRecord->FinalPhrase.'\') AS RELEVANCE
+                FROM "SearchEngineFullContent"
+                        INNER JOIN "SearchEngineDataObject"
+                            ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
+                WHERE "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
+                    AND "SearchEngineDataObjectID" NOT IN ('.implode(",", array_keys($array)).')
+                ORDER BY "Level", RELEVANCE DESC';
             $rows = DB::query($sql);
             foreach ($rows as $row) {
                 if (!isset($array[$row["ItemID"]])) {
                     $array[$row["ItemID"]] = $row["ItemClassName"];
                 }
             }
-            $finalArray = $this->makeClassGroups(
-                $array,
-                $debug
-            );
+            if($this->hasClassGroups()) {
+                $finalArray = $this->makeClassGroups(
+                    $array,
+                    $debug
+                );
+            } else {
+                $finalArray = $array;
+            }
+            $keys = array_keys($finalArray);
             //retrieve objects
             $objects = SearchEngineDataObject::get()
-                ->filter(array("ID" => array_keys($finalArray)))
-                ->sort("FIELD(\"ID\", ".implode(",", array_keys($finalArray)).")");
+                ->filter(array("ID" => $keys))
+                ->sort("FIELD(\"ID\", ".implode(",", $keys).")");
         }
         return $objects;
     }

@@ -85,7 +85,7 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
         return $this->_mySearchEngineCustomForm;
     }
 
-    public function SearchEngineClearHistoryID()
+    protected function SearchEngineClearHistoryID()
     {
         //clear old history
         if (Director::is_ajax()) {
@@ -104,7 +104,7 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
     public function SearchEngineKeywordsPhrase()
     {
         $val = isset($_GET["SearchEngineKeywords"]) ? $_GET["SearchEngineKeywords"] : "";
-        
+
         return DBField::create_field("Varchar", $val);
     }
 }
