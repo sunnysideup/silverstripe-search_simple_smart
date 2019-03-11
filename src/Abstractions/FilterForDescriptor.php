@@ -12,16 +12,13 @@ use SilverStripe\View\ViewableData;
  */
 
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD:  extends Object (ignore case)
-  * NEW:  extends ViewableData (COMPLEX)
-  * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-abstract class SearchEngineFilterForDescriptor extends ViewableData
+
+abstract class SearchEngineFilterForDescriptor
 {
+
+    // use Extensible;
+    // use Injectable;
+    // use Configurable;
 
     /**
      * returns the name - e.g. "Pages Only", "Files Only"
