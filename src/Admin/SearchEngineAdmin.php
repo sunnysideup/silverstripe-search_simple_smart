@@ -36,8 +36,8 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     public function providePermissions()
     {
         return array(
-         'SEARCH_ENGINE_ADMIN' => 'Administer Search Engine'
-     );
+            'SEARCH_ENGINE_ADMIN' => 'Administer Search Engine'
+        );
     }
 
     /*

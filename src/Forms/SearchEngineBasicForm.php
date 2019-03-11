@@ -2,21 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Forms;
 
-use OptionSetField;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+use SilverStripe\Forms\OptionsetField;
 
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\FieldList;
@@ -199,7 +185,7 @@ class SearchEngineBasicForm extends Form
                 if ($this->includeSort) {
                     $this->Fields()->insertAfter(
                         //TextField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
-                        OptionSetField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
+                        OptionsetField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
                         "SearchEngineKeywords"
                     );
                 } else {
