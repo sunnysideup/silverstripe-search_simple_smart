@@ -39,17 +39,17 @@ class SearchEngineMakeSearchable extends DataExtension
 
 
     /**
-     * List of FIelds that are level one (most important)
+     * List of Fields that are level one (most important)
      * e.g. Title, Name, etc...
      * @var Array
      */
-    private static $default_level_one_fields = [];
+    private static $search_engine_default_level_one_fields = [];
 
     /**
      * List of fields that should not be included by default
      * @var Array
      */
-    private static $default_excluded_db_fields = array(
+    private static $search_engine_default_excluded_db_fields = array(
         "ReportClass",
         "CanViewType",
         "ExtraMeta",
@@ -86,6 +86,7 @@ class SearchEngineMakeSearchable extends DataExtension
     public function SearchEngineDataObjectFullContent()
     {
         $item = SearchEngineDataObject::find_or_make($this->owner);
+
         return $item->SearchEngineFullContents();
     }
 
@@ -97,6 +98,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $item = SearchEngineDataObject::find_or_make($this->owner);
         $field = "SearchEngineKeywords_Level".$level;
+
         return $item->$field();
     }
 
@@ -142,6 +144,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     $arrayOfTemplates[]= "SearchEngineResultItem_DataObject_MoreDetails";
                 }
                 $arrayOfTemplates[] = "SearchEngineResultItem_DataObject";
+
                 return $arrayOfTemplates;
             }
         }
@@ -282,10 +285,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function onBeforeDelete()
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner, true);
-        if ($item && $item->exists()) {
-            $item->delete();
-        }
+        $this->SearchEngineDeleteFromIndexing();
         //todo: make sure that the linked objects are also reindexed.
     }
 
@@ -296,10 +296,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function onAfterUnpublish()
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner, true);
-        if ($item && $item->exists()) {
-            $item->delete();
-        }
+        $this->SearchEngineDeleteFromIndexing();
         //todo: make sure that the linked objects are also reindexed.
     }
 
@@ -312,11 +309,16 @@ class SearchEngineMakeSearchable extends DataExtension
         $alsoTrigger = $this->owner->SearchEngineAlsoTrigger();
         if (is_array($alsoTrigger) && count($alsoTrigger)) {
             foreach ($alsoTrigger as $details) {
-
                 $className = $details["ClassName"];
                 $id = $details["ID"];
                 $obj = $className::get()->byID($id);
-                $obj->write();
+                if($obj->hasExtension(Versioned::class)) {
+                    if ($obj->isPublished()) {
+                        $obj->writeToStage('Live');
+                    }
+                } else {
+                    $obj->write();
+                }
             }
         }
     }
@@ -332,14 +334,12 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function onAfterWrite()
     {
-        $exclude = false;
-        if(!isset($this->_onAfterWriteCount[$this->owner->ID])) {
-            $this->_onAfterWriteCount[$this->owner->ID] = 0;
-        }
-        $exclude = $this->SearchEngineExcludeFromIndex();
-        if ($exclude) {
+        if ($this->SearchEngineExcludeFromIndex()) {
             //do nothing...
         } else {
+            if(!isset($this->_onAfterWriteCount[$this->owner->ID])) {
+                $this->_onAfterWriteCount[$this->owner->ID] = 0;
+            }
             $item = SearchEngineDataObject::find_or_make($this->owner);
             if ($item && $this->_onAfterWriteCount[$this->owner->ID]++ < 2) {
                 $item->write();
@@ -356,7 +356,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $exclude = false;
         $alwaysExclude = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
-        if (in_array($this->owner->ClassName, $alwaysExclude)) {
+        if (in_array($this->owner->ClassName, $alwaysExclude) || is_subclass_of($this->owner->ClassName, $alwaysExclude)) {
             $exclude = true;
         } else {
             if ($this->owner->hasMethod("SearchEngineExcludeFromIndexProvider")) {
@@ -377,13 +377,18 @@ class SearchEngineMakeSearchable extends DataExtension
         //search index.
         if ($exclude) {
             $exclude = true;
-            if ($item = SearchEngineDataObject::find_or_make($this->owner, true)) {
-                if ($item && $item->exists()) {
-                    $item->delete();
-                }
-            }
+            $this->SearchEngineDeleteFromIndexing();
         }
         return $exclude;
+    }
+
+    public function SearchEngineDeleteFromIndexing()
+    {
+        if ($item = SearchEngineDataObject::find_or_make($this->owner, true)) {
+            if ($item && $item->exists()) {
+                $item->delete();
+            }
+        }
     }
 
     /**
@@ -398,8 +403,8 @@ class SearchEngineMakeSearchable extends DataExtension
         if (is_array($levelFields) && count($levelFields)) {
             //do nothing
         } else {
-            $levelOneFieldArray = Config::inst()->get(SearchEngineMakeSearchable::class, "default_level_one_fields");
-            $excludedFieldArray = Config::inst()->get(SearchEngineMakeSearchable::class, "default_excluded_db_fields");
+            $levelOneFieldArray = Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields");
+            $excludedFieldArray = Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields");
             $dbArray = $this->searchEngineRelFields($this->owner, "db");
             $levelFields = array(SearchEngineKeyword::level_sanitizer(1) => array(), SearchEngineKeyword::level_sanitizer(2) => array());
             foreach ($dbArray as $field => $type) {
@@ -464,7 +469,9 @@ class SearchEngineMakeSearchable extends DataExtension
 
     /**
      * @param DataObject $object
-     * @param array $fields
+     * @param array $fields array of TWO items.  The first specifies the relation,
+     *                      the second one the method that should be run on the relation (if any)
+     *                      you can also specific more relations ...
      *
      * @return array
      */
@@ -473,8 +480,17 @@ class SearchEngineMakeSearchable extends DataExtension
         if (count($fields) == 0 || !is_array($fields)) {
             $str .= $object->getTitle();
         } else {
-            $dbArray = $this->searchEngineRelFields($object, "db");
             $fieldCount = count($fields);
+            $possibleMethod = $fields[0];
+            if(substr($possibleMethod, 0, 3) === 'get' &&  $object->hasMethod($possibleMethod)) {
+                if ($fieldCount == 1) {
+                    $str .= $object->$possibleMethod()." ";
+                } elseif ($fieldCount == 2) {
+                    $secondMethod = $fields[1];
+                    $str .= $this->owner->$possibleMethod()->$secondMethod()." ";
+                }
+            }
+            $dbArray = $this->searchEngineRelFields($object, "db");
             //db field
             if (isset($dbArray[$fields[0]])) {
                 if ($fieldCount == 1) {
@@ -487,16 +503,21 @@ class SearchEngineMakeSearchable extends DataExtension
             //has one relation
             else {
                 $method = array_shift($fields);
-                $hasOneArray = $this->searchEngineRelFields($object, "has_one");
+                $hasOneArray = array_merge(
+                    $this->searchEngineRelFields($object, "has_one"),
+                    $this->searchEngineRelFields($object, "belongs_to")
+                );
+                //has_one relation
                 if (isset($hasOneArray[$method])) {
                     $foreignObject = $this->owner->$method();
-                    $str .= $this->searchEngineRelObject($foreignObject, $fields, $str)." ";
+                    $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
                 }
                 //many relation
                 else {
                     $manyArray = array_merge(
                         $this->searchEngineRelFields($object, "has_many"),
-                        $this->searchEngineRelFields($object, "many_many")
+                        $this->searchEngineRelFields($object, "many_many"),
+                        $this->searchEngineRelFields($object, "belongs_many_many")
                     );
                     if (isset($manyArray[$method])) {
                         $foreignObjects = $this->owner->$method()->limit(100);
@@ -507,6 +528,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 }
             }
         }
+
         return $str;
     }
 
@@ -527,15 +549,12 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private function searchEngineRelFields($object, $relType)
     {
-        if (! isset($this->_array_of_relations[$this->owner->ID])) {
-            $this->_array_of_relations[$this->owner->ID] = [];
+        if (!isset($this->_array_of_relations[$object->ClassName])) {
+            $this->_array_of_relations[$object->ClassName] = [];
         }
-        if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName])) {
-            $this->_array_of_relations[$this->owner->ID][$object->ClassName] = [];
+        if (!isset($this->_array_of_relations[$object->ClassName][$relType])) {
+            $this->_array_of_relations[$object->ClassName][$relType] = $object->stat($relType);
         }
-        if (!isset($this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType])) {
-            $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType] = $object->stat($relType);
-        }
-        return $this->_array_of_relations[$this->owner->ID][$object->ClassName][$relType];
+        return $this->_array_of_relations[$object->ClassName][$relType];
     }
 }
