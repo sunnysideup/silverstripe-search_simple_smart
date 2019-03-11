@@ -17,6 +17,11 @@ use SilverStripe\ORM\DataObject;
 
 class SearchEngineDataObjectToBeIndexed extends DataObject
 {
+    /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineDataObjectToBeIndexed';
 
     /**
      * @var string

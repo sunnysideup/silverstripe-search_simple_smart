@@ -25,6 +25,12 @@ class SearchEngineDataObject extends DataObject
 {
 
     /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineDataObject';
+
+    /**
      * @var string
      */
     private static $singular_name = "Searchable Item";

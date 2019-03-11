@@ -9,6 +9,11 @@ use SilverStripe\ORM\DataObject;
 
 class SearchEngineKeywordFindAndRemove extends DataObject
 {
+    /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineKeywordFindAndRemove';
 
     /*
      * @var string

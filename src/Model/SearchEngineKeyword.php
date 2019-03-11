@@ -21,6 +21,12 @@ use SilverStripe\Core\Flushable;
 
 class SearchEngineKeyword extends DataObject implements Flushable
 {
+    /**
+     * Defines the database table name
+     * @var string
+     */
+    private static $table_name = 'SearchEngineKeyword';
+
     public static function flush()
     {
         self::export_keyword_list();
