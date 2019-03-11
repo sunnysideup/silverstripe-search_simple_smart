@@ -16,7 +16,7 @@ SearchEngineKeyword:
   keyword_list_folder_name: "_searchengine_json"
 
 SearchEngineMakeSearchable:
-  default_level_one_fields:
+  search_engine_default_level_one_fields:
     - Title
     - Name
     - FirstName
@@ -24,7 +24,7 @@ SearchEngineMakeSearchable:
     - MetaTitle
     - MenuTitle
     - Email
-  default_excluded_db_fields:
+  search_engine_default_excluded_db_fields:
     - Password
 
 SearchEngineFullContent:
