@@ -14,17 +14,13 @@ use SilverStripe\View\ViewableData;
  */
 
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD:  extends Object (ignore case)
-  * NEW:  extends ViewableData (COMPLEX)
-  * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-abstract class SearchEngineSortByDescriptor extends ViewableData
+abstract class SearchEngineSortByDescriptor
 {
 
+
+    // use Extensible;
+    // use Injectable;
+    // use Configurable;
 
     /**
      * this is a metasorter, allowing you to always
@@ -108,14 +104,6 @@ abstract class SearchEngineSortByDescriptor extends ViewableData
                     $classGroupCounts[$key] = 0;
                 }
 
-                /**
-                  * ### @@@@ START REPLACEMENT @@@@ ###
-                  * WHY: upgrade to SS4
-                  * OLD: $className (case sensitive)
-                  * NEW: $className (COMPLEX)
-                  * EXP: Check if the class name can still be used as such
-                  * ### @@@@ STOP REPLACEMENT @@@@ ###
-                  */
                 foreach ($array as $id => $className) {
 
 /**
