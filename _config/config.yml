@@ -4,26 +4,21 @@ After:
   - 'framework/*'
   - 'cms/*'
 Before:
-  - 'mysite/*'
+  - 'app/*'
 ---
-
 Page:
   extensions:
-    - SearchEngineMakeSearchable
-
-SiteConfig:
+    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - SearchEngineSiteConfigExtension
-
-ErrorPage:
+    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineSiteConfigExtension
+SilverStripe\ErrorPage\ErrorPage:
   search_engine_exclude_from_index: true
-
-ContentController:
+SilverStripe\CMS\Controllers\ContentController:
   extensions:
-    - SearchEngineContentControllerExtension
-
-LeftAndMain:
+    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineContentControllerExtension
+SilverStripe\Admin\LeftAndMain:
   extra_requirements_css:
-    - "searchengine/css/SearchEngineCMS.css"
+    - searchengine/css/SearchEngineCMS.css
   extra_requirements_javascript:
-    - "searchengine/javascript/CMS.js"
+    - searchengine/javascript/CMS.js

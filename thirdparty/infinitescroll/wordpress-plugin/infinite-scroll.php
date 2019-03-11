@@ -1,4 +1,6 @@
 <?php
+
+use SilverStripe\i18n\i18n;
 /*
 Plugin Name: Infinite Scroll
 Description: Automatically loads the next page of posts into the bottom of the initial page.
@@ -71,7 +73,7 @@ class Infinite_Scroll {
 		add_action( 'admin_init', array( &$this, 'upgrade_check' ) );
 
 		//i18n
-		add_action( 'init', array( &$this, 'i18n' ) );
+		add_action( 'init', array( &$this, i18n::class ) );
 
 		//default options
 		add_action( 'init', array( &$this, 'init_defaults' ) );

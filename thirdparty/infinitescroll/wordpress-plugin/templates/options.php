@@ -1,4 +1,6 @@
 <?php
+
+use SilverStripe\Dev\Debug;
 /**
  * Template to display options page
  * @package Infinite_Scroll
@@ -114,7 +116,7 @@
 	</tr>
 	<tr valign="top">
 		<th scope="row">
-			<?php _e( 'Debug', 'infinite-scroll' ) ?>
+			<?php _e( Debug::class, 'infinite-scroll' ) ?>
 		</th>
 		<td>
 			<input type="checkbox" id="infinite_scroll[debug]" name="infinite_scroll[debug]" value="true" <?php checked($this->parent->options->debug) ?> />

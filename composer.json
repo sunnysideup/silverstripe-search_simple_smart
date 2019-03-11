@@ -1,6 +1,6 @@
 {
     "name": "sunnysideup/search_simple_smart",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "description": "Silverstripe Module that allows you to set up complex search algorythms in an easyway",
     "keywords": [
         "Silverstripe-CMS",
@@ -22,7 +22,18 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~3.6",
-        "silverstripe/cms": "~3.6"
+        "silverstripe/recipe-cms": "^4.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sunnysideup\\SearchSimpleSmart\\": "src/"
+        }
+    },
+    "extra": {
+        "expose": [
+            "client/javascript",
+            "client/images",
+            "client/css"
+        ]
     }
 }
