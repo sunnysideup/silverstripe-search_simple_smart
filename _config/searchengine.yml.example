@@ -86,4 +86,3 @@ SearchEngineFilterForClassName:
   classes_to_include:
     MyDataObjectFooBarThing: 'Title goes here'
     MyOtherPage: 'Title goes here'
-
