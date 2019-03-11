@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use SearchEngineStemming;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStemming;
 
 use SilverStripe\Security\Security;
 use SilverStripe\ORM\DB;
