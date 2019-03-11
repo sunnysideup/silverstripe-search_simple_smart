@@ -388,37 +388,12 @@ class SearchEngineBasicForm extends Form
         $options = Config::inst()->get(SearchEngineBasicForm::class, "sort_by_options");
         $array = array();
 
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         foreach ($options as $key => $className) {
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $provider = Injector::inst()->get($className);
             if (!$provider instanceof SearchEngineSortByDescriptor) {
                 user_error($provider->ClassName."should extend SearchEngineSortByDescriptor - like so: class <u>".$provider->ClassName." extends SearchEngineSortByDescriptor</u>");
             }
-
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: $className (case sensitive)
-              * NEW: $className (COMPLEX)
-              * EXP: Check if the class name can still be used as such
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             $array[$className] = $provider->getShortTitle();
         }
 
@@ -434,39 +409,14 @@ class SearchEngineBasicForm extends Form
         $options = Config::inst()->get(SearchEngineBasicForm::class, "filter_for_options");
         $array = array();
 
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         foreach ($options as $key => $className) {
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $provider = Injector::inst()->get($className);
             if (!$provider instanceof SearchEngineFilterForDescriptor) {
                 user_error($provider->ClassName."should extend SearchEngineFilterForDescriptor - like so: class <u>".$provider->ClassName." extends SearchEngineFilterForDescriptor</u>");
             }
             $optionsToAdd = $provider->getFilterList();
             foreach ($optionsToAdd as $optionKey => $optionValue) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                 $array[$className.".".$optionKey] = $optionValue;
             }
         }

@@ -99,14 +99,6 @@ class SearchEngineSearchRecordHistory extends DataObject
             }
         }
 
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: Session:: (case sensitive)
-          * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
-          * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly.
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         Controller::curr()->getRequest()->getSession()->set("SearchEngineSearchRecordHistoryID", $obj->write());
         return $obj;
     }
@@ -157,15 +149,6 @@ class SearchEngineSearchRecordHistory extends DataObject
     {
         if (self::$_latest_search_cache === false) {
             self::$_latest_search_cache = 0;
-
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: Session:: (case sensitive)
-              * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
-              * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly.
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             $id = intval(Controller::curr()->getRequest()->getSession()->get("SearchEngineSearchRecordHistoryID"))-0;
             if ($id) {
                 self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()->byID($id);

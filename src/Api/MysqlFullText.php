@@ -38,18 +38,16 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
  *
  *
  */
+ use SilverStripe\Core\Config\Configurable;
+ use SilverStripe\Core\Injector\Injectable;
+ use SilverStripe\Core\Extensible;
 
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD:  extends Object (ignore case)
-  * NEW:  extends ViewableData (COMPLEX)
-  * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-class SearchEngineProvider_MYSQLFullText extends ViewableData implements SearchEngineSearchEngineProvider
+class SearchEngineProvider_MYSQLFullText implements SearchEngineSearchEngineProvider
 {
+
+    use Extensible;
+    use Injectable;
+    use Configurable;
 
     /*
      * @var array
@@ -79,32 +77,32 @@ class SearchEngineProvider_MYSQLFullText extends ViewableData implements SearchE
             $keywordIDArray = array(0 => 0);
             $rows = DB::query(
                 "
-				SELECT \"SearchEngineKeywordID\"
-				FROM \"SearchEngineSearchRecord_SearchEngineKeywords\"
-				WHERE
-					\"KeywordPosition\" = $i
-					AND \"SearchEngineSearchRecordID\" = ".$this->searchRecord->ID
+                SELECT \"SearchEngineKeywordID\"
+                FROM \"SearchEngineSearchRecord_SearchEngineKeywords\"
+                WHERE
+                    \"KeywordPosition\" = $i
+                    AND \"SearchEngineSearchRecordID\" = ".$this->searchRecord->ID
             );
             foreach ($rows as $row) {
                 $keywordIDArray[$row["SearchEngineKeywordID"]] = $row["SearchEngineKeywordID"];
             }
             $rowsLevel1 = DB::query("
-				SELECT \"SearchEngineDataObjectID\"
-				FROM SearchEngineKeyword_SearchEngineDataObjects_Level1
-				WHERE \"SearchEngineKeywordID\" IN (".implode(",", $keywordIDArray).")
-				GROUP BY \"SearchEngineDataObjectID\"");
+                SELECT \"SearchEngineDataObjectID\"
+                FROM SearchEngineKeyword_SearchEngineDataObjects_Level1
+                WHERE \"SearchEngineKeywordID\" IN (".implode(",", $keywordIDArray).")
+                GROUP BY \"SearchEngineDataObjectID\"");
             $rowsLevel1Array = array(0 => 0);
             foreach ($rowsLevel1 as $row) {
                 $rowsLevel1Array[$row["SearchEngineDataObjectID"]] = $row["SearchEngineDataObjectID"];
             }
             $rowsLevel2 = DB::query("
-				SELECT \"SearchEngineDataObjectID\"
-				FROM SearchEngineDataObject_SearchEngineKeywords_Level2
-				WHERE
-					\"SearchEngineKeywordID\" IN (".implode(",", $keywordIDArray).") AND
-					\"SearchEngineDataObjectID\" NOT IN (".implode(",", $rowsLevel1Array).")
-				GROUP BY \"SearchEngineDataObjectID\"
-			");
+                SELECT \"SearchEngineDataObjectID\"
+                FROM SearchEngineDataObject_SearchEngineKeywords_Level2
+                WHERE
+                    \"SearchEngineKeywordID\" IN (".implode(",", $keywordIDArray).") AND
+                    \"SearchEngineDataObjectID\" NOT IN (".implode(",", $rowsLevel1Array).")
+                GROUP BY \"SearchEngineDataObjectID\"
+            ");
             $rowsLevel2Array = array(0 => 0);
             foreach ($rowsLevel2 as $row) {
                 $rowsLevel2Array[$row["SearchEngineDataObjectID"]] = $row["SearchEngineDataObjectID"];

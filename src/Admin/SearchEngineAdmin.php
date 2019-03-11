@@ -72,76 +72,14 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         if ($this->modelClass == SearchEngineAdvancedSettings::class) {
             Requirements::customScript("SearchEngineManifest();", "SearchEngineManifest");
 
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: $className (case sensitive)
-              * NEW: $className (COMPLEX)
-              * EXP: Check if the class name can still be used as such
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             $classNames = SearchEngineDataObject::searchable_class_names();
-
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: $className (case sensitive)
-              * NEW: $className (COMPLEX)
-              * EXP: Check if the class name can still be used as such
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             asort($classNames);
             $manifest = "";
-
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: $className (case sensitive)
-              * NEW: $className (COMPLEX)
-              * EXP: Check if the class name can still be used as such
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             if (is_array($classNames) && count($classNames)) {
                 $manifest .= "<div id=\"SearchEngineManifest\"><ul>";
-
-                /**
-                  * ### @@@@ START REPLACEMENT @@@@ ###
-                  * WHY: upgrade to SS4
-                  * OLD: $className (case sensitive)
-                  * NEW: $className (COMPLEX)
-                  * EXP: Check if the class name can still be used as such
-                  * ### @@@@ STOP REPLACEMENT @@@@ ###
-                  */
                 foreach ($classNames as $className => $classNameTitle) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                     $numberOfIndexedObjects = SearchEngineDataObject::get()->filter(array("DataObjectClassName" => $className))->count();
-
-                    /**
-                      * ### @@@@ START REPLACEMENT @@@@ ###
-                      * WHY: upgrade to SS4
-                      * OLD: $className (case sensitive)
-                      * NEW: $className (COMPLEX)
-                      * EXP: Check if the class name can still be used as such
-                      * ### @@@@ STOP REPLACEMENT @@@@ ###
-                      */
                     $manifest .= "<li class=\"".($numberOfIndexedObjects ? "hasEntries" : "doesNotHaveEntries")."\"><h3>$classNameTitle ($numberOfIndexedObjects)</h3><ul>";
-
-                    /**
-                      * ### @@@@ START REPLACEMENT @@@@ ###
-                      * WHY: upgrade to SS4
-                      * OLD: $className (case sensitive)
-                      * NEW: $className (COMPLEX)
-                      * EXP: Check if the class name can still be used as such
-                      * ### @@@@ STOP REPLACEMENT @@@@ ###
-                      */
                     $class = Injector::inst()->get($className);
                     $manifest .= "<li><strong>Fields Indexed (level 1 / 2  is used to determine importance for relevance sorting):</strong>".$class->SearchEngineFieldsToBeIndexedHumanReadable()."</li>";
                     $manifest .= "<li><strong>Templates:</strong>".$this->printNice($class->SearchEngineResultsTemplates(false))."</li>";
@@ -185,11 +123,11 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         $updateVerboseField = ReadonlyField::create("UpdateSearchIndexVerbose", "3. Do index", "<h4><a href=\"/dev/tasks/SearchEngineUpdateSearchIndex?verbose=1&amp;uptonow=1\">Run Task: execute the to be indexed list</a></h4>"),
                         $updateKeywordList = ReadonlyField::create(SearchEngineCreateKeywordJS::class, "4. Update keywords", "<h4><a href=\"/dev/tasks/SearchEngineCreateKeywordJS\">Run Task: update keyword list</a></h4>"),
                         $debugTestField = ReadonlyField::create("DebugTestField", "5. Debug Search", "
-							<h4>
-							To debug a search, please add ?searchenginedebug=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
-							<br /><br />
-							To bypass all caching please add ?flush=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
-						</h4>")
+                            <h4>
+                            To debug a search, please add ?searchenginedebug=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
+                            <br /><br />
+                            To bypass all caching please add ?flush=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
+                        </h4>")
                     ),
                     new Tab(
                         'Manifest',

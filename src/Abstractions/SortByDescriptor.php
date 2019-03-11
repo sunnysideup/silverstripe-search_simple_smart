@@ -4,27 +4,17 @@ namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
-use SilverStripe\View\ViewableData;
 
-/***
- * This is an interface that can be added
- * to any DataObject that is
- *
- *
- */
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Extensible;
 
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD:  extends Object (ignore case)
-  * NEW:  extends ViewableData (COMPLEX)
-  * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-abstract class SearchEngineSortByDescriptor extends ViewableData
+abstract class SearchEngineSortByDescriptor
 {
 
+    use Extensible;
+    use Injectable;
+    use Configurable;
 
     /**
      * this is a metasorter, allowing you to always
@@ -107,37 +97,10 @@ abstract class SearchEngineSortByDescriptor extends ViewableData
                 if (!isset($classGroupCounts[$key])) {
                     $classGroupCounts[$key] = 0;
                 }
-
-                /**
-                  * ### @@@@ START REPLACEMENT @@@@ ###
-                  * WHY: upgrade to SS4
-                  * OLD: $className (case sensitive)
-                  * NEW: $className (COMPLEX)
-                  * EXP: Check if the class name can still be used as such
-                  * ### @@@@ STOP REPLACEMENT @@@@ ###
-                  */
                 foreach ($array as $id => $className) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                     if (in_array($className, $classGroupGroup)) {
                         if ((!isset($classGroupLimits[$key]))  || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
                             $classGroupCounts[$key]++;
-
-                            /**
-                              * ### @@@@ START REPLACEMENT @@@@ ###
-                              * WHY: upgrade to SS4
-                              * OLD: $className (case sensitive)
-                              * NEW: $className (COMPLEX)
-                              * EXP: Check if the class name can still be used as such
-                              * ### @@@@ STOP REPLACEMENT @@@@ ###
-                              */
                             $newArray[$id] = $className;
                         }
                         unset($array[$id]);
@@ -145,24 +108,7 @@ abstract class SearchEngineSortByDescriptor extends ViewableData
                 }
             }
 
-            /**
-              * ### @@@@ START REPLACEMENT @@@@ ###
-              * WHY: upgrade to SS4
-              * OLD: $className (case sensitive)
-              * NEW: $className (COMPLEX)
-              * EXP: Check if the class name can still be used as such
-              * ### @@@@ STOP REPLACEMENT @@@@ ###
-              */
             foreach ($array as $id => $className) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                 $newArray[$id] = $className;
             }
             return $newArray;

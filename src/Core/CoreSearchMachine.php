@@ -13,16 +13,16 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use SilverStripe\View\ViewableData;
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD:  extends Object (ignore case)
-  * NEW:  extends ViewableData (COMPLEX)
-  * EXP: This used to extend Object, but object does not exist anymore. You can also manually add use Extensible, use Injectable, and use Configurable
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-class SearchEngineCoreSearchMachine extends ViewableData
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Extensible;
+
+class SearchEngineCoreSearchMachine
 {
+
+    use Extensible;
+    use Injectable;
+    use Configurable;
 
     /**
      * class used to provide the raw results

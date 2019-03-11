@@ -43,47 +43,11 @@ class SearchEngineIndexAll extends BuildTask
         if ($this->verbose) {
             echo "<h2>Starting</h2>";
         }
-
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         $classNames = SearchEngineDataObject::searchable_class_names();
-
-        /**
-          * ### @@@@ START REPLACEMENT @@@@ ###
-          * WHY: upgrade to SS4
-          * OLD: $className (case sensitive)
-          * NEW: $className (COMPLEX)
-          * EXP: Check if the class name can still be used as such
-          * ### @@@@ STOP REPLACEMENT @@@@ ###
-          */
         foreach ($classNames as $className => $classTitle) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $count = $className::get()->count();
             $j = 0;
             for ($i = 0; $i < $count; $i = $i + 10) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: upgrade to SS4
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                 $objects = $className::get()->limit(10, $i);
                 foreach ($objects as $obj) {
                     if ($obj instanceof SiteTree) {
