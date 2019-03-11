@@ -9,6 +9,7 @@ use SilverStripe\Core\Extensible;
 abstract class SearchEngineFilterForDescriptor
 {
 
+
     use Extensible;
     use Injectable;
     use Configurable;
