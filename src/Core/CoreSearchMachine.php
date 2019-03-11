@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Core;
 
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProvider_MYSQLFullText;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
@@ -32,7 +32,7 @@ class SearchEngineCoreSearchMachine
      *
      * @var string
      */
-    private static $class_name_for_search_provision = SearchEngineProvider_MYSQLFullText::class;
+    private static $class_name_for_search_provision = SearchEngineProviderMYSQLFullText::class;
 
     /**
      *

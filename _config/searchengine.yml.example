@@ -9,7 +9,7 @@ Before:
 ---
 
 SearchEngineCoreSearchMachine:
-  class_name_for_search_provision: 'SearchEngineProvider_MYSQLFullText'
+  class_name_for_search_provision: 'SearchEngineProviderMYSQLFullText'
 
 
 SearchEngineKeyword:
