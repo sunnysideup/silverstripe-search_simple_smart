@@ -1,6 +1,7 @@
 <?php
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
+use SilverStripe\Security\Permission;
 
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
@@ -36,7 +37,7 @@ class SearchEngineDataObject extends DataObject
     private static $singular_name = "Searchable Item";
     public function i18n_singular_name()
     {
-        return self::$singular_name;
+        return $this->Config()->get('singular_name');
     }
 
     /**
@@ -45,7 +46,7 @@ class SearchEngineDataObject extends DataObject
     private static $plural_name = "Searchable Items";
     public function i18n_plural_name()
     {
-        return self::$plural_name;
+        return $this->Config()->get('plural_name');
     }
 
     /**
@@ -152,12 +153,55 @@ class SearchEngineDataObject extends DataObject
     );
 
     /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canEdit($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canDelete($member = null, $context = [])
+    {
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canView($member = null, $context = [])
+    {
+        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
      *
      * @var Array
      */
     private static $classes_to_exclude = array(
         ErrorPage::class,
-        "Image_Cached",
         VirtualPage::class,
         RedirectorPage::class,
         Folder::class
@@ -193,6 +237,7 @@ class SearchEngineDataObject extends DataObject
                 user_error("DataObject expected, instead, the following was provided: ".var_dump($obj));
             }
         }
+
         return self::$_find_or_make_items[$obj->ClassName."_".$obj->ID];
     }
 
@@ -221,14 +266,6 @@ class SearchEngineDataObject extends DataObject
             }
         }
         return $array;
-    }
-
-    /**
-     * @return bool
-     */
-    public function canDelete($member = null, $context = [])
-    {
-        return true;
     }
 
     /**

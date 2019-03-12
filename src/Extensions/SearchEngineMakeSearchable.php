@@ -355,10 +355,16 @@ class SearchEngineMakeSearchable extends DataExtension
     public function SearchEngineExcludeFromIndex()
     {
         $exclude = false;
-        $alwaysExclude = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
-        if (in_array($this->owner->ClassName, $alwaysExclude) || is_subclass_of($this->owner->ClassName, $alwaysExclude)) {
-            $exclude = true;
-        } else {
+        $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
+        foreach($alwaysExcludeClassNames as $alwaysExcludeClassName) {
+            if (
+                $this->owner->ClassName === $alwaysExcludeClassName ||
+                is_subclass_of($this->owner->ClassName, $alwaysExcludeClassName)
+            ) {
+                $exclude = true;
+            }
+        }
+        if($exclude === false) {
             if ($this->owner->hasMethod("SearchEngineExcludeFromIndexProvider")) {
                 $exclude = $this->owner->SearchEngineExcludeFromIndexProvider();
             } else {
@@ -425,6 +431,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 }
             }
         }
+
         return $levelFields;
     }
 
@@ -487,17 +494,18 @@ class SearchEngineMakeSearchable extends DataExtension
                     $str .= $object->$possibleMethod()." ";
                 } elseif ($fieldCount == 2) {
                     $secondMethod = $fields[1];
-                    $str .= $this->owner->$possibleMethod()->$secondMethod()." ";
+                    $str .= $object->$possibleMethod()->$secondMethod()." ";
                 }
             }
             $dbArray = $this->searchEngineRelFields($object, "db");
             //db field
             if (isset($dbArray[$fields[0]])) {
+                $dbField = $fields[0];
                 if ($fieldCount == 1) {
-                    $str .= $object->$fields[0]." ";
+                    $str .= $object->$dbField." ";
                 } elseif ($fieldCount == 2) {
                     $method = $fields[1];
-                    $str .= $this->owner->dbObject($fields[0])->$method()." ";
+                    $str .= $object->dbObject($fields[0])->$method()." ";
                 }
             }
             //has one relation
@@ -509,7 +517,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 );
                 //has_one relation
                 if (isset($hasOneArray[$method])) {
-                    $foreignObject = $this->owner->$method();
+                    $foreignObject = $object->$method();
                     $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
                 }
                 //many relation
@@ -520,7 +528,7 @@ class SearchEngineMakeSearchable extends DataExtension
                         $this->searchEngineRelFields($object, "belongs_many_many")
                     );
                     if (isset($manyArray[$method])) {
-                        $foreignObjects = $this->owner->$method()->limit(100);
+                        $foreignObjects = $object->$method()->limit(100);
                         foreach ($foreignObjects as $foreignObject) {
                             $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
                         }

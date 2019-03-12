@@ -11,6 +11,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Tasks\SearchEngineRemoveAll;
 use SilverStripe\ORM\DB;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\BuildTask;
 
 class SearchEngineRemoveAll extends BuildTask
@@ -58,13 +59,13 @@ class SearchEngineRemoveAll extends BuildTask
             die("please add the i-am-sure get variable to this task");
         }
         $allTables = Config::inst()->get(SearchEngineRemoveAll::class, "all_tables");
-        $tables = DB::getConn()->tableList();
+        $tables = DataObject::getSchema()->getTableNames();
         foreach ($tables as $table) {
             if (in_array($table, $allTables)) {
                 DB::alteration_message("Drop \"$table\"", "deleted");
-                if (method_exists(DB::getConn(), 'clearTable')) {
-                    @DB::query("DROP \"$table\"");
-                    DB::getConn()->clearTable($table);
+                if (method_exists(DB::get_conn(), 'clearTable')) {
+                    // @DB::query("DROP \"$table\"");
+                    DB::get_conn()->clearTable($table);
                 } else {
                     DB::query("TRUNCATE \"$table\"");
                 }

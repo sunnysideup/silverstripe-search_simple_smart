@@ -16,6 +16,7 @@ use SilverStripe\View\ViewableData;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Extensible;
+use SilverStripe\ORM\ArrayList;
 
 class SearchEngineCoreSearchMachine
 {
@@ -239,7 +240,34 @@ class SearchEngineCoreSearchMachine
             $this->debugArray[] = "SQL SORT: <pre>".print_r($sqlSort, 1)."</pre>";
             $this->debugArray[] = "CUSTOM SORT: <pre>".((!empty($startTimeForCustomSort)) ? "YES - seconds taken: ".round($endTimeForCustomSort - $startTimeForCustomSort, 5) : "NO")."</pre>";
         }
+
         return $dataList;
+    }
+
+    public function ConvertDataListToOriginalObjects($dataList, $acceptableClassesArray = [])
+    {
+        $al = ArrayList::create();
+        foreach($dataList as $dataListItem)
+        {
+            $item = $dataListItem->SourceObject();
+            if($item) {
+                $accepted = true;
+                if(count($acceptableClassesArray)) {
+                    $accepted = false;
+                    foreach($acceptableClassesArray as $acceptableClass ) {
+                        if (
+                            $item->ClassName === $acceptableClass ||
+                            is_subclass_of($item->ClassName, $acceptableClass)
+                        ) {
+                            $accepted = true;
+                        }
+                    }
+                }
+                if($accepted) {
+                    $al->push($dataListItem->$item);
+                }
+            }
+        }
     }
 
     /**

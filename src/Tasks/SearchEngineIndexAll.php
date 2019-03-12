@@ -7,6 +7,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\CMS\Model\SiteTree;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\Versioned\Versioned;
 
 class SearchEngineIndexAll extends BuildTask
 {
@@ -45,16 +46,24 @@ class SearchEngineIndexAll extends BuildTask
         }
         $classNames = SearchEngineDataObject::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
+            $hasVersioned = false;
             $count = $className::get()->count();
-            $j = 0;
             for ($i = 0; $i < $count; $i = $i + 10) {
                 $objects = $className::get()->limit(10, $i);
                 foreach ($objects as $obj) {
-                    if ($obj instanceof SiteTree) {
+                    if ($hasVersioned || $obj->hasExtension(Versioned::class)) {
+                        $hasVersioned = true;
                         if ($obj->IsPublished()) {
-                            //do nothing
+                            //all OK!
                         } else {
+                            if ($this->verbose) {
+                                DB::alteration_message("Not published ".$item->getTitle(), 'deleted');
+                            }
                             continue;
+                        }
+                    } else {
+                        if ($this->verbose) {
+                            DB::alteration_message("Not versioned, will always be searchable: ".$item->getTitle(), 'deleted');
                         }
                     }
                     $item = SearchEngineDataObject::find_or_make($obj);
@@ -63,20 +72,21 @@ class SearchEngineIndexAll extends BuildTask
                             DB::alteration_message("Queueing ".$item->getTitle()." for indexing");
                         }
                         SearchEngineDataObjectToBeIndexed::add($item);
+                    } else {
                         if ($this->verbose) {
-                            flush();
-                            ob_end_flush();
-                            ob_start();
+                            DB::alteration_message("No need to queue ".$item->getTitle()." for indexing");
                         }
                     }
+                }
+                if ($this->verbose) {
+                    flush();
+                    ob_end_flush();
+                    ob_start();
                 }
             }
         }
         if ($this->verbose) {
             echo "<h2>======================</h2>";
-        }
-        if ($this->verbose) {
-            DB::alteration_message("Now run the <a href=\"/dev/tasks/SearchEngineUpdateSearchIndex/?uptonow=1\">index task</a> to do the actual indexing");
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStemming;
 
+use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory;
@@ -51,7 +52,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     private static $singular_name = "Search Record";
     public function i18n_singular_name()
     {
-        return self::$singular_name;
+        return $this->Config()->get('singular_name');
     }
 
     /**
@@ -60,7 +61,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     private static $plural_name = "Search Records";
     public function i18n_plural_name()
     {
-        return self::$plural_name;
+        return $this->Config()->get('plural_name');
     }
 
     /**
@@ -126,11 +127,47 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     );
 
     /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canEdit($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
      * @return boolean
      */
     public function canDelete($member = null, $context = [])
     {
         return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canView($member = null, $context = [])
+    {
+        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
     }
 
     /**
@@ -249,7 +286,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 } elseif ($length < 4) {
                     $whereArray[] = '"Keyword" = \''.$innerKeyword.'\'';
                 } else {
-                    if ($stem && $stem != $keyword) {
+                    if ($stem && $stem !== $keyword) {
                         $whereArray[] = "\"Keyword\" LIKE '".$stem."%'";
                     }
                     $whereArray[] = "\"Keyword\" LIKE '".$innerKeyword."%'";
@@ -262,10 +299,12 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 $keywords = SearchEngineKeyword::get()
                     ->where($where)
                     ->exclude(array("ID" => $selectArray))
-                    ->limit(5);
-                $selectArray +=  $keywords->map("ID", "ID")->toArray();
+                    ->limit(12);
+                $selectArray += $keywords->map("ID", "ID")->toArray();
                 foreach ($selectArray as $id) {
-                    $this->SearchEngineKeywords()->add($id, array("KeywordPosition" => $realPosition));
+                    if($id) {
+                        $this->SearchEngineKeywords()->add($id, array("KeywordPosition" => $realPosition));
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
@@ -30,7 +31,7 @@ class SearchEngineFullContent extends DataObject
     private static $singular_name = "Full Content";
     public function i18n_singular_name()
     {
-        return self::$singular_name;
+        return $this->Config()->get('singular_name');
     }
 
     /*
@@ -39,7 +40,7 @@ class SearchEngineFullContent extends DataObject
     private static $plural_name = "Full Contents";
     public function i18n_plural_name()
     {
-        return self::$plural_name;
+        return $this->Config()->get('plural_name');
     }
 
     /*
@@ -115,11 +116,47 @@ class SearchEngineFullContent extends DataObject
     );
 
     /**
-     * @return bool
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
      */
     public function canEdit($member = null, $context = [])
     {
         return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canDelete($member = null, $context = [])
+    {
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canView($member = null, $context = [])
+    {
+        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
     }
 
     /**
@@ -181,15 +218,6 @@ class SearchEngineFullContent extends DataObject
         $this->Level = SearchEngineKeyword::level_sanitizer($this->Level);
         $this->Content = strip_tags($this->Content);
     }
-
-    /**
-     * @return bool
-     */
-    public function canDelete($member = null, $context = [])
-    {
-        return false;
-    }
-
 
     public function onAfterWrite()
     {
