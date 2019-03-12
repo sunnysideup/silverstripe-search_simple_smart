@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -29,7 +30,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     private static $singular_name = "To Be (re)Indexed";
     public function i18n_singular_name()
     {
-        return self::$singular_name;
+        return $this->Config()->get('singular_name');
     }
 
     /**
@@ -38,7 +39,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     private static $plural_name = "To Be (re)Indexed";
     public function i18n_plural_name()
     {
-        return self::$plural_name;
+        return $this->Config()->get('plural_name');
     }
 
     /**
@@ -93,6 +94,50 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     );
 
     /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canEdit($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canDelete($member = null, $context = [])
+    {
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canView($member = null, $context = [])
+    {
+        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
      * you must set this to true once you have your cron job
      * up and running.
      * The cron job runs this task every ?? minutes.
@@ -115,21 +160,16 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     }
 
     /**
-     * @return bool
-     */
-    public function canDelete($member = null, $context = [])
-    {
-        return true;
-    }
-
-    /**
      *
      * @param SearchEngineDataObject $item
      * @return SearchEngineDataObjectToBeIndexed
      */
     public static function add($item)
     {
-        $fieldArray = array("SearchEngineDataObjectID" => $item->ID, "Completed" => 0);
+        $fieldArray = [
+            "SearchEngineDataObjectID" => $item->ID,
+            "Completed" => 0
+        ];
         $objToBeIndexedRecord = SearchEngineDataObjectToBeIndexed::get()
             ->filter($fieldArray)->first();
         if ($objToBeIndexedRecord) {

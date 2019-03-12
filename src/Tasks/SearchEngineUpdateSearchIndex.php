@@ -20,7 +20,7 @@ class SearchEngineUpdateSearchIndex extends BuildTask
      * title of the task
      * @var string
      */
-    protected $description = "Updates all the search indexes. Boolean GET parameters available are: ?verbose, ?uptonow";
+    protected $description = "Updates all the search indexes. Boolean GET parameter available: ?uptonow";
 
     /**
      * @var boolean

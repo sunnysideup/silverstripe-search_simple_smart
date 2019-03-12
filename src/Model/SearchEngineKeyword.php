@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use SilverStripe\ORM\DB;
@@ -41,7 +42,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     private static $singular_name = "Keyword";
     public function i18n_singular_name()
     {
-        return self::$singular_name;
+        return $this->Config()->get('singular_name');
     }
 
     /*
@@ -50,7 +51,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     private static $plural_name = "Keywords";
     public function i18n_plural_name()
     {
-        return self::$plural_name;
+        return $this->Config()->get('plural_name');
     }
 
     /*
@@ -140,13 +141,48 @@ class SearchEngineKeyword extends DataObject implements Flushable
         MySQLSchemaManager::ID => 'ENGINE=MyISAM'
     );
 
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return false;
+    }
 
     /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canEdit($member = null, $context = [])
+    {
+        return false;
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
      * @return boolean
      */
     public function canDelete($member = null, $context = [])
     {
-        return false;
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canView($member = null, $context = [])
+    {
+        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Security\Permission;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEnginePunctuationFindAndRemove;
 use SilverStripe\ORM\DB;
@@ -21,7 +22,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     private static $singular_name = "Punctuation to Remove";
     public function i18n_singular_name()
     {
-        return self::$singular_name;
+        return $this->Config()->get('singular_name');
     }
 
     /**
@@ -30,7 +31,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     private static $plural_name = "Punctuations to Remove";
     public function i18n_plural_name()
     {
-        return self::$plural_name;
+        return $this->Config()->get('plural_name');
     }
 
     /**
@@ -75,6 +76,52 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
         "Character" => "Character",
         "Custom.Nice" => "Manually Entered"
     );
+
+
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canCreate($member = null, $context = [])
+    {
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canEdit($member = null, $context = [])
+    {
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canDelete($member = null, $context = [])
+    {
+        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
+
+    /**
+     * @param Member $member
+     * @param array $context Additional context-specific data which might
+     * affect whether (or where) this object could be created.
+     * @return boolean
+     */
+    public function canView($member = null, $context = [])
+    {
+        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+    }
 
     /**
      * @param strig $character
