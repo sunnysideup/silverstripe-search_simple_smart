@@ -16,6 +16,12 @@ class SearchEngineIndexAll extends BuildTask
      * title of the task
      * @var string
      */
+    protected $limit = 5;
+
+    /**
+     * title of the task
+     * @var string
+     */
     protected $title = "Index All DataObjects";
 
     /**
@@ -48,6 +54,12 @@ class SearchEngineIndexAll extends BuildTask
         foreach ($classNames as $className => $classTitle) {
             $hasVersioned = false;
             $count = $className::get()->count();
+            if($count > $this->limit) {
+                $count = $this->limit;
+            }
+            if ($this->verbose) {
+                DB::alteration_message("<h4>Found ".$count.' of '.$classTitle.'</h4>');
+            }
             for ($i = 0; $i < $count; $i = $i + 10) {
                 $objects = $className::get()->limit(10, $i);
                 foreach ($objects as $obj) {

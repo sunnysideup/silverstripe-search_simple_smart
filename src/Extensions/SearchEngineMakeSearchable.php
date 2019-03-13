@@ -489,48 +489,44 @@ class SearchEngineMakeSearchable extends DataExtension
         } else {
             $fieldCount = count($fields);
             $possibleMethod = $fields[0];
-            if(substr($possibleMethod, 0, 3) === 'get' &&  $object->hasMethod($possibleMethod)) {
-                if ($fieldCount == 1) {
-                    $str .= $object->$possibleMethod()." ";
-                } elseif ($fieldCount == 2) {
-                    $secondMethod = $fields[1];
-                    $str .= $object->$possibleMethod()->$secondMethod()." ";
+            if(substr($possibleMethod, 0, 3) === 'get' &&  $object->hasMethod($possibleMethod) && $fieldCount == 1) {
+                $str .= $object->$possibleMethod()." ";
+            } else {
+                $dbArray = $this->searchEngineRelFields($object, "db");
+                //db field
+                if (isset($dbArray[$fields[0]])) {
+                    $dbField = $fields[0];
+                    if ($fieldCount == 1) {
+                        $str .= $object->$dbField." ";
+                    } elseif ($fieldCount == 2) {
+                        $method = $fields[1];
+                        $str .= $object->dbObject($dbField)->$method()." ";
+                    }
                 }
-            }
-            $dbArray = $this->searchEngineRelFields($object, "db");
-            //db field
-            if (isset($dbArray[$fields[0]])) {
-                $dbField = $fields[0];
-                if ($fieldCount == 1) {
-                    $str .= $object->$dbField." ";
-                } elseif ($fieldCount == 2) {
-                    $method = $fields[1];
-                    $str .= $object->dbObject($fields[0])->$method()." ";
-                }
-            }
-            //has one relation
-            else {
-                $method = array_shift($fields);
-                $hasOneArray = array_merge(
-                    $this->searchEngineRelFields($object, "has_one"),
-                    $this->searchEngineRelFields($object, "belongs_to")
-                );
-                //has_one relation
-                if (isset($hasOneArray[$method])) {
-                    $foreignObject = $object->$method();
-                    $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
-                }
-                //many relation
+                //has one relation
                 else {
-                    $manyArray = array_merge(
-                        $this->searchEngineRelFields($object, "has_many"),
-                        $this->searchEngineRelFields($object, "many_many"),
-                        $this->searchEngineRelFields($object, "belongs_many_many")
+                    $method = array_shift($fields);
+                    $hasOneArray = array_merge(
+                        $this->searchEngineRelFields($object, "has_one"),
+                        $this->searchEngineRelFields($object, "belongs_to")
                     );
-                    if (isset($manyArray[$method])) {
-                        $foreignObjects = $object->$method()->limit(100);
-                        foreach ($foreignObjects as $foreignObject) {
-                            $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
+                    //has_one relation
+                    if (isset($hasOneArray[$method])) {
+                        $foreignObject = $object->$method();
+                        $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
+                    }
+                    //many relation
+                    else {
+                        $manyArray = array_merge(
+                            $this->searchEngineRelFields($object, "has_many"),
+                            $this->searchEngineRelFields($object, "many_many"),
+                            $this->searchEngineRelFields($object, "belongs_many_many")
+                        );
+                        if (isset($manyArray[$method])) {
+                            $foreignObjects = $object->$method()->limit(100);
+                            foreach ($foreignObjects as $foreignObject) {
+                                $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
+                            }
                         }
                     }
                 }
