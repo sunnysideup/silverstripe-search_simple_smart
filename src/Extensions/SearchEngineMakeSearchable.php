@@ -62,44 +62,59 @@ class SearchEngineMakeSearchable extends DataExtension
      * sets stage to LIVE
      * indexes the current object.
      */
-    public function searchEngineIndex()
+    public function searchEngineIndex($searchEngineDataObject = null)
     {
         //last check...
-        if ($this->SearchEngineExcludeFromIndex()) {
-            //do nothing
+        if(! $searchEngineDataObject) {
+            $searchEngineDataObject = SearchEngineDataObject::find_or_make($this->owner);
         } else {
+            if ($this->SearchEngineExcludeFromIndex()) {
+                $searchEngineDataObject = null;
+            }
+            //do nothing
+        }
+        if($searchEngineDataObject) {
             //clear search history
             SearchEngineSearchRecord::flush();
-            $originalMode = Versioned::get_reading_mode();
+            $originalMode = Versioned::get_stage();
             Versioned::set_stage("Live");
-            $item = SearchEngineDataObject::find_or_make($this->owner);
             $fullContentArray = $this->owner->SearchEngineFullContentForIndexing();
-            SearchEngineFullContent::add_data_object_array($item, $fullContentArray);
-            Versioned::set_reading_mode($originalMode);
+            SearchEngineFullContent::add_data_object_array($searchEngineDataObject, $fullContentArray);
+            Versioned::set_stage($originalMode);
         }
     }
 
     /**
      * Indexed Full Content Data
-     * @return DataList
+     * @return DataList|null
      */
     public function SearchEngineDataObjectFullContent()
     {
         $item = SearchEngineDataObject::find_or_make($this->owner);
+        if($item) {
 
-        return $item->SearchEngineFullContents();
+            return $item->SearchEngineFullContents();
+        } else {
+
+            return SearchEngineFullContent::get()->filter('ID', 0);
+        }
     }
 
     /**
      * Indexed Keywords
-     * @return DataList
+     * @return DataList|null
      */
     public function SearchEngineKeywordDataObjectMatches($level = 1)
     {
         $item = SearchEngineDataObject::find_or_make($this->owner);
-        $field = "SearchEngineKeywords_Level".$level;
+        if($item) {
+            $field = "SearchEngineKeywords_Level".$level;
 
-        return $item->$field();
+            return $item->$field();
+        } else {
+
+            return SearchEngineKeyword::get()->filter('ID', 0);
+        }
     }
 
     /**
@@ -184,55 +199,56 @@ class SearchEngineMakeSearchable extends DataExtension
         if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check("SEARCH_ENGINE_ADMIN")) {
             if ($this->SearchEngineExcludeFromIndex()) {
                 return;
+            } else {
+                $item = SearchEngineDataObject::find_or_make($this->owner);
+                $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(array("SearchEngineDataObjectID" => $item->ID, "Completed" => 0))->count() ? "Yes" : "No";
+                $fields->addFieldToTab("Root.SearchEngine", $lastIndexed = new ReadonlyField("LastIndexed", "Approximately Last Index", $this->owner->LastEdited));
+                $fields->addFieldToTab("Root.SearchEngine", $toBeIndexed = new ReadonlyField("ToBeIndexed", "On the list to be indexed", $toBeIndexed));
+                $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
+                $fields->addFieldToTab(
+                    "Root.SearchEngine",
+                    $itemField = new LiteralField(
+                        "Levels",
+                        $this->owner->SearchEngineFieldsToBeIndexedHumanReadable(true)
+                    )
+                );
+                $fields->addFieldToTab(
+                    "Root.SearchEngine",
+                    new GridField(
+                        "SearchEngineKeywords_Level1",
+                        "Keywords Level 1",
+                        $this->owner->SearchEngineKeywordDataObjectMatches(1),
+                        $config
+                    )
+                );
+                $fields->addFieldToTab(
+                    "Root.SearchEngine",
+                    new GridField(
+                        "SearchEngineKeywords_Level2",
+                        "Keywords Level 2",
+                        $this->owner->SearchEngineKeywordDataObjectMatches(2),
+                        $config
+                    )
+                );
+                $fields->addFieldToTab(
+                    "Root.SearchEngine",
+                    new GridField(
+                        'SearchEngineFullContent',
+                        "Full Content",
+                        $this->owner->SearchEngineDataObjectFullContent(),
+                        $config
+                    )
+                );
+                $fields->addFieldToTab(
+                    "Root.SearchEngine",
+                    $itemField = new GridField(
+                        'SearchEngineDataObject',
+                        "Searchable Item",
+                        SearchEngineDataObject::get()->filter(array("DataObjectClassName" => $this->owner->ClassName, "DataObjectID" => $this->owner->ID)),
+                        $config
+                    )
+                );
             }
-            $item = SearchEngineDataObject::find_or_make($this->owner);
-            $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(array("SearchEngineDataObjectID" => $item->ID, "Completed" => 0))->count() ? "Yes" : "No";
-            $fields->addFieldToTab("Root.SearchEngine", $lastIndexed = new ReadonlyField("LastIndexed", "Approximately Last Index", $this->owner->LastEdited));
-            $fields->addFieldToTab("Root.SearchEngine", $toBeIndexed = new ReadonlyField("ToBeIndexed", "On the list to be indexed", $toBeIndexed));
-            $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
-            $fields->addFieldToTab(
-                "Root.SearchEngine",
-                $itemField = new LiteralField(
-                    "Levels",
-                    $this->owner->SearchEngineFieldsToBeIndexedHumanReadable(true)
-                )
-            );
-            $fields->addFieldToTab(
-                "Root.SearchEngine",
-                new GridField(
-                    "SearchEngineKeywords_Level1",
-                    "Keywords Level 1",
-                    $this->owner->SearchEngineKeywordDataObjectMatches(1),
-                    $config
-                )
-            );
-            $fields->addFieldToTab(
-                "Root.SearchEngine",
-                new GridField(
-                    "SearchEngineKeywords_Level2",
-                    "Keywords Level 2",
-                    $this->owner->SearchEngineKeywordDataObjectMatches(2),
-                    $config
-                )
-            );
-            $fields->addFieldToTab(
-                "Root.SearchEngine",
-                new GridField(
-                    SearchEngineFullContent::class,
-                    "Full Content",
-                    $this->owner->SearchEngineDataObjectFullContent(),
-                    $config
-                )
-            );
-            $fields->addFieldToTab(
-                "Root.SearchEngine",
-                $itemField = new GridField(
-                    SearchEngineDataObject::class,
-                    "Searchable Item",
-                    SearchEngineDataObject::get()->filter(array("DataObjectClassName" => $this->owner->ClassName, "DataObjectID" => $this->owner->ID)),
-                    $config
-                )
-            );
         }
     }
 
@@ -341,9 +357,11 @@ class SearchEngineMakeSearchable extends DataExtension
                 $this->_onAfterWriteCount[$this->owner->ID] = 0;
             }
             $item = SearchEngineDataObject::find_or_make($this->owner);
-            if ($item && $this->_onAfterWriteCount[$this->owner->ID]++ < 2) {
-                $item->write();
-                DB::query("UPDATE \"SearchEngineDataObject\" SET LastEdited = NOW() WHERE ID = ".(intval($item->ID)-0).";");
+            $this->_onAfterWriteCount[$this->owner->ID]++;
+            if ($item && $this->_onAfterWriteCount[$this->owner->ID] < 2) {
+                SearchEngineKeyword::export_keyword_list();
+                // $item->write();
+                // DB::query("UPDATE \"SearchEngineDataObject\" SET LastEdited = NOW() WHERE ID = ".(intval($item->ID)-0).";");
                 SearchEngineDataObjectToBeIndexed::add($item);
             }
         }
@@ -371,9 +389,9 @@ class SearchEngineMakeSearchable extends DataExtension
                 $exclude = Config::inst()->get($this->owner->ClassName, "search_engine_exclude_from_index");
             }
             //special case SiteTree
-            if ($this->owner instanceof SiteTree) {
+            if ($this->owner->hasExtension(Versioned::class)) {
                 if ($this->owner->ShowInSearch && $this->owner->IsPublished()) {
-                    //do nothing
+                    //do nothing - no need to exclude
                 } else {
                     $exclude = true;
                 }
@@ -383,14 +401,15 @@ class SearchEngineMakeSearchable extends DataExtension
         //search index.
         if ($exclude) {
             $exclude = true;
-            $this->SearchEngineDeleteFromIndexing();
+            // CAN NOT RUN THIS HERE!!!!
+            // $this->SearchEngineDeleteFromIndexing();
         }
         return $exclude;
     }
 
     public function SearchEngineDeleteFromIndexing()
     {
-        if ($item = SearchEngineDataObject::find_or_make($this->owner, true)) {
+        if ($item = SearchEngineDataObject::find_or_make($this->owner, $doNotMake = true)) {
             if ($item && $item->exists()) {
                 $item->delete();
             }

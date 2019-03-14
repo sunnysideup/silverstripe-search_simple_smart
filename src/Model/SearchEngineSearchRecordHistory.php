@@ -145,7 +145,7 @@ class SearchEngineSearchRecordHistory extends DataObject
                 $obj->$field = $value;
             }
         } else {
-            $obj = SearchEngineSearchRecordHistory::get()->filter($fieldArray)->first();
+            $obj = DataObject::get_one(SearchEngineSearchRecordHistory::class, $fieldArray);
             if (!$obj) {
                 $obj = SearchEngineSearchRecordHistory::create($fieldArray);
             }

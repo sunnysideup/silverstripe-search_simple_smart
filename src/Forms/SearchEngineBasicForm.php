@@ -21,6 +21,7 @@ use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\GroupedList;
 use SilverStripe\View\ArrayData;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
@@ -338,7 +339,7 @@ class SearchEngineBasicForm extends Form
         if ($fullResultsClassName = Config::inst()->get(SearchEngineBasicForm::class, "full_results_page_type")) {
             if ($this->Controller()->dataRecord->ClassName != $fullResultsClassName) {
                 if (is_subclass_of($fullResultsClassName, SiteTree::class)) {
-                    $obj = $fullResultsClassName::get()->first();
+                    $obj = DataObject::get_one($fullResultsClassName);
                     if ($obj) {
                         unset($data["url"]);
                         $fullResultsLink = $obj->Link(SearchEngineBasicForm::class)."?".http_build_query($data, "", "&amp;");

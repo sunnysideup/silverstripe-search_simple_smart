@@ -15,6 +15,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineAdvancedSettings;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\HTMLReadonlyField;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
@@ -30,6 +31,7 @@ use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Security\Permission;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Security\PermissionProvider;
+use SilverStripe\ORM\FieldType\DBField;
 
 class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
 {
@@ -101,28 +103,32 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                     'Root',
                     new Tab(
                         'Settings',
-                        $printNice[] = ReadonlyField::create("searchable_class_names", 'Searchable Class Names', $this->printNice(SearchEngineDataObject::searchable_class_names())),
-                        $printNice[] = ReadonlyField::create("classes_to_exclude", 'Data Object - Classes To Exclude', $this->printNice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))),
-                        ReadonlyField::create("class_name_for_search_provision", 'Class or Search Provision', Config::inst()->get(SearchEngineCoreSearchMachine::class, "class_name_for_search_provision")),
-                        ReadonlyField::create("remove_all_non_alpha_numeric", 'Keywords - Remove Non Alpha Numeric Keywords', Config::inst()->get(SearchEngineKeyword::class, "remove_all_non_alpha_numeric")? "True" : "False"),
-                        ReadonlyField::create("add_stop_words", 'Keyword Find And Remove - Add Stop Words', Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words")? "True" : "False"),
-                        ReadonlyField::create("remove_all_non_alpha_numeric_full_content", 'Full Content - Remove Non Alpha Numeric Keywords', Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric")? "True" : "False"),
-                        ReadonlyField::create(SearchEngineDataObjectToBeIndexed::class, 'Cron Job Is Running - make sure to turn this on once you have set up your Cron Job', Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")? "True" : "False"),
-                        $printNice[] = ReadonlyField::create("search_engine_default_level_one_fields", 'Make Searchable - Default Level 1 Fields', $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))),
-                        $printNice[] = ReadonlyField::create("search_engine_default_excluded_db_fields", 'Make Searchable - Fields Excluded by Default', $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))),
-                        $printNice[] = ReadonlyField::create("class_groups", 'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups"))),
-                        $printNice[] = ReadonlyField::create("class_group_limits", 'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))),
-                        $printNice[] = ReadonlyField::create("classes_to_include", 'Filter for class names list - OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))),
-                        $printNice[] = ReadonlyField::create("get_js_keyword_file_name", 'Location for saving Keywords as JSON for autocomplete', $this->printNice(SearchEngineKeyword::get_js_keyword_file_name())),
-                        $printNice[] = ReadonlyField::create("get_js_keyword_file_last_changed", 'Keyword autocomplete last updated ... (see tasks to update keyword list) ', $jsLastChanged)
+                        $printNice[] = HTMLReadonlyField::create(
+                            "searchable_class_names",
+                            'Searchable Class Names',
+                            $this->printNice(SearchEngineDataObject::searchable_class_names())
+                        ),
+                        $printNice[] = HTMLReadonlyField::create("classes_to_exclude", 'Data Object - Classes To Exclude', $this->printNice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))),
+                        HTMLReadonlyField::create("class_name_for_search_provision", 'Class or Search Provision', Config::inst()->get(SearchEngineCoreSearchMachine::class, "class_name_for_search_provision")),
+                        HTMLReadonlyField::create("remove_all_non_alpha_numeric", 'Keywords - Remove Non Alpha Numeric Keywords', Config::inst()->get(SearchEngineKeyword::class, "remove_all_non_alpha_numeric")? "True" : "False"),
+                        HTMLReadonlyField::create("add_stop_words", 'Keyword Find And Remove - Add Stop Words', Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words")? "True" : "False"),
+                        HTMLReadonlyField::create("remove_all_non_alpha_numeric_full_content", 'Full Content - Remove Non Alpha Numeric Keywords', Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric")? "True" : "False"),
+                        HTMLReadonlyField::create(SearchEngineDataObjectToBeIndexed::class, 'Cron Job Is Running - make sure to turn this on once you have set up your Cron Job', Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")? "True" : "False"),
+                        $printNice[] = HTMLReadonlyField::create("search_engine_default_level_one_fields", 'Make Searchable - Default Level 1 Fields', $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))),
+                        $printNice[] = HTMLReadonlyField::create("search_engine_default_excluded_db_fields", 'Make Searchable - Fields Excluded by Default', $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))),
+                        $printNice[] = HTMLReadonlyField::create("class_groups", 'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups"))),
+                        $printNice[] = HTMLReadonlyField::create("class_group_limits", 'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))),
+                        $printNice[] = HTMLReadonlyField::create("classes_to_include", 'Filter for class names list - OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))),
+                        $printNice[] = HTMLReadonlyField::create("get_js_keyword_file_name", 'Location for saving Keywords as JSON for autocomplete', $this->printNice(SearchEngineKeyword::get_js_keyword_file_name())),
+                        $printNice[] = HTMLReadonlyField::create("get_js_keyword_file_last_changed", 'Keyword autocomplete last updated ... (see tasks to update keyword list) ', $jsLastChanged)
                     ),
                     new Tab(
                         'Tasks',
-                        $removeAllField = ReadonlyField::create("RemoveAllSearchData", "1. Remove All Search Data", "<h4><a href=\"/dev/tasks/SearchEngineRemoveAll\">Run Task: remove all</a></h4>"),
-                        $indexAllField = ReadonlyField::create("IndexAllObjects", "2. Queue for indexing", "<h4><a href=\"/dev/tasks/SearchEngineIndexAll\">Run Task: list all for indexing</a></h4>"),
-                        $updateVerboseField = ReadonlyField::create("UpdateSearchIndexVerbose", "3. Do index", "<h4><a href=\"/dev/tasks/SearchEngineUpdateSearchIndex?verbose=1&amp;uptonow=1\">Run Task: execute the to be indexed list</a></h4>"),
-                        $updateKeywordList = ReadonlyField::create(SearchEngineCreateKeywordJS::class, "4. Update keywords", "<h4><a href=\"/dev/tasks/SearchEngineCreateKeywordJS\">Run Task: update keyword list</a></h4>"),
-                        $debugTestField = ReadonlyField::create("DebugTestField", "5. Debug Search", "
+                        $removeAllField = HTMLReadonlyField::create("RemoveAllSearchData", "1. Remove All Search Data", "<h4><a href=\"/dev/tasks/SearchEngineRemoveAll\">Run Task: remove all</a></h4>"),
+                        $indexAllField = HTMLReadonlyField::create("IndexAllObjects", "2. Queue for indexing", "<h4><a href=\"/dev/tasks/SearchEngineIndexAll\">Run Task: list all for indexing</a></h4>"),
+                        $updateVerboseField = HTMLReadonlyField::create("UpdateSearchIndexVerbose", "3. Do index", "<h4><a href=\"/dev/tasks/SearchEngineUpdateSearchIndex?verbose=1&amp;oldonesonly=1\">Run Task: execute the to be indexed list</a></h4>"),
+                        $updateKeywordList = HTMLReadonlyField::create(SearchEngineCreateKeywordJS::class, "4. Update keywords", "<h4><a href=\"/dev/tasks/SearchEngineCreateKeywordJS\">Run Task: update keyword list</a></h4>"),
+                        $debugTestField = HTMLReadonlyField::create("DebugTestField", "5. Debug Search", "
                             <h4>
                             To debug a search, please add ?searchenginedebug=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
                             <br /><br />
@@ -135,17 +141,9 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                     )
                 )
             );
-            foreach ($printNice as $myField) {
-                $myField->dontEscape = true;
-            }
-            $removeAllField->dontEscape = true;
             $removeAllField->setRightTitle("Careful - this will remove all the search engine index data.");
-            $indexAllField->dontEscape = true;
             $indexAllField->setRightTitle("Careful - this will take signigicant time and resources.");
-            $updateVerboseField->dontEscape = true;
             $updateVerboseField->setRightTitle("Updates all the search indexes with verbose set to true.");
-            $updateKeywordList->dontEscape = true;
-            $debugTestField->dontEscape = true;
 
             $form->setFields($field);
         } elseif ($this->modelClass == SearchEngineSearchRecordHistory::class) {
