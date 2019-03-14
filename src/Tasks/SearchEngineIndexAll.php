@@ -13,14 +13,12 @@ class SearchEngineIndexAll extends BuildTask
 {
 
     /**
-     * title of the task
-     * @var string
+     * @var int
      */
-    protected $limit = 10;
+    protected $limit = 10000;
 
     /**
-     * title of the task
-     * @var string
+     * @var int
      */
     protected $step = 10;
 
@@ -48,7 +46,7 @@ class SearchEngineIndexAll extends BuildTask
      */
     public function run($request)
     {
-        set_time_limit(600);
+        set_time_limit(3600);
         ob_start();
         if ($this->verbose) {
             DB::alteration_message("Consider running the clear all task first <a href=\"/dev/tasks/SearchEngineRemoveAll/\">remove all task</a> first. This will REMOVE ALL SEARCH ENGINE DATA.");
