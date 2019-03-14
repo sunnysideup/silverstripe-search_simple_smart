@@ -207,38 +207,37 @@ class SearchEngineDataObject extends DataObject
         Folder::class
     );
 
-    private static $_find_or_make_items = [];
-
     /**
      *
      * @param DataObject $obj
      * @param bool $doNotMake
-     * @return SearchEngineDataObject | false
+     * @return SearchEngineDataObject|null
      */
     public static function find_or_make($obj, $doNotMake = false)
     {
-        if (!isset(self::$_find_or_make_items[$obj->ClassName."_".$obj->ID])) {
-            if ($obj instanceof DataObject) {
+
+        if ($obj->hasExtension(SearchEngineMakeSearchable::class)) {
+            if($obj->SearchEngineExcludeFromIndex()) {
+                
+                return null;
+            } else {
                 $fieldArray = array(
                     "DataObjectClassName" => $obj->ClassName,
                     "DataObjectID" => $obj->ID
                 );
-                $item = SearchEngineDataObject::get()
-                    ->filter($fieldArray)
-                    ->first();
+                $item = DataObject::get_one(SearchEngineDataObject::class, $fieldArray);
                 if ($item || $doNotMake) {
                     //do nothing;
                 } else {
                     $item = SearchEngineDataObject::create($fieldArray);
                     $item->write();
                 }
-                self::$_find_or_make_items[$obj->ClassName."_".$obj->ID] = $item;
-            } else {
-                user_error("DataObject expected, instead, the following was provided: ".var_dump($obj));
-            }
-        }
 
-        return self::$_find_or_make_items[$obj->ClassName."_".$obj->ID];
+                return $item;
+            }
+        } else {
+            user_error("DataObject expected, instead, the following was provided: ".var_dump($obj));
+        }
     }
 
     /**
@@ -349,13 +348,9 @@ class SearchEngineDataObject extends DataObject
     public static function remove($obj)
     {
         $item = self::find_or_make($obj, $doNotMake = true);
-        $item->delete();
-    }
-
-    public function onAfterWrite()
-    {
-        parent::onAfterWrite();
-        SearchEngineKeyword::export_keyword_list();
+        if($item && $item->exists()) {
+            $item->delete();
+        }
     }
 
     /**
@@ -364,8 +359,8 @@ class SearchEngineDataObject extends DataObject
      */
     public function onBeforeDelete()
     {
-
         ///DataObject to be Indexed
+        $this->flushCache();
         $objects = SearchEngineDataObjectToBeIndexed::get()
             ->filter(array("SearchEngineDataObjectID" => $this->ID));
         foreach ($objects as $object) {
@@ -380,6 +375,7 @@ class SearchEngineDataObject extends DataObject
             $object->delete();
         }
         parent::onBeforeDelete();
+        $this->flushCache();
     }
 
     /**
