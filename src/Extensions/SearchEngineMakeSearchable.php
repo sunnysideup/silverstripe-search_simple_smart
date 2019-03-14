@@ -576,7 +576,7 @@ class SearchEngineMakeSearchable extends DataExtension
             $this->_array_of_relations[$object->ClassName] = [];
         }
         if (!isset($this->_array_of_relations[$object->ClassName][$relType])) {
-            $this->_array_of_relations[$object->ClassName][$relType] = $object->stat($relType);
+            $this->_array_of_relations[$object->ClassName][$relType] = Config::inst()->get($object->ClassName, $relType);
         }
         return $this->_array_of_relations[$object->ClassName][$relType];
     }
