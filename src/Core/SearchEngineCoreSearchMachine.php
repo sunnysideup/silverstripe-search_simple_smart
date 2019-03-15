@@ -35,6 +35,20 @@ class SearchEngineCoreSearchMachine
      */
     private static $class_name_for_search_provision = SearchEngineProviderMYSQLFullText::class;
 
+
+    /**
+     * only search ....
+     *     [
+     *          ClassName => ID
+     *          ClassName => ID
+     *          ClassName => ID
+     *          ClassName => ID
+     *     ]
+     * @var array
+     */
+    protected $preFilterClassNameID = [];
+
+
     /**
      *
      * @var string
@@ -63,9 +77,16 @@ class SearchEngineCoreSearchMachine
      *
      * @var boolean
      */
-    protected $bypassCaching = false;
+    protected $bypassCaching = true;
+
+
+    public function setPreFilterClassNameID($array)
+    {
+        $this->preFilterClassNameID = $array;
+    }
 
     /**
+     *
      * this function runs the Core Search Machine
      * @param string $searchPhrase
      * @param array $filterProviders
@@ -113,6 +134,18 @@ class SearchEngineCoreSearchMachine
             $dataList = SearchEngineDataObject::get()
                 ->filter(array("ID" => $listOfIDsRAW))
                 ->sort("FIELD(\"ID\", ".implode(",", $listOfIDsRAW).")");
+        }
+
+        if(is_array($this->preFilterClassNameID) && count($this->preFilterClassNameID)) {
+            $tempArray = [];
+            foreach($this->preFilterClassNameID as $className => $id) {
+                $tempArray[$className.$id] = '("DataObjectClassName"  = \''.$className.'\' AND "DataObjectID" = '.$id .')';
+
+            }
+            print_r($tempArray);
+            $dataList = $dataList->where(implode(' OR ', $tempArray));
+            print_r($dataList->count());
+            print_r($dataList->sql());
         }
 
         /**
@@ -244,28 +277,14 @@ class SearchEngineCoreSearchMachine
         return $dataList;
     }
 
-    public function ConvertDataListToOriginalObjects($dataList, $acceptableClassesArray = [])
+    public function ConvertDataListToOriginalObjects($dataList)
     {
         $al = ArrayList::create();
         foreach($dataList as $dataListItem)
         {
             $item = $dataListItem->SourceObject();
             if($item) {
-                $accepted = true;
-                if(count($acceptableClassesArray)) {
-                    $accepted = false;
-                    foreach($acceptableClassesArray as $acceptableClass ) {
-                        if (
-                            $item->ClassName === $acceptableClass ||
-                            is_subclass_of($item->ClassName, $acceptableClass)
-                        ) {
-                            $accepted = true;
-                        }
-                    }
-                }
-                if($accepted) {
-                    $al->push($dataListItem->$item);
-                }
+                $al->push($item);
             }
         }
     }
