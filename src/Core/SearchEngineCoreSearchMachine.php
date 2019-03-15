@@ -139,13 +139,10 @@ class SearchEngineCoreSearchMachine
         if(is_array($this->preFilterClassNameID) && count($this->preFilterClassNameID)) {
             $tempArray = [];
             foreach($this->preFilterClassNameID as $className => $id) {
-                $tempArray[$className.$id] = '("DataObjectClassName"  = \''.$className.'\' AND "DataObjectID" = '.$id .')';
+                $tempArray[$className.$id] = '("DataObjectClassName"  = \''.addslashes($className).'\' AND "DataObjectID" = '.$id .')';
 
             }
-            print_r($tempArray);
             $dataList = $dataList->where(implode(' OR ', $tempArray));
-            print_r($dataList->count());
-            print_r($dataList->sql());
         }
 
         /**
