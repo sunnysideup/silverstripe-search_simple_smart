@@ -56,8 +56,11 @@ class SearchEngineIndexAll extends BuildTask
         }
         $classNames = SearchEngineDataObject::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
+            $filter = ['ClassName' => $className];
             $hasVersioned = false;
-            $count = $className::get()->count();
+            $count = $className::get()
+                ->filter($filter)
+                ->count();
             $sort = null;
             if($count > $this->limit) {
                 $count = $this->limit;
@@ -67,7 +70,7 @@ class SearchEngineIndexAll extends BuildTask
                 echo "<h4>Found ".$count.' of '.$classTitle.'</h4>';
             }
             for ($i = 0; $i <= $count; $i = $i + $this->step) {
-                $objects = $className::get()->limit($this->step, $i);
+                $objects = $className::get()->filter($filter)->limit($this->step, $i);
                 if($sort) {
                     $objects = $objects->sort($sort);
                 }
