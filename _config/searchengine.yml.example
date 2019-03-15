@@ -7,15 +7,15 @@ PageController:
   extensions:
     - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineContentControllerExtension
 
-SearchEngineCoreSearchMachine:
+Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine:
   class_name_for_search_provision: SearchEngineProviderMYSQLFullText
 
 
-SearchEngineKeyword:
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword:
   remove_all_non_alpha_numeric: false
   keyword_list_folder_name: "_searchengine_json"
 
-SearchEngineMakeSearchable:
+Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable:
   search_engine_default_level_one_fields:
     - Title
     - Name
@@ -27,22 +27,22 @@ SearchEngineMakeSearchable:
   search_engine_default_excluded_db_fields:
     - Password
 
-SearchEngineFullContent:
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent:
   remove_all_non_alpha_numeric: false
 
-SearchEngineKeywordFindAndRemove:
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeywordFindAndRemove:
   add_stop_words: true
 
-SearchEngineDataObject:
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject:
   classes_to_exclude:
     - ErrorPage
     - RedirectorPage
     - VirtualPage
 
-SearchEngineDataObjectToBeIndexed:
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed:
   cron_job_running: true
 
-SearchEngineSortByDescriptor:
+Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor:
   class_groups:
     1:
       - HomePage
@@ -54,7 +54,7 @@ SearchEngineSortByDescriptor:
     1: 12
     2: 20
 
-SearchEngineBasicForm:
+Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm:
   jquery_source: "foo/bar/jquery.js"
   full_results_page_type: "MySearchResultsPage"
   sort_by_options:
@@ -64,12 +64,12 @@ SearchEngineBasicForm:
     - SearchEngineFilterForClassName
     - SearchEngineFilterForRecent
 
-SearchEngineFilterForClassName:
+Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName:
   classes_to_include:
     - MyDataObjectFooBarThing
     - MyOtherPage
 # OR !
-SearchEngineFilterForClassName:
+Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName:
   classes_to_include:
     MyDataObjectFooBarThing: 'Title goes here'
     MyOtherPage: 'Title goes here'

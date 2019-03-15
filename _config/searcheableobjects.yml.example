@@ -1,7 +1,7 @@
 ---
 Name: my_search_simple_smart_searcheableobjects
 ---
-File:
+SilverStripe\Assets\File:
   extensions:
     - SearchEngineMakeSearchable
   search_engine_full_contents_fields_array:

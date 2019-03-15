@@ -193,9 +193,7 @@ class SearchEngineFullContent extends DataObject
         //you dont want to clean keywords now as this will remove all the spaces!
         //$content = SearchEngineKeyword::clean_keyword($content);
         $fieldArray = array("SearchEngineDataObjectID" => $item->ID, "Level" => $level);
-        $obj = SearchEngineFullContent::get()
-            ->filter($fieldArray)
-            ->first();
+        $obj = DataObject::get_one(SearchEngineFullContent::class, $fieldArray);
         if (!$obj) {
             $obj = SearchEngineFullContent::create($fieldArray);
         }

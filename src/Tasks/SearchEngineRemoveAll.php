@@ -21,20 +21,20 @@ class SearchEngineRemoveAll extends BuildTask
      * list of all model tables
      * @var Array
      */
-    private static $all_tables = array(
+    private static $index_tables = array(
         'SearchEngineDataObject',
         'SearchEngineDataObjectToBeIndexed',
         'SearchEngineFullContent',
         'SearchEngineKeyword',
+        "SearchEngineKeyword_SearchEngineDataObjects_Level1",
+        "SearchEngineDataObject_SearchEngineKeywords_Level2",
+    );
+
+    private static $search_history_tables = [
         'SearchEngineSearchRecord',
         'SearchEngineSearchRecordHistory',
-        "SearchEngineKeyword_SearchEngineDataObjects",
-        "SearchEngineDataObject_SearchEngineKeywords_Level1",
-        "SearchEngineDataObject_SearchEngineKeywords_Level2",
-        "SearchEngineKeyword_SearchEngineDataObjects_Level1",
-        "SearchEngineKeyword_SearchEngineDataObjects_Level2",
         "SearchEngineSearchRecord_SearchEngineKeywords"
-    );
+    ];
 
     /**
      * Title of the task
@@ -58,17 +58,17 @@ class SearchEngineRemoveAll extends BuildTask
         if (!$iAmSure) {
             die("please add the i-am-sure get variable to this task");
         }
-        $allTables = Config::inst()->get(SearchEngineRemoveAll::class, "all_tables");
-        $tables = DataObject::getSchema()->getTableNames();
-        foreach ($tables as $table) {
-            if (in_array($table, $allTables)) {
-                DB::alteration_message("Drop \"$table\"", "deleted");
-                if (method_exists(DB::get_conn(), 'clearTable')) {
-                    // @DB::query("DROP \"$table\"");
-                    DB::get_conn()->clearTable($table);
-                } else {
-                    DB::query("TRUNCATE \"$table\"");
-                }
+        $allTables = array_merge(
+            Config::inst()->get(SearchEngineRemoveAll::class, "index_tables"),
+            Config::inst()->get(SearchEngineRemoveAll::class, "search_history_tables")
+        );
+        foreach ($allTables as $table) {
+            DB::alteration_message("Drop \"$table\"", "deleted");
+            if (method_exists(DB::get_conn(), 'clearTable')) {
+                // @DB::query("DROP \"$table\"");
+                DB::get_conn()->clearTable($table);
+            } else {
+                DB::query("TRUNCATE \"$table\"");
             }
         }
         DB::alteration_message("====================== completed =======================");

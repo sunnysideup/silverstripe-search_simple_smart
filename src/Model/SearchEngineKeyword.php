@@ -120,11 +120,6 @@ class SearchEngineKeyword extends DataObject implements Flushable
     /*
      * @var array
      */
-    private static $_add_keyword_cache = [];
-
-    /*
-     * @var array
-     */
     private static $indexes = array(
         'SearchFields' => array(
             'type' => 'fulltext',
@@ -189,7 +184,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      *
      * @var string
      */
-    private static $keyword_list_folder_name = "_search_engine_keywords";
+    private static $keyword_list_folder_name = "";
 
     /**
      * @casted variable
@@ -212,7 +207,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
                 return "no new file created as the current one is less than 120 seconds old.";
             //do nothing
             } else {
-                if(Security::database_is_ready() && 1 === 2) {
+                if(Security::database_is_ready()) {
                     $rows = DB::query("SELECT \"Keyword\" FROM \"SearchEngineKeyword\" ORDER BY \"Keyword\";");
                     $array = [];
                     foreach ($rows as $row) {
@@ -241,16 +236,17 @@ class SearchEngineKeyword extends DataObject implements Flushable
      */
     public static function get_js_keyword_file_name($includeBase = false)
     {
-        $fileName = "keywords.js";
         $myFolderName = Config::inst()->get(SearchEngineKeyword::class, "keyword_list_folder_name");
         if (!$myFolderName) {
             return false;
         }
         $myFolder = Folder::find_or_make($myFolderName);
+
+        $fileName = "keywords.js";
         if ($includeBase) {
-            return Director::baseFolder().'/'.$myFolder->getFilename();
+            return Director::baseFolder().'/'.$myFolder->getFilename().'/'.$fileName;
         } else {
-            return $myFolder->FileName.$fileName;
+            return $myFolder->getFilename().'/'.$fileName;
         }
     }
 
@@ -262,20 +258,14 @@ class SearchEngineKeyword extends DataObject implements Flushable
     public static function add_keyword($keyword)
     {
         self::clean_keyword($keyword);
-        if (isset(self::$_add_keyword_cache[$keyword])) {
-            //do nothing
-        } else {
-            $fieldArray = array("Keyword" => $keyword);
-            self::$_add_keyword_cache[$keyword] = SearchEngineKeyword::get()
-                ->filter($fieldArray)
-                ->first();
-            if (!self::$_add_keyword_cache[$keyword]) {
-                $obj = SearchEngineKeyword::create($fieldArray);
-                $obj->write();
-                self::$_add_keyword_cache[$keyword] = $obj;
-            }
+        $fieldArray = array("Keyword" => $keyword);
+        $obj = DataObject::get_one(SearchEngineKeyword::class, $fieldArray);
+        if (! $obj) {
+            $obj = SearchEngineKeyword::create($fieldArray);
+            $obj->write();
         }
-        return self::$_add_keyword_cache[$keyword];
+
+        return $obj;
     }
 
 
