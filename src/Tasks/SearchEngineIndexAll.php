@@ -13,22 +13,26 @@ class SearchEngineIndexAll extends BuildTask
 {
 
     /**
-     * title of the task
-     * @var string
+     * @var int
      */
-    protected $limit = 5;
+    protected $limit = 10000;
+
+    /**
+     * @var int
+     */
+    protected $step = 10;
 
     /**
      * title of the task
      * @var string
      */
-    protected $title = "Index All DataObjects";
+    protected $title = "Add All Pages and Objects to be Indexed";
 
     /**
      * description of the task
      * @var string
      */
-    protected $description = "Careful - this will take signigicant time and resources.";
+    protected $description = "Add all pages and other objects to be indexed in the future.";
 
     /**
      *
@@ -42,7 +46,7 @@ class SearchEngineIndexAll extends BuildTask
      */
     public function run($request)
     {
-        set_time_limit(600);
+        set_time_limit(3600);
         ob_start();
         if ($this->verbose) {
             DB::alteration_message("Consider running the clear all task first <a href=\"/dev/tasks/SearchEngineRemoveAll/\">remove all task</a> first. This will REMOVE ALL SEARCH ENGINE DATA.");
@@ -54,39 +58,29 @@ class SearchEngineIndexAll extends BuildTask
         foreach ($classNames as $className => $classTitle) {
             $hasVersioned = false;
             $count = $className::get()->count();
+            $sort = null;
             if($count > $this->limit) {
                 $count = $this->limit;
+                $sort = 'RAND()';
             }
             if ($this->verbose) {
-                DB::alteration_message("<h4>Found ".$count.' of '.$classTitle.'</h4>');
+                echo "<h4>Found ".$count.' of '.$classTitle.'</h4>';
             }
-            for ($i = 0; $i < $count; $i = $i + 10) {
-                $objects = $className::get()->limit(10, $i);
+            for ($i = 0; $i <= $count; $i = $i + $this->step) {
+                $objects = $className::get()->limit($this->step, $i);
+                if($sort) {
+                    $objects = $objects->sort($sort);
+                }
                 foreach ($objects as $obj) {
-                    if ($hasVersioned || $obj->hasExtension(Versioned::class)) {
-                        $hasVersioned = true;
-                        if ($obj->IsPublished()) {
-                            //all OK!
-                        } else {
-                            if ($this->verbose) {
-                                DB::alteration_message("Not published ".$item->getTitle(), 'deleted');
-                            }
-                            continue;
-                        }
-                    } else {
-                        if ($this->verbose) {
-                            DB::alteration_message("Not versioned, will always be searchable: ".$item->getTitle(), 'deleted');
-                        }
-                    }
                     $item = SearchEngineDataObject::find_or_make($obj);
                     if ($item) {
                         if ($this->verbose) {
-                            DB::alteration_message("Queueing ".$item->getTitle()." for indexing");
+                            DB::alteration_message("Queueing: ".$obj->getTitle()." for indexing");
                         }
-                        SearchEngineDataObjectToBeIndexed::add($item);
+                        SearchEngineDataObjectToBeIndexed::add($item, false);
                     } else {
                         if ($this->verbose) {
-                            DB::alteration_message("No need to queue ".$item->getTitle()." for indexing");
+                            DB::alteration_message("Cant not queue: ".$obj->getTitle()." for indexing");
                         }
                     }
                 }

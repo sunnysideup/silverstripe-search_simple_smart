@@ -52,6 +52,13 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     /**
      * @var array
      */
+    private static $indexes = array(
+        "Completed" => true
+    );
+
+    /**
+     * @var array
+     */
     private static $has_one = array(
         "SearchEngineDataObject" => SearchEngineDataObject::class,
     );
@@ -159,34 +166,65 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         return "ERROR";
     }
 
+    private static $_cache_for_items = [];
+
     /**
      *
      * @param SearchEngineDataObject $item
      * @return SearchEngineDataObjectToBeIndexed
      */
-    public static function add($item)
+    public static function add(SearchEngineDataObject $searchEngineDataObject, $alsoIndex = true)
     {
-        $fieldArray = [
-            "SearchEngineDataObjectID" => $item->ID,
-            "Completed" => 0
-        ];
-        $objToBeIndexedRecord = SearchEngineDataObjectToBeIndexed::get()
-            ->filter($fieldArray)->first();
-        if ($objToBeIndexedRecord) {
-            //do nothing
+        if($searchEngineDataObject && $searchEngineDataObject->exists()) {
+            if(! isset(self::$_cache_for_items[$searchEngineDataObject->ID])) {
+                $fieldArray = [
+                    "SearchEngineDataObjectID" => $searchEngineDataObject->ID,
+                    "Completed" => 0
+                ];
+                $objToBeIndexedRecord = DataObject::get_one(
+                    SearchEngineDataObjectToBeIndexed::class,
+                    $fieldArray
+                );
+                if ($objToBeIndexedRecord && $objToBeIndexedRecord->exists()) {
+                    //do nothing
+                } else {
+                    $objToBeIndexedRecord = SearchEngineDataObjectToBeIndexed::create($fieldArray);
+                    $objToBeIndexedRecord->write();
+                }
+                if (Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")) {
+                    //cron will take care of it...
+                } else {
+                    //do it immediately...
+                    if($alsoIndex) {
+                        $objToBeIndexedRecord->IndexNow($searchEngineDataObject);
+                    }
+                }
+                self::$_cache_for_items[$searchEngineDataObject->ID] = $objToBeIndexedRecord;
+            }
+            return self::$_cache_for_items[$searchEngineDataObject->ID];
         } else {
-            $objToBeIndexedRecord = SearchEngineDataObjectToBeIndexed::create($fieldArray);
-            $objToBeIndexedRecord->write();
+            user_error('The SearchEngineDataObject needs to exist');
         }
-        if (Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")) {
-            //cron will take care of it...
+    }
+
+    public function IndexNow(SearchEngineDataObject $searchEngineDataObject = null)
+    {
+        if(! $searchEngineDataObject) {
+            $searchEngineDataObject  = $this->SearchEngineDataObject();
+        }
+        if($searchEngineDataObject && $searchEngineDataObject->exists() && $searchEngineDataObject instanceof SearchEngineDataObject) {
+            $sourceObject = $searchEngineDataObject->SourceObject();
+            if($sourceObject && $sourceObject->exists()) {
+                $sourceObject->searchEngineIndex($searchEngineDataObject);
+                $this->Completed = 1;
+                $this->write();
+            } else {
+                $this->delete();
+                $searchEngineDataObject->delete();
+            }
         } else {
-            //do it immediately...
-            $item->SourceObject()->searchEngineIndex();
-            $objToBeIndexedRecord->Completed = 1;
-            $objToBeIndexedRecord->write();
+            $this->delete();
         }
-        return $objToBeIndexedRecord;
     }
 
     /**
@@ -194,16 +232,24 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      * @param bool
      * @return DataList
      */
-    public static function to_run($upToNow = false)
+    public static function to_run($oldOnesOnly = false)
     {
         $objects = SearchEngineDataObjectToBeIndexed::get()
             ->exclude(array("SearchEngineDataObjectID" => 0))
             ->filter(array("Completed" => 0));
-        if ($upToNow) {
-            //do nothing
-        } else {
+        if ($oldOnesOnly) {
             $objects = $objects->where("UNIX_TIMESTAMP(\"Created\") < ".strtotime("5 minutes ago"));
         }
         return $objects;
+    }
+
+    /**
+     * Event handler called before deleting from the database.
+     */
+    public function onBeforeDelete()
+    {
+        $this->flushCache();
+        parent::onBeforeDelete();
+        $this->flushCache();
     }
 }

@@ -20,7 +20,7 @@ class SearchEngineUpdateSearchIndex extends BuildTask
      * title of the task
      * @var string
      */
-    protected $description = "Updates all the search indexes. Boolean GET parameter available: ?uptonow";
+    protected $description = "Updates all the search indexes. Boolean GET parameter available: ?oldonesonly";
 
     /**
      * @var boolean
@@ -30,7 +30,7 @@ class SearchEngineUpdateSearchIndex extends BuildTask
     /**
      * @var boolean
      */
-    protected $upToNow = false;
+    protected $oldOnesOnly = false;
 
     /**
      * @param boolean
@@ -43,9 +43,9 @@ class SearchEngineUpdateSearchIndex extends BuildTask
     /**
      * @param boolean
      */
-    public function setUpToNow($b)
+    public function setOldOnesOnly($b)
     {
-        $this->upToNow = $b;
+        $this->oldOnesOnly = $b;
     }
 
     /**
@@ -59,21 +59,21 @@ class SearchEngineUpdateSearchIndex extends BuildTask
         ob_start();
         //evaluate get variables
         if ($request) {
-            $this->upToNow = $request->getVar("uptonow") ? true : false;
+            $this->oldOnesOnly = $request->getVar("oldonesonly") ? true : false;
         }
         //get data
         if ($this->verbose) {
             echo "<h2>Starting</h2>";
         }
-        $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->upToNow);
+        $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly);
         foreach ($searchEngineDataObjectsToBeIndexed as $searchEngineDataObjectToBeIndexed) {
-            $item = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
-            if ($item) {
-                $sourceObject = $item->SourceObject();
+            $searchEngineDataObject = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
+            if ($searchEngineDataObject) {
+                $sourceObject = $searchEngineDataObject->SourceObject();
                 if ($sourceObject) {
                     if ($sourceObject::has_extension(SearchEngineMakeSearchable::class)) {
                         if ($this->verbose) {
-                            DB::alteration_message("Indexing ".$item->DataObjectClassName.".".$item->DataObjectID."", "created");
+                            DB::alteration_message("Indexing ".$searchEngineDataObject->DataObjectClassName.".".$searchEngineDataObject->DataObjectID."", "created");
                         }
                         $sourceObject->searchEngineIndex();
                         if ($this->verbose) {
@@ -83,9 +83,9 @@ class SearchEngineUpdateSearchIndex extends BuildTask
                         }
                     } else {
                         if ($this->verbose) {
-                            DB::alteration_message("Could not find ".$item->DataObjectClassName.".".$item->DataObjectID." thus deleting entry", "deleted");
+                            DB::alteration_message("Could not find ".$searchEngineDataObject->DataObjectClassName.".".$searchEngineDataObject->DataObjectID." thus deleting entry", "deleted");
                         }
-                        $item->delete();
+                        $searchEngineDataObject->delete();
                         if ($this->verbose) {
                             flush();
                             ob_end_flush();
