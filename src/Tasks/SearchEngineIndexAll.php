@@ -8,6 +8,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\Core\Environment;
 
 class SearchEngineIndexAll extends BuildTask
 {
@@ -46,13 +47,13 @@ class SearchEngineIndexAll extends BuildTask
      */
     public function run($request)
     {
-        set_time_limit(3600);
-        ob_start();
+        //set basics
+        ini_set('memory_limit', '512M');
+        Environment::increaseMemoryLimitTo();
+        //20 minutes
+        Environment::increaseTimeLimitTo(7200);
         if ($this->verbose) {
-            DB::alteration_message("Consider running the clear all task first <a href=\"/dev/tasks/SearchEngineRemoveAll/\">remove all task</a> first. This will REMOVE ALL SEARCH ENGINE DATA.");
-        }
-        if ($this->verbose) {
-            echo "<h2>Starting</h2>";
+            $this->flushNow("<h2>Starting</h2>", false);
         }
         $classNames = SearchEngineDataObject::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
@@ -64,7 +65,7 @@ class SearchEngineIndexAll extends BuildTask
             $sort = null;
             if($count > $this->limit) {
                 $count = $this->limit;
-                $sort = 'RAND()';
+                $sort = DB::get_conn()->random().' ASC';
             }
             if ($this->verbose) {
                 echo "<h4>Found ".$count.' of '.$classTitle.'</h4>';
@@ -78,24 +79,36 @@ class SearchEngineIndexAll extends BuildTask
                     $item = SearchEngineDataObject::find_or_make($obj);
                     if ($item) {
                         if ($this->verbose) {
-                            DB::alteration_message("Queueing: ".$obj->getTitle()." for indexing");
+                            $this->flushNow("Queueing: ".$obj->getTitle()." for indexing");
                         }
                         SearchEngineDataObjectToBeIndexed::add($item, false);
                     } else {
                         if ($this->verbose) {
-                            DB::alteration_message("Cant not queue: ".$obj->getTitle()." for indexing");
+                            $this->flushNow("Cant not queue: ".$obj->getTitle()." for indexing");
                         }
                     }
-                }
-                if ($this->verbose) {
-                    flush();
-                    ob_end_flush();
-                    ob_start();
                 }
             }
         }
         if ($this->verbose) {
             echo "<h2>======================</h2>";
+        }
+    }
+
+    public function flushNow($message, $type = '', $bullet = true)
+    {
+        echo '';
+        // check that buffer is actually set before flushing
+        if (ob_get_length()) {
+            @ob_flush();
+            @flush();
+            @ob_end_flush();
+        }
+        @ob_start();
+        if ($bullet) {
+            DB::alteration_message($message, $type);
+        } else {
+            echo $message;
         }
     }
 }

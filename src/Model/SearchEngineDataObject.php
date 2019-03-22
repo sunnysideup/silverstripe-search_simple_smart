@@ -16,6 +16,7 @@ use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Versioned\Versioned;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Psr\SimpleCache\CacheInterface;
 /**
@@ -152,6 +153,21 @@ class SearchEngineDataObject extends DataObject
         "SearchEngineDataObjectToBeIndexed" => "Listed for indexing"
     );
 
+
+    private static $_original_mode = null;
+
+    public static function start_indexing_mode()
+    {
+        SearchEngineSearchRecord::flush();
+        self::$_original_mode = Versioned::get_stage();
+        Versioned::set_stage("Live");
+    }
+
+    public static function end_indexing_mode()
+    {
+        Versioned::set_stage(self::$_original_mode);
+    }
+
     /**
      * @param Member $member
      * @param array $context Additional context-specific data which might
@@ -218,7 +234,7 @@ class SearchEngineDataObject extends DataObject
 
         if ($obj->hasExtension(SearchEngineMakeSearchable::class)) {
             if($obj->SearchEngineExcludeFromIndex()) {
-                
+
                 return null;
             } else {
                 $fieldArray = array(
