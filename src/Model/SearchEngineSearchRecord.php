@@ -25,6 +25,10 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      */
     private static $table_name = 'SearchEngineSearchRecord';
 
+    /**
+     * clears all records
+     * 
+     */
     public static function flush()
     {
         if (Security::database_is_ready()) {

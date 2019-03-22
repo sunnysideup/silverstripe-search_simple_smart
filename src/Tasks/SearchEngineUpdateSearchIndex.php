@@ -2,13 +2,19 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use SilverStripe\ORM\DB;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\Core\Environment;
 
 class SearchEngineUpdateSearchIndex extends BuildTask
 {
+
+    protected $recursions = 9999;
+
+    protected $step = 10;
 
     /**
      * title of the task
@@ -55,8 +61,10 @@ class SearchEngineUpdateSearchIndex extends BuildTask
     public function run($request)
     {
         //set basics
-        set_time_limit(3600);
-        ob_start();
+        ini_set('memory_limit', '512M');
+        Environment::increaseMemoryLimitTo();
+        //20 minutes
+        Environment::increaseTimeLimitTo(7200);
         //evaluate get variables
         if ($request) {
             $this->oldOnesOnly = $request->getVar("oldonesonly") ? true : false;
@@ -65,44 +73,62 @@ class SearchEngineUpdateSearchIndex extends BuildTask
         if ($this->verbose) {
             echo "<h2>Starting</h2>";
         }
-        $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly);
-        foreach ($searchEngineDataObjectsToBeIndexed as $searchEngineDataObjectToBeIndexed) {
-            $searchEngineDataObject = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
-            if ($searchEngineDataObject) {
-                $sourceObject = $searchEngineDataObject->SourceObject();
-                if ($sourceObject) {
-                    if ($sourceObject::has_extension(SearchEngineMakeSearchable::class)) {
+
+        SearchEngineDataObject::start_indexing_mode();
+
+        for($i = 0; $i < $this->recursions; $i++ ) {
+            $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, $this->step);
+            $count = $searchEngineDataObjectsToBeIndexed->count();
+            if($count === 0) {
+                break;
+            }
+            $this->flushNow('Recursion '.$i.' with '.$count.' records');
+            foreach ($searchEngineDataObjectsToBeIndexed as $searchEngineDataObjectToBeIndexed) {
+                $searchEngineDataObject = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
+                if ($searchEngineDataObject) {
+                    $sourceObject = $searchEngineDataObject->SourceObject();
+                    if ($sourceObject) {
                         if ($this->verbose) {
-                            DB::alteration_message("Indexing ".$searchEngineDataObject->DataObjectClassName.".".$searchEngineDataObject->DataObjectID."", "created");
+                            $this->flushNow("Indexing ".$searchEngineDataObject->DataObjectClassName.".".$searchEngineDataObject->DataObjectID."", "created");
                         }
-                        $sourceObject->searchEngineIndex();
-                        if ($this->verbose) {
-                            flush();
-                            ob_end_flush();
-                            ob_start();
-                        }
+                        $sourceObject->searchEngineIndex($searchEngineDataObject, false);
                     } else {
                         if ($this->verbose) {
-                            DB::alteration_message("Could not find ".$searchEngineDataObject->DataObjectClassName.".".$searchEngineDataObject->DataObjectID." thus deleting entry", "deleted");
+                            $this->flushNow("Could not find ".$searchEngineDataObject->DataObjectClassName.".".$searchEngineDataObject->DataObjectID." thus deleting entry", "deleted");
                         }
                         $searchEngineDataObject->delete();
-                        if ($this->verbose) {
-                            flush();
-                            ob_end_flush();
-                            ob_start();
-                        }
+                    }
+                } else {
+                    if ($this->verbose) {
+                        $this->flushNow("Could not find item for: ".$searchEngineDataObjectToBeIndexed->ID, "deleted");
                     }
                 }
-            } else {
-                if ($this->verbose) {
-                    DB::alteration_message("Could not find item for: ".$searchEngineDataObjectToBeIndexed->ID, "deleted");
-                }
+                $searchEngineDataObjectToBeIndexed->Completed = 1;
+                $searchEngineDataObjectToBeIndexed->write();
             }
-            $searchEngineDataObjectToBeIndexed->Completed = 1;
-            $searchEngineDataObjectToBeIndexed->write();
         }
+        SearchEngineDataObject::end_indexing_mode();
         if ($this->verbose) {
-            DB::alteration_message("====================== completed =======================");
+            $this->flushNow("====================== completed =======================");
         }
     }
+
+
+    public function flushNow($message, $type = '', $bullet = true)
+    {
+        echo '';
+        // check that buffer is actually set before flushing
+        if (ob_get_length()) {
+            @ob_flush();
+            @flush();
+            @ob_end_flush();
+        }
+        @ob_start();
+        if ($bullet) {
+            DB::alteration_message($message, $type);
+        } else {
+            echo $message;
+        }
+    }
+
 }

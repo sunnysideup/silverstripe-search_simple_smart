@@ -61,8 +61,12 @@ class SearchEngineMakeSearchable extends DataExtension
      * deletes cached search results
      * sets stage to LIVE
      * indexes the current object.
+     * @param $searchEngineDataObject SearchEngineDataObject
+     * @param $withModeChange do everything necessary for indexings.
+     *                        Setting this to false means the stage will not be set
+     *                        and the cache will not be cleared.
      */
-    public function searchEngineIndex($searchEngineDataObject = null)
+    public function searchEngineIndex($searchEngineDataObject = null, $withModeChange = true)
     {
         //last check...
         if(! $searchEngineDataObject) {
@@ -75,12 +79,14 @@ class SearchEngineMakeSearchable extends DataExtension
         }
         if($searchEngineDataObject) {
             //clear search history
-            SearchEngineSearchRecord::flush();
-            $originalMode = Versioned::get_stage();
-            Versioned::set_stage("Live");
+            if($withModeChange) {
+                SearchEngineDataObject::start_indexing_mode();
+            }
             $fullContentArray = $this->owner->SearchEngineFullContentForIndexing();
             SearchEngineFullContent::add_data_object_array($searchEngineDataObject, $fullContentArray);
-            Versioned::set_stage($originalMode);
+            if($withModeChange) {
+                SearchEngineDataObject::end_indexing_mode();
+            }
         }
     }
 

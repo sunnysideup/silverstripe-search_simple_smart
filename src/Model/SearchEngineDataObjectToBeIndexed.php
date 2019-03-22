@@ -6,6 +6,7 @@ use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -232,11 +233,13 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      * @param bool
      * @return DataList
      */
-    public static function to_run($oldOnesOnly = false)
+    public static function to_run($oldOnesOnly = false, $limit = 10)
     {
         $objects = SearchEngineDataObjectToBeIndexed::get()
             ->exclude(array("SearchEngineDataObjectID" => 0))
-            ->filter(array("Completed" => 0));
+            ->filter(array("Completed" => 0))
+            ->sort(DB::get_conn()->random().' ASC')
+            ->limit($limit);
         if ($oldOnesOnly) {
             $objects = $objects->where("UNIX_TIMESTAMP(\"Created\") < ".strtotime("5 minutes ago"));
         }
