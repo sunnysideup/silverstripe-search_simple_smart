@@ -34,13 +34,14 @@ class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
      * return an array like
      *     Date => ASC
      *     Title => DESC
-     * @param boolean $debug
+     *
+     * @param mixed $sortProviderValues = null
      *
      * @return Array| null
      */
-    public function getSqlSortArray($debug = false)
+    public function getSqlSortArray($sortProviderValues = null)
     {
-        return array("Created" => "DESC");
+        return ["Created" => "DESC"];
     }
 
 
@@ -48,7 +49,7 @@ class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
      *
      * @return boolean
      */
-    public function hasCustomSort()
+    public function hasCustomSort($sortProviderValues = null)
     {
         return true;
     }
@@ -58,27 +59,15 @@ class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
      * Does any custom filtering
      * @param SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
-     * @param boolean $debug
      *
      * @return SS_List
      */
-    public function doCustomSort($objects, $searchRecord, $debug = false)
+    public function doCustomSort($objects, $searchRecord)
     {
         if ($objects->count() < 2) {
             //do nothing
         } else {
-            if($this->hasClassGroups()) {
-                $finalArray = $this->makeClassGroups(
-                    $objects->Map("ID", "DataObjectClassName")->toArray(),
-                    $debug
-                );
-                //retrieve objects
-                $keys = array_keys($finalArray);
-                //retrieve objects
-                $objects = SearchEngineDataObject::get()
-                    ->filter(array("ID" => $keys))
-                    ->sort("FIELD(\"ID\", ".implode(",", $keys).")");
-            }
+            $objects = $this->makeClassGroups($objects);
         }
         return $objects;
     }

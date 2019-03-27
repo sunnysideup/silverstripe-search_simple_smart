@@ -65,7 +65,7 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
     /**
      * @return DataList of SearchEngineDataObjects
      */
-    public function getRawResults()
+    public function getRawResults($returnFilter = false)
     {
 
         //1. find keywords
@@ -114,7 +114,13 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
         } else {
             $finalArray = $dataObjectArray[1];
         }
+        $filter = ["ID" => $finalArray];
+        if($returnFilter) {
 
-        return SearchEngineDataObject::get()->filter(array("ID" => $finalArray));
+            return $filter;
+        } else {
+
+            return SearchEngineDataObject::get()->filter($filter);
+        }
     }
 }

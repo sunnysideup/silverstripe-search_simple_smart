@@ -27,7 +27,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     /**
      * clears all records
-     * 
+     *
      */
     public static function flush()
     {
@@ -327,7 +327,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     {
         $field = $this->getListIDField($filterStep);
         if ($list && $list instanceof SS_List && $list->count()) {
-            $this->$field = implode(",", $list->map("ID", "ID")->toArray());
+            return $this->setListOfIDs($list->column('ID'), $filterStep);
+        } elseif(is_string($list) && $list) {
+            return $this->setListOfIDs(explode(',', $list), $filterStep);
+        } elseif(is_array($list) && $list) {
+            $this->$field = implode(',', array_unique($list));
         } else {
             $this->$field = "-1";
         }

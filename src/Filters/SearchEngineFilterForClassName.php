@@ -10,8 +10,10 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 {
 
+
+
     /**
-     * list of classes that should be "filterable"
+     * list of classes that should be included in no values are set
      * @var array
      */
     private static $classes_to_include = [];
@@ -72,20 +74,21 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     }
 
     /**
-     * returns the sort statement that is addeded to search
+     * returns the filter statement that is addeded to search
      * query prior to searching the SearchEngineDataObjects
      *
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
-     *     "LastEdited:GreaterThan" => "10-10-2001"
      *
      * @param array $filterArray
-     * @param boolean $debug
      *
      * @return array| null
      */
-    public function getSqlFilterArray($filterArray, $debug = false)
+    public function getSqlFilterArray($filterArray)
     {
+        if(! $filterArray) {
+            $filterArray = array_keys($this->getFilterList());
+        }
         $array = [];
 
         foreach ($filterArray as $className) {
@@ -107,18 +110,4 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         return false;
     }
 
-    /**
-     *
-     * Does any custom filtering
-     * @param SS_List $objects
-     * @param SearchEngineSearchRecord $searchRecord
-     * @param array $filterArray
-     * @param boolean $debug
-     *
-     * @return SS_List
-     */
-    public function doCustomFilter($objects, $searchRecord, $filterArray, $debug = false)
-    {
-        return $objects;
-    }
 }

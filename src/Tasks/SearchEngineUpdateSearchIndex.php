@@ -12,7 +12,7 @@ use SilverStripe\Core\Environment;
 class SearchEngineUpdateSearchIndex extends BuildTask
 {
 
-    protected $recursions = 9999;
+    protected $recursions = 100;
 
     protected $step = 10;
 

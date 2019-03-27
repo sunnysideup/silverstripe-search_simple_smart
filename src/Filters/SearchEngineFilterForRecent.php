@@ -7,6 +7,8 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
 {
 
+    private static $recent_string = '-1 week';
+
     /**
      * @return String
      */
@@ -45,13 +47,14 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      *     Date => ASC
      *     Title => DESC
      * @param array $filterArray
-     * @param boolean $debug
      *
      * @return Array| null
      */
-    public function getSqlFilterArray($filterArray, $debug = false)
+    public function getSqlFilterArray($filterArray)
     {
-        return array("LastEdited:GreaterThan" => date("Y-m-d", strtotime("-1 week")));
+        $recentTS = strtotime($this->Config()->get('recent_string'));
+
+        return array("LastEdited:GreaterThan" => date("Y-m-d", $recentTS));
     }
 
     /**
@@ -67,18 +70,4 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
         return false;
     }
 
-    /**
-     *
-     * Does any custom filtering
-     * @param SS_List $objects
-     * @param SearchEngineSearchRecord $searchRecord
-     * @param array $filterArray
-     * @param boolean $debug
-     *
-     * @return SS_List
-     */
-    public function doCustomFilter($objects, $searchRecord, $filterArray, $debug = false)
-    {
-        return $objects;
-    }
 }

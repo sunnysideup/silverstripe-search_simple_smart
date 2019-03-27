@@ -275,7 +275,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     }
                     if ($includeExample) {
                         $fields = explode(".", $field);
-                        $data = " ".$this->searchEngineRelObject($this->owner, $fields);
+                        $data = " ".$this->searchEngineRelObject($this->owner, $fields).' ';
                         $str .= "<li> - <strong>$title</strong> <em>".$data."</em></li>";
                     } else {
                         $str .= "<li> - $title</li>";
@@ -489,7 +489,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     if (is_array($fieldArray) && count($fieldArray)) {
                         foreach ($fieldArray as $field) {
                             $fields = explode(".", $field);
-                            $finalArray[$level] .= " ".$this->searchEngineRelObject($this->owner, $fields);
+                            $finalArray[$level] .= " ".$this->searchEngineRelObject($this->owner, $fields)." ";
                         }
                     }
                 }
@@ -510,22 +510,22 @@ class SearchEngineMakeSearchable extends DataExtension
     private function searchEngineRelObject($object, $fields, $str = "")
     {
         if (count($fields) == 0 || !is_array($fields)) {
-            $str .= $object->getTitle();
+            $str .= ' '.$object->getTitle()." ";
         } else {
             $fieldCount = count($fields);
             $possibleMethod = $fields[0];
             if(substr($possibleMethod, 0, 3) === 'get' &&  $object->hasMethod($possibleMethod) && $fieldCount == 1) {
-                $str .= $object->$possibleMethod()." ";
+                $str .= ' '.$object->$possibleMethod()." ";
             } else {
                 $dbArray = $this->searchEngineRelFields($object, "db");
                 //db field
                 if (isset($dbArray[$fields[0]])) {
                     $dbField = $fields[0];
                     if ($fieldCount == 1) {
-                        $str .= $object->$dbField." ";
+                        $str .= ' '.$object->$dbField." ";
                     } elseif ($fieldCount == 2) {
                         $method = $fields[1];
-                        $str .= $object->dbObject($dbField)->$method()." ";
+                        $str .= ' '.$object->dbObject($dbField)->$method()." ";
                     }
                 }
                 //has one relation
@@ -538,7 +538,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     //has_one relation
                     if (isset($hasOneArray[$method])) {
                         $foreignObject = $object->$method();
-                        $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
+                        $str .= ' '.$this->searchEngineRelObject($foreignObject, $fields)." ";
                     }
                     //many relation
                     else {
@@ -550,7 +550,7 @@ class SearchEngineMakeSearchable extends DataExtension
                         if (isset($manyArray[$method])) {
                             $foreignObjects = $object->$method()->limit(100);
                             foreach ($foreignObjects as $foreignObject) {
-                                $str .= $this->searchEngineRelObject($foreignObject, $fields)." ";
+                                $str .= ' '.$this->searchEngineRelObject($foreignObject, $fields)." ";
                             }
                         }
                     }
