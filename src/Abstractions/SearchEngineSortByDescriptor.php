@@ -57,19 +57,28 @@ abstract class SearchEngineSortByDescriptor
      * return an array like
      *     Date => ASC
      *     Title => DESC
-     * @param boolean $debug
      *
-     * @return array| null
+     * @param mixed $sortProviderValues
+     *
+     * @return array|null
      */
-    abstract public function getSqlSortArray($debug = false);
+    abstract public function getSqlSortArray($sortProviderValues = null);
+
+
+    protected $debug = false;
+
+    public function __construct($debug = false)
+    {
+        $this->debug = $debug;
+    }
 
     /**
      * Do we need to do custom sorting?
      * @return boolean
      */
-    public function hasCustomSort()
+    public function hasCustomSort($sortProviderValues = null)
     {
-        $array = $this->getSqlSortArray();
+        $array = $this->getSqlSortArray($sortProviderValues);
         if (is_array($array) && count($array) > 0) {
             return false;
         }
@@ -79,42 +88,61 @@ abstract class SearchEngineSortByDescriptor
     /**
      * Do any custom sorting
      *
-     * @param boolean $debug
      *
      * @param array $array - id => ClassName
      * @return SS_List
      */
-    abstract public function doCustomSort($objects, $searchRecord, $debug = false);
+    abstract public function doCustomSort($objects, $searchRecord);
 
-    protected function makeClassGroups($array, $debug = false)
+    protected function groupCustomSort($objects) {
+        if($this->hasClassGroups()) {
+            //retrieve objects
+            $keys = array_keys($finalArray);
+
+        }
+        return $objects;
+    }
+
+    /**
+     *
+     * @param  [type] $array an array if IDs,
+     * @return [type]        [description]
+     */
+    protected function makeClassGroups($objects)
     {
-        $classGroupCounts = [];
-        $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups");
-        if (is_array($classGroups) && count($classGroups)) {
-            $classGroupLimits = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits");
-            $newArray = [];
-            foreach ($classGroups as $key => $classGroupGroup) {
-                if (!isset($classGroupCounts[$key])) {
-                    $classGroupCounts[$key] = 0;
-                }
-                foreach ($array as $id => $className) {
-                    if (in_array($className, $classGroupGroup)) {
-                        if ((!isset($classGroupLimits[$key]))  || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
-                            $classGroupCounts[$key]++;
-                            $newArray[$id] = $className;
+        if($this->hasClassGroups()) {
+            if ($objects->count() > 1) {
+                $classGroupCounts = [];
+                $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups");
+                $classGroupLimits = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits");
+                $newArray = [];
+                $array = $objects->Map("ID", "DataObjectClassName")->toArray();
+                foreach ($classGroups as $key => $classGroupGroup) {
+                    if (!isset($classGroupCounts[$key])) {
+                        $classGroupCounts[$key] = 0;
+                    }
+                    foreach ($array as $id => $className) {
+                        if (in_array($className, $classGroupGroup)) {
+                            if ((!isset($classGroupLimits[$key]))  || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
+                                $classGroupCounts[$key]++;
+                                $newArray[$id] = $className;
+                            }
+                            unset($array[$id]);
                         }
-                        unset($array[$id]);
                     }
                 }
-            }
 
-            foreach ($array as $id => $className) {
-                $newArray[$id] = $className;
+                foreach ($array as $id => $className) {
+                    $newArray[$id] = $className;
+                }
+                $keys = array_keys($newArray);
+                //retrieve objects
+                $objects = SearchEngineDataObject::get()
+                    ->filter(array("ID" => $keys))
+                    ->sort("FIELD(\"ID\", ".implode(",", $keys).")");
             }
-            return $newArray;
-        } else {
-            return $array();
         }
+        return $objects;
     }
 
     protected function hasClassGroups()

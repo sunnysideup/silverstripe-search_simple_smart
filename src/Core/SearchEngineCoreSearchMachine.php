@@ -11,6 +11,7 @@ use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
 use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
+use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance;
 use SilverStripe\View\ViewableData;
 
 use SilverStripe\Core\Config\Configurable;
@@ -37,29 +38,22 @@ class SearchEngineCoreSearchMachine
 
 
     /**
-     * only search ....
-     *     [
-     *          ClassName => ID
-     *          ClassName => ID
-     *          ClassName => ID
-     *          ClassName => ID
-     *     ]
+     * ClassNameForFilter => ValuesToFilterFor...
      * @var array
      */
-    protected $preFilterClassNameID = [];
-
-
-    /**
-     *
-     * @var string
-     */
-    protected $filterProviders = "";
+    protected $filterProviders = [];
 
     /**
      *
      * @var string
      */
-    protected $sortProvider = "";
+    protected $sortProvider = SearchEngineSortByRelevance::class;
+
+    /**
+     *
+     * @var mixed
+     */
+    protected $sortProviderValues = null;
 
     /**
      *
@@ -79,10 +73,45 @@ class SearchEngineCoreSearchMachine
      */
     protected $bypassCaching = true;
 
-
-    public function setPreFilterClassNameID($array)
+    /**
+     *
+     * @param [type] $filterClassName [description]
+     * @param [type] $filterValues    [description]
+     *
+     * @return this
+     */
+    public function addFilter($filterClassName, $filterValues)
     {
-        $this->preFilterClassNameID = $array;
+        $this->filterProviders[$filterClassName] = $filterValues;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param string $sortProvider classname of a sort provider
+     * @param mixed|null $sortProviderValues    values for the sorting - if any
+     *
+     * @return this
+     */
+    public function setSorter($sortProvider, $sortProviderValues = null)
+    {
+        $this->sortProvider = $sortProvider;
+        $this->sortProviderValues = $sortProviderValues;
+
+        return $this;
+    }
+
+    public function setDebug($bool)
+    {
+        $this->debug = $bool;
+
+        return $this;
+    }
+
+    public function getDebug()
+    {
+        return $this->debug;
     }
 
     /**
@@ -94,17 +123,20 @@ class SearchEngineCoreSearchMachine
      *
      * @return DataList
      */
-    public function run($searchPhrase, $filterProviders = array(), $sortProvider = "")
+    public function run($searchPhrase, $filterProviders = [], $sortProvider = '', $sortProviderValues = null)
     {
-        if ((isset($_GET["searchenginedebug"]) || SiteConfig::current_site_config()->SearchEngineDebug) && Permission::check("SEARCH_ENGINE_ADMIN")) {
+        if ((!empty($_GET["searchenginedebug"]) || SiteConfig::current_site_config()->SearchEngineDebug) && Permission::check("SEARCH_ENGINE_ADMIN")) {
             $this->debug = true;
         }
         if (isset($_GET["flush"])) {
             $this->bypassCaching = true;
         }
         //save variables
-        $this->filterProviders = $filterProviders;
-        $this->sortProvider = $sortProvider;
+        $this->filterProviders += $filterProviders;
+        if($sortProvider) {
+            $this->sortProvider = $sortProvider;
+            $this->sortProviderValues = $sortProviderValues;
+        }
         if ($this->debug) {
             $startTime = microtime(true);
             $filterExecutedRAW = false;
@@ -113,12 +145,14 @@ class SearchEngineCoreSearchMachine
         }
 
         //add record
-        $searchRecord = SearchEngineSearchRecord::add_search($searchPhrase, $filterProviders, $this->bypassCaching);
+        $searchRecord = SearchEngineSearchRecord::add_search($searchPhrase, $this->filterProviders, $this->bypassCaching);
         if (!$searchRecord->FinalPhrase) {
             //previous data has been deleted
             //lets retrieve it again.
             $searchRecord->write();
         }
+
+        //check previously saved data.
         $listOfIDsRAW = $searchRecord->getListOfIDs("RAW");
         if (!$listOfIDsRAW) {
             if ($this->debug) {
@@ -128,6 +162,7 @@ class SearchEngineCoreSearchMachine
             $searchProviderName = Config::inst()->get(SearchEngineCoreSearchMachine::class, "class_name_for_search_provision");
             $searchProvider = Injector::inst()->get($searchProviderName);
             $searchProvider->setSearchRecord($searchRecord);
+            //get search objects that match the keywords
             $dataList = $searchProvider->getRawResults();
             $listOfIDsRAW = $searchRecord->setListOfIDs($dataList, "RAW");
         } else {
@@ -136,19 +171,18 @@ class SearchEngineCoreSearchMachine
                 ->sort("FIELD(\"ID\", ".implode(",", $listOfIDsRAW).")");
         }
 
-        if(is_array($this->preFilterClassNameID) && count($this->preFilterClassNameID)) {
-            $tempArray = [];
-            foreach($this->preFilterClassNameID as $className => $id) {
-                $tempArray[$className.$id] = '("DataObjectClassName"  = \''.addslashes($className).'\' AND "DataObjectID" = '.$id .')';
-
+        //create filters
+        if (is_array($this->filterProviders) && count($this->filterProviders)) {
+            foreach ($this->filterProviders as $filterClassName => $filterValues) {
+                $filterObjects[$filterClassName] = $filterClassName::create($this->debug);
             }
-            $dataList = $dataList->where(implode(' OR ', $tempArray));
         }
 
         /**
          * ROUND 1
          * filter and sort the datalist using SQL
          */
+        //get cached value for SQL ID List.
         $listOfIDsSQL = $searchRecord->getListOfIDs("SQL");
         $filterStringForDebug = "";
         $filterClassesWithValues = [];
@@ -156,21 +190,11 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $filterExecutedSQL = true;
             }
-            if (is_array($filterProviders) && count($filterProviders)) {
-                foreach ($filterProviders as $key => $dudd) {
-                    list($filterClassName, $filterValue) = explode(".", $key);
-                    if (!isset($filterClassesWithValues[$filterClassName])) {
-                        $filterClassesWithValues[$filterClassName] = [];
-                    }
-                    $filterClassesWithValues[$filterClassName][] = $filterValue;
-                }
-                foreach ($filterClassesWithValues as $filterClassName => $filterValues) {
-                    $filterObjects[$filterClassName] = $filterClassName::create();
-                    if ($filter = $filterObjects[$filterClassName]->getSqlFilterArray($filterValues, $this->debug)) {
-                        $dataList = $dataList->filter($filter);
-                        if ($this->debug) {
-                            $filterStringForDebug .= print_r($filter, 1);
-                        }
+            foreach($this->filterProviders as $filterClassName => $filterValues) {
+                if ($filter = $filterObjects[$filterClassName]->getSqlFilterArray($filterValues)) {
+                    $dataList = $dataList->filter($filter);
+                    if ($this->debug) {
+                        $filterStringForDebug .= $this->fancyPrintR($filter);
                     }
                 }
             }
@@ -178,15 +202,17 @@ class SearchEngineCoreSearchMachine
         } else {
             $dataList = SearchEngineDataObject::get()
                 ->filter(array("ID" => $listOfIDsSQL))
-                ->sort("FIELD(\"ID\", ".implode(",", $listOfIDsRAW).")");
+                ->sort("FIELD(\"ID\", ".implode(",", $listOfIDsSQL).")");
         }
         $hasCustomSort = false;
-        $sqlSort = [];
-        if ($sortProvider) {
-            $sortProviderObject = $sortProvider::create();
-            $hasCustomSort = $sortProviderObject->hasCustomSort();
-            $sortArray = $sortProviderObject->getSqlSortArray($this->debug);
+        $nonCustomSort = [];
+        if ($this->sortProvider) {
+            $name = $this->sortProvider;
+            $sortProviderObject = $name::create($this->debug);
+            $hasCustomSort = $sortProviderObject->hasCustomSort($this->sortProviderValues);
+            $sortArray = $sortProviderObject->getSqlSortArray($this->sortProviderValues);
             if (is_array($sortArray) && count($sortArray)) {
+                $nonCustomSort = $sortArray;
                 $dataList = $dataList->sort($sortArray);
             }
         }
@@ -200,12 +226,12 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $filterExecutedCUSTOM = true;
             }
-            foreach ($filterClassesWithValues as $filterClassName => $filterValues) {
-                if ($filterObjects[$filterClassName] && $filterObjects[$filterClassName]->hasCustomFilter($filterValues)) {
+            foreach($this->filterProviders as $filterClassName => $filterValues) {
+                if ($filterObjects[$filterClassName]->hasCustomFilter($filterValues)) {
                     if ($this->debug) {
                         $startTimeForCustomFilter = microtime(true);
                     }
-                    $dataList = $filterObjects[$filterClassName]->doCustomFilter($dataList, $searchRecord, $filterValues, $this->debug);
+                    $dataList = $filterObjects[$filterClassName]->doCustomFilter($dataList, $searchRecord, $filterValues);
                     if ($this->debug) {
                         $endTimeForCustomFilter = microtime(true);
                     }
@@ -213,13 +239,13 @@ class SearchEngineCoreSearchMachine
             }
             $listOfIDsCUSTOM = $searchRecord->setListOfIDs($dataList, "CUSTOM");
         } else {
-            $dataList = SearchEngineDataObject::get()->filter(array("ID" => $listOfIDsCUSTOM))->sort($sqlSort);
+            $dataList = SearchEngineDataObject::get()->filter(array("ID" => $listOfIDsCUSTOM))->sort($nonCustomSort);
         }
         if ($hasCustomSort) {
             if ($this->debug) {
                 $startTimeForCustomSort = microtime(true);
             }
-            $dataList = $sortProviderObject->doCustomSort($dataList, $searchRecord, $this->debug);
+            $dataList = $sortProviderObject->doCustomSort($dataList, $searchRecord);
             if ($this->debug) {
                 $endTimeForCustomSort = microtime(true);
             }
@@ -237,7 +263,7 @@ class SearchEngineCoreSearchMachine
             $this->debugArray[] = "Object Count: ".SearchEngineDataObject::get()->count();
             $this->debugArray[] = "Keyword Count: ".SearchEngineKeyword::get()->count();
             $this->debugArray[] = "---------------- Data Provided --------------";
-            $this->debugArray[] = "Filters: <pre>".print_r($filterProviders, 1)."</pre>";
+            $this->debugArray[] = "Filters: <pre>".print_r(array_keys($this->filterProviders), 1)."</pre>";
             $this->debugArray[] = "Sorters: <pre>".print_r($sortProvider, 1)."</pre>";
             $this->debugArray[] = "Phrase Entered: <pre>".print_r($searchRecord->Phrase, 1)."</pre>";
             $this->debugArray[] = "Cleaned Searched: <pre>".print_r($searchRecord->FinalPhrase, 1)."</pre>";
@@ -256,9 +282,12 @@ class SearchEngineCoreSearchMachine
             $filter1 = " (". (($filterExecutedRAW) ?    "executed " : "from cache")  ."): carried out by: ".$searchProviderName."";
             $filter2 = " (". (($filterExecutedSQL) ?    "executed"  : "from cache")  ."): <pre>".print_r($filterStringForDebug, 1)."</pre>";
             $filter3 = " (". (($filterExecutedCUSTOM) ? "executed"  : "from cache")  ."): ".((!empty($startTimeForCustomFilter)) ? "YES - seconds taken: ".round($endTimeForCustomSort - $startTimeForCustomSort, 5) : "NO")."";
-            $matches1 = (is_array($listOfIDsRAW) ? count($listOfIDsRAW).": <pre>".print_r(implode(",", $listOfIDsRAW), 1)."</pre>" : 0);
-            $matches2 = (is_array($listOfIDsSQL) ? count($listOfIDsSQL).": <pre>".print_r(implode(",", $listOfIDsSQL), 1)."</pre>" : 0);
-            $matches3 = (is_array($listOfIDsCUSTOM) ? count($listOfIDsCUSTOM).": <pre>".print_r(implode(",", $listOfIDsCUSTOM), 1)."</pre>" : 0);
+            $listOfIDsRAW = explode(',', $listOfIDsRAW);
+            $listOfIDsSQL = explode(',', $listOfIDsSQL);
+            $listOfIDsCUSTOM = explode(',', $listOfIDsCUSTOM);
+            $matches1 = (is_array($listOfIDsRAW) ? count($listOfIDsRAW).": <pre>".$this->fancyPrintR($listOfIDsRAW)."</pre>" : 0);
+            $matches2 = (is_array($listOfIDsSQL) ? count($listOfIDsSQL).": <pre>".$this->fancyPrintR($listOfIDsSQL)."</pre>" : 0);
+            $matches3 = (is_array($listOfIDsCUSTOM) ? count($listOfIDsCUSTOM).": <pre>".$this->fancyPrintR($listOfIDsCUSTOM)."</pre>" : 0);
 
             $this->debugArray[] = "STEP 1: RAW Filter $filter1";
             $this->debugArray[] = "... RAW matches $matches1";
@@ -267,16 +296,17 @@ class SearchEngineCoreSearchMachine
             $this->debugArray[] = "STEP 3: CUSTOM Filter $filter3";
             $this->debugArray[] = "... CUSTOM matches $matches3";
             $this->debugArray[] = "---------------- Sorting --------------";
-            $this->debugArray[] = "SQL SORT: <pre>".print_r($sqlSort, 1)."</pre>";
+            $this->debugArray[] = "SQL SORT: <pre>".print_r($nonCustomSort, 1)."</pre>";
             $this->debugArray[] = "CUSTOM SORT: <pre>".((!empty($startTimeForCustomSort)) ? "YES - seconds taken: ".round($endTimeForCustomSort - $startTimeForCustomSort, 5) : "NO")."</pre>";
         }
 
         return $dataList;
     }
 
-    public function ConvertDataListToOriginalObjects($dataList)
+    public function ConvertDataListToOriginalObjects($dataList, $limit = 500)
     {
         $al = ArrayList::create();
+        $dataList = $dataList->limit($limit);
         foreach($dataList as $dataListItem)
         {
             $item = $dataListItem->SourceObject();
@@ -284,6 +314,8 @@ class SearchEngineCoreSearchMachine
                 $al->push($item);
             }
         }
+
+        return $al;
     }
 
     /**
@@ -296,5 +328,28 @@ class SearchEngineCoreSearchMachine
             return "<h3>Debug Info</h3><ul><li>".implode("</li><li>", $this->debugArray)."</li></ul>";
         }
         return "";
+    }
+
+
+    private function fancyPrintR($array, $limit = 50)
+    {
+        if(is_array($array)) {
+            if(count($array) <= $limit) {
+                foreach($array as $key => $values) {
+                    if(is_array($values)) {
+                        return '
+                        <br />'.$key.': '.$this->fancyPrintR($values);
+                    } else {
+                        $this->fancyPrintR($key);
+                    }
+                }
+                return print_r($array, 1);
+            } else {
+                return print_r(array_splice($array, 0, $limit), 1).'
+                <br />... AND MORE';
+            }
+        } else {
+            return print_r($array, 1);
+        }
     }
 }

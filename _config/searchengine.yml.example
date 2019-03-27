@@ -58,11 +58,11 @@ Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm:
   jquery_source: "foo/bar/jquery.js"
   full_results_page_type: "MySearchResultsPage"
   sort_by_options:
-    - SearchEngineSortByRelevance
-    - SearchEngineSortByLastEdited
+    - Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance
+    - Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByLastEdited
   filter_for_options:
-    - SearchEngineFilterForClassName
-    - SearchEngineFilterForRecent
+    - Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName
+    - Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForRecent
 
 Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName:
   classes_to_include:

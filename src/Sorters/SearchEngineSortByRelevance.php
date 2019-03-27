@@ -42,11 +42,11 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      *     Date => ASC
      *     Title => DESC
      *
-     * @param boolean $debug
+     * @param mixed $sortProviderValues
      *
      * @return array
      */
-    public function getSqlSortArray($debug = false)
+    public function getSqlSortArray($sortProviderValues = null)
     {
         return [];
     }
@@ -55,7 +55,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      *
      * @return boolean
      */
-    public function hasCustomSort()
+    public function hasCustomSort($sortProviderValues = null)
     {
         return true;
     }
@@ -65,16 +65,25 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      *
      * @param SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
-     * @param boolean $debug
      *
      * @return SS_List
      */
-    public function doCustomSort($objects, $searchRecord, $debug = false)
+    public function doCustomSort($objects, $searchRecord)
     {
         if ($objects->count() < 2) {
             //do nothing
         } else {
-            $array = array(0 => 0);
+            $array = array(0 => -1);
+            $fromSQL = '
+                FROM "SearchEngineFullContent"
+                    INNER JOIN "SearchEngineDataObject"
+                        ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
+            ';
+            $sortSQL = '
+                ORDER BY
+                    "Level",
+                    RELEVANCE DESC
+            ';
 
             //look for complete phrase if there is more than one word.
             //exact full match of search phrase using relevance, level 1 first
@@ -82,54 +91,49 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             if (count(explode(" ", $searchRecord->Phrase) > 1)) {
                 $sql = '
                     SELECT
-                        "SearchEngineDataObjectID" AS ItemID,
-                        "DataObjectClassName" AS ItemClassName,
-                        LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content") AS FIRSTPOSITION
-                    FROM "SearchEngineFullContent"
-                        INNER JOIN "SearchEngineDataObject"
-                            ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
+                        "SearchEngineDataObject"."ID" AS MyID,
+                        (999999 - LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content")) AS RELEVANCE
+                    '.$fromSQL.'
                     WHERE
                         "Content" LIKE \'%'.Convert::raw2sql($searchRecord->Phrase).'%\'
                         AND "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                    ORDER BY
-                        "Level" ASC,
-                        FIRSTPOSITION ASC;';
+                    '.$sortSQL.'
+                ;';
                 $rows = DB::query($sql);
                 foreach ($rows as $row) {
-                    if (!isset($array[$row["ItemID"]])) {
-                        $array[$row["ItemID"]] = $row["ItemClassName"];
+                    if(! isset($array[$row["MyID"]])) {
+                        $array[$row["MyID"]] = $row["RELEVANCE"];
                     }
                 }
             }
             //fulltext using relevance, level 1 first.
             $sql = '
-                SELECT "SearchEngineDataObjectID" AS ItemID,"DataObjectClassName" AS ItemClassName, MATCH ("Content") AGAINST (\''.$searchRecord->FinalPhrase.'\') AS RELEVANCE
-                FROM "SearchEngineFullContent"
-                        INNER JOIN "SearchEngineDataObject"
-                            ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
-                WHERE "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                    AND "SearchEngineDataObjectID" NOT IN ('.implode(",", array_keys($array)).')
-                ORDER BY "Level", RELEVANCE DESC';
+                SELECT
+                    "SearchEngineDataObject"."ID" AS MyID,
+                    MATCH ("Content") AGAINST (\''.$searchRecord->FinalPhrase.'\') AS RELEVANCE
+                '.$fromSQL.'
+                WHERE
+                    "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
+                    AND "SearchEngineDataObjectID" NOT IN ('.implode(",", $array).')
+                    '.$sortSQL.'
+                ;';
             $rows = DB::query($sql);
             foreach ($rows as $row) {
-                if (!isset($array[$row["ItemID"]])) {
-                    $array[$row["ItemID"]] = $row["ItemClassName"];
+                if(! isset($array[$row["MyID"]])) {
+                    $array[$row["MyID"]] = $row["RELEVANCE"];
                 }
             }
-            if($this->hasClassGroups()) {
-                $finalArray = $this->makeClassGroups(
-                    $array,
-                    $debug
-                );
-            } else {
-                $finalArray = $array;
-            }
-            $keys = array_keys($finalArray);
+            $ids = array_keys($array);
+
             //retrieve objects
             $objects = SearchEngineDataObject::get()
-                ->filter(array("ID" => $keys))
-                ->sort("FIELD(\"ID\", ".implode(",", $keys).")");
+                ->filter(array("ID" => $ids))
+                ->sort("FIELD(\"ID\", ".implode(",", $ids).")");
+
+            //group results!
+            $objects = $this->makeClassGroups($objects);
         }
+
         return $objects;
     }
 }
