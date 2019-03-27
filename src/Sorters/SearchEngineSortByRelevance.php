@@ -88,21 +88,25 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //look for complete phrase if there is more than one word.
             //exact full match of search phrase using relevance, level 1 first
             //and further upfront in text as second sort by.
-            if (count(explode(" ", $searchRecord->Phrase) > 1)) {
-                $sql = '
-                    SELECT
-                        "SearchEngineDataObject"."ID" AS MyID,
-                        (999999 - LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content")) AS RELEVANCE
-                    '.$fromSQL.'
-                    WHERE
-                        "Content" LIKE \'%'.Convert::raw2sql($searchRecord->Phrase).'%\'
-                        AND "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                    '.$sortSQL.'
-                ;';
-                $rows = DB::query($sql);
-                foreach ($rows as $row) {
-                    if(! isset($array[$row["MyID"]])) {
-                        $array[$row["MyID"]] = $row["RELEVANCE"];
+            $phraseArray = explode(" ", $searchRecord->Phrase);
+            if(is_array($phraseArray)) {
+                $phraseArrayCount = count($phraseArray);
+                if (count($phraseArrayCount) > 1) {
+                    $sql = '
+                        SELECT
+                            "SearchEngineDataObject"."ID" AS MyID,
+                            (999999 - LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content")) AS RELEVANCE
+                        '.$fromSQL.'
+                        WHERE
+                            "Content" LIKE \'%'.Convert::raw2sql($searchRecord->Phrase).'%\'
+                            AND "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
+                        '.$sortSQL.'
+                    ;';
+                    $rows = DB::query($sql);
+                    foreach ($rows as $row) {
+                        if(! isset($array[$row["MyID"]])) {
+                            $array[$row["MyID"]] = $row["RELEVANCE"];
+                        }
                     }
                 }
             }
