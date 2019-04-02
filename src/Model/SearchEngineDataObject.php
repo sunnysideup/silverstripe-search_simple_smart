@@ -11,12 +11,15 @@ use SilverStripe\CMS\Model\VirtualPage;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\Assets\Folder;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\ReadonlyField;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Psr\SimpleCache\CacheInterface;
 /**
@@ -124,7 +127,6 @@ class SearchEngineDataObject extends DataObject
      */
     private static $casting = array(
         "Title" => "Varchar",
-        "ListedForIndexing" => "Boolean",
         "HTMLOutput" => "HTMLText",
         "HTMLOutputMoreDetails" => "HTMLText"
     );
@@ -134,7 +136,10 @@ class SearchEngineDataObject extends DataObject
      */
     private static $summary_fields = array(
         "Title" => "Title",
-        "LastEdited.Nice" => "Last Updated"
+        "LastEdited.Nice" => "Last Updated",
+        "SearchEngineDataObjectToBeIndexed.Count" => 'Indexed Times',
+        "SearchEngineKeywords_Level1.Count" => 'Level1 Keywords',
+        "SearchEngineKeywords_Level2.Count" => 'Level2 Keywords'
     );
 
     /**
@@ -310,17 +315,11 @@ class SearchEngineDataObject extends DataObject
         } else {
             $objectName = "ERROR: NOT FOUND";
         }
+
         return $objectClassName.": ".$objectName;
     }
 
-    /**
-     * @casted variable
-     * @return bool
-     */
-    public function getListedForIndexing()
-    {
-        return $this->SearchEngineDataObjectToBeIndexedID ? true : false;
-    }
+
 
     /**
      * @param boolean $moreDetails
@@ -396,13 +395,26 @@ class SearchEngineDataObject extends DataObject
 
     /**
      *
-     * @return DataObject | null
+     * @return DataObject|null
      */
     public function SourceObject()
     {
         $className = $this->DataObjectClassName;
         $id = $this->DataObjectID;
+
         return $className::get()->byID($id);
+    }
+
+    /**
+     *
+     * @return DataObject|null
+     */
+    public function SourceObjectExists()
+    {
+        $className = $this->DataObjectClassName;
+        $id = $this->DataObjectID;
+
+        return $className::get()->filter(['ID' => $id])->count() === 1 ? true : false;
     }
 
     /**
@@ -449,4 +461,57 @@ class SearchEngineDataObject extends DataObject
         }
         return self::$_special_sort_group[$this->DataObjectClassName];
     }
+
+
+    /**
+     * CMS Fields
+     * @return FieldList
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        $fields->addFieldToTab(
+            'Root.Main',
+            ReadonlyField::create(
+                'Title',
+                'Title'
+            ),
+            'DataObjectClassName'
+        );
+        $object = $this->SourceObject();
+        if($object && $object->hasMethod('CMSEditLink')) {
+            $fields->addFieldToTab(
+                'Root.Main',
+                ReadonlyField::create(
+                    'CMSLink',
+                    'Open in CMS',
+                    DBField::create_field('HTMLText', '<a href="'.$object->CMSEditLink().'" target="_blank">open actual object in the cms</a>')
+                )
+            );
+        }
+        if($object && $object->hasMethod('Link')) {
+            $fields->addFieldToTab(
+                'Root.Main',
+                ReadonlyField::create(
+                    'FrontEndLink',
+                    'Open on site',
+                    DBField::create_field('HTMLText', '<a href="'.$object->Link().'" target="_blank">open on site</a>')
+                )
+            );
+        }
+
+        if ($myTab = $fields->fieldByName('Root.SearchEngineKeywords_Level2')) {
+            $fields->removeFieldFromTab('Root', 'SearchEngineKeywords_Level2');
+            $fields->fieldByName('Root')->push($myTab);
+        }
+
+
+        return $fields;
+    }
+
+    public function CMSEditLink()
+    {
+        return '/admin/searchengine/Sunnysideup-SearchSimpleSmart-Model-SearchEngineDataObject/EditForm/field/Sunnysideup-SearchSimpleSmart-Model-SearchEngineDataObject/item/'.$this->ID.'/edit';
+    }
+
 }
