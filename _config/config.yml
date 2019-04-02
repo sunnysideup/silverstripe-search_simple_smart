@@ -17,9 +17,3 @@ SilverStripe\CMS\Model\VirtualPage:
 
 SilverStripe\CMS\Model\RedirectorPage:
   search_engine_exclude_from_index: true
-
-SilverStripe\Admin\LeftAndMain:
-  extra_requirements_css:
-    - 'sunnysideup/search_simple_smart: client/css/CMS.css'
-  extra_requirements_javascript:
-    - 'sunnysideup/search_simple_smart: client/javascript/CMS.js'

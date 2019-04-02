@@ -16,6 +16,13 @@ use SilverStripe\Dev\BuildTask;
 
 class SearchEngineRemoveAll extends BuildTask
 {
+    /**
+     * Set a custom url segment (to follow dev/tasks/)
+     *
+     * @config
+     * @var string
+     */
+    private static $segment = 'SearchEngineRemoveAll';
 
     /**
      * list of all model tables
@@ -74,4 +81,10 @@ class SearchEngineRemoveAll extends BuildTask
         DB::alteration_message("====================== completed =======================");
         DB::alteration_message("Please make sure to run a <a href=\"/dev/build/\">dev/build</a> to finalise your cleanup");
     }
+
+    function Link()
+    {
+        return '/dev/tasks/'.$this->Config()->get('segment');
+    }
+
 }
