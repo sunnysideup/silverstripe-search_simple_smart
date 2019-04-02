@@ -101,8 +101,9 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 ;';
                 $rows = DB::query($sql);
                 foreach ($rows as $row) {
-                    if(! isset($array[$row["MyID"]])) {
-                        $array[$row["MyID"]] = $row["RELEVANCE"];
+                    $id = $row["MyID"];
+                    if(! isset($array[$id])) {
+                        $array[$id] = $row["RELEVANCE"];
                     }
                 }
             }
@@ -114,13 +115,14 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 '.$fromSQL.'
                 WHERE
                     "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                    AND "SearchEngineDataObjectID" NOT IN ('.implode(",", $array).')
+                    AND "SearchEngineDataObjectID" NOT IN ('.implode(",", array_keys($array)).')
                     '.$sortSQL.'
                 ;';
             $rows = DB::query($sql);
             foreach ($rows as $row) {
-                if(! isset($array[$row["MyID"]])) {
-                    $array[$row["MyID"]] = $row["RELEVANCE"];
+                $id = $row["MyID"];
+                if(! isset($array[$id])) {
+                    $array[$id] = $row["RELEVANCE"];
                 }
             }
             $ids = array_keys($array);

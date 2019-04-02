@@ -53,9 +53,6 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      */
     public function getSqlFilterArray($filterArray)
     {
-        if($this->debug) {
-            print_r($filterArray);
-        }
         return ["DataObjectID" => $filterArray];
     }
 

@@ -8,6 +8,8 @@ use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\ReadonlyField;
 
 /**
  * presents a list of dataobjects
@@ -83,6 +85,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     private static $summary_fields = array(
         "Title" => "Searchable Object",
+        "Created.Nice" => "Added On",
         "Completed.Nice" => "Completed"
     );
 
@@ -254,5 +257,29 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         $this->flushCache();
         parent::onBeforeDelete();
         $this->flushCache();
+    }
+
+    /**
+     * CMS Fields
+     * @return FieldList
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        if($obj = $this->SearchEngineDataObject()) {
+            $fields->replaceField(
+                'SearchEngineDataObjectID',
+                ReadonlyField::create(
+                    'SearchEngineDataObjectTitle',
+                    'Object',
+                    DBField::create_field(
+                        'HTMLText',
+                        '<a href="'.$obj->CMSEditLink().'">'.$obj->getTitle().'</a>'
+                    )
+                )
+            );
+        }
+
+        return $fields;
     }
 }
