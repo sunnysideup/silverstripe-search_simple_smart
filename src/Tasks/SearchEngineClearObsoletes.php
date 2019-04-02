@@ -17,7 +17,7 @@ class SearchEngineClearObsoletes extends BuildTask
     /**
      * @var int
      */
-    protected $limit = 10000;
+    protected $limit = 100000;
 
     /**
      * @var int
@@ -75,6 +75,8 @@ class SearchEngineClearObsoletes extends BuildTask
                 if($obj->SourceObjectExists() === false) {
                     $this->flushNow('DELETING '.$obj->ID);
                     $obj->delete();
+                } else {
+                    $this->flushNow('OK ... '.$obj->ID);
                 }
             }
         }

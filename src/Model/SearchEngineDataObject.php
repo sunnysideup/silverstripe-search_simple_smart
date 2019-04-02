@@ -485,7 +485,7 @@ class SearchEngineDataObject extends DataObject
                 ReadonlyField::create(
                     'CMSLink',
                     'Open in CMS',
-                    DBField::create_field('HTMLText', '<a href="'.$object->CMSEditLink().'" target="_blank">open actual object in the cms</a>')
+                    DBField::create_field('HTMLText', '<a href="'.$object->CMSEditLink().'" target="_blank">open to edit</a>')
                 )
             );
         }
@@ -494,8 +494,8 @@ class SearchEngineDataObject extends DataObject
                 'Root.Main',
                 ReadonlyField::create(
                     'FrontEndLink',
-                    'Open on site',
-                    DBField::create_field('HTMLText', '<a href="'.$object->Link().'" target="_blank">open on site</a>')
+                    'Open on front-end',
+                    DBField::create_field('HTMLText', '<a href="'.$object->Link().'" target="_blank">open to view</a>')
                 )
             );
         }
