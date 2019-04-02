@@ -8,6 +8,8 @@ use SilverStripe\Core\Config\Config;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\ReadonlyField;
 
 /**
  * Full Content for each dataobject, separated by level of importance.
@@ -91,6 +93,14 @@ class SearchEngineFullContent extends DataObject
         "Level" => "Level",
         "ShortContent" => "Content"
     );
+
+    /**
+     * Defines a default list of filters for the search context
+     * @var array
+     */
+    private static $searchable_fields = [
+        'Level' => 'ExtactMatchFilter'
+    ];
 
     /*
      * @var array
@@ -297,4 +307,30 @@ class SearchEngineFullContent extends DataObject
         );
         return $content;
     }
+
+    /**
+     * CMS Fields
+     * @return FieldList
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        if($obj = $this->SearchEngineDataObject()) {
+            $fields->replaceField(
+                'SearchEngineDataObjectID',
+                ReadonlyField::create(
+                    'SearchEngineDataObjectTitle',
+                    'Object',
+                    DBField::create_field(
+                        'HTMLText',
+                        '<a href="'.$obj->CMSEditLink().'">'.$obj->getTitle().'</a>'
+                    )
+                )
+            );
+        }
+        return $fields;
+    }
+
+
+
 }

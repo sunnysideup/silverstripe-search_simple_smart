@@ -85,9 +85,17 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     private static $summary_fields = array(
         "Title" => "Searchable Object",
-        "Created.Nice" => "Added On",
+        "Created" => "Added On",
         "Completed.Nice" => "Completed"
     );
+
+    /**
+     * Defines a default list of filters for the search context
+     * @var array
+     */
+    private static $searchable_fields = [
+        'Completed' => 'ExtactMatchFilter'
+    ];
 
     /**
      * @var array

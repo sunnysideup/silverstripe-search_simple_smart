@@ -97,30 +97,85 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
             } else {
                 $jsLastChanged = "unknown";
             }
-            $printNice = [];
             $field = new FieldList(
                 new TabSet(
                     'Root',
                     new Tab(
                         'Settings',
-                        $printNice[] = HTMLReadonlyField::create(
+                        HTMLReadonlyField::create(
                             "searchable_class_names",
                             'Searchable Class Names',
-                            $this->printNice(SearchEngineDataObject::searchable_class_names())
+                            $this->printNice((SearchEngineDataObject::searchable_class_names()))
                         ),
-                        $printNice[] = HTMLReadonlyField::create("classes_to_exclude", 'Data Object - Classes To Exclude', $this->printNice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))),
-                        HTMLReadonlyField::create("class_name_for_search_provision", 'Class or Search Provision', Config::inst()->get(SearchEngineCoreSearchMachine::class, "class_name_for_search_provision")),
-                        HTMLReadonlyField::create("remove_all_non_alpha_numeric", 'Keywords - Remove Non Alpha Numeric Keywords', Config::inst()->get(SearchEngineKeyword::class, "remove_all_non_alpha_numeric")? "True" : "False"),
-                        HTMLReadonlyField::create("add_stop_words", 'Keyword Find And Remove - Add Stop Words', Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words")? "True" : "False"),
-                        HTMLReadonlyField::create("remove_all_non_alpha_numeric_full_content", 'Full Content - Remove Non Alpha Numeric Keywords', Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric")? "True" : "False"),
-                        HTMLReadonlyField::create(SearchEngineDataObjectToBeIndexed::class, 'Cron Job Is Running - make sure to turn this on once you have set up your Cron Job', Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")? "True" : "False"),
-                        $printNice[] = HTMLReadonlyField::create("search_engine_default_level_one_fields", 'Make Searchable - Default Level 1 Fields', $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))),
-                        $printNice[] = HTMLReadonlyField::create("search_engine_default_excluded_db_fields", 'Make Searchable - Fields Excluded by Default', $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))),
-                        $printNice[] = HTMLReadonlyField::create("class_groups", 'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups"))),
-                        $printNice[] = HTMLReadonlyField::create("class_group_limits", 'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))),
-                        $printNice[] = HTMLReadonlyField::create("classes_to_include", 'Filter for class names list - OPTIONAL', $this->printNice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))),
-                        $printNice[] = HTMLReadonlyField::create("get_js_keyword_file_name", 'Location for saving Keywords as JSON for autocomplete', $this->printNice(SearchEngineKeyword::get_js_keyword_file_name())),
-                        $printNice[] = HTMLReadonlyField::create("get_js_keyword_file_last_changed", 'Keyword autocomplete last updated ... (see tasks to update keyword list) ', $jsLastChanged)
+                        HTMLReadonlyField::create(
+                            "classes_to_exclude",
+                            'Data Object - Classes To Exclude',
+                            $this->printNice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))
+                        ),
+                        HTMLReadonlyField::create(
+                            "class_name_for_search_provision",
+                            'Class or Search Provision',
+                            Config::inst()->get(SearchEngineCoreSearchMachine::class, "class_name_for_search_provision")),
+                        HTMLReadonlyField::create(
+                            "remove_all_non_alpha_numeric",
+                            'Keywords - Remove Non Alpha Numeric Keywords',
+                            Config::inst()->get(SearchEngineKeyword::class, "remove_all_non_alpha_numeric")? "True" : "False"
+                        ),
+                        HTMLReadonlyField::create(
+                            "add_stop_words",
+                            'Add Default Stop Words',
+                            Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words")? "True" : "False"
+                        ),
+                        HTMLReadonlyField::create(
+                            "add_stop_words_length",
+                            'Length of Default Stop Words List',
+                            Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words_length")
+                        ),
+                        HTMLReadonlyField::create(
+                            "remove_all_non_alpha_numeric_full_content",
+                            'Full Content - Remove Non Alpha Numeric Keywords',
+                            Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric")? "True" : "False"
+                        ),
+                        HTMLReadonlyField::create(
+                            SearchEngineDataObjectToBeIndexed::class,
+                            'Cron Job Is Running - make sure to turn this on once you have set up your Cron Job',
+                            Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")? "True" : "False"
+                        ),
+                        HTMLReadonlyField::create(
+                            "search_engine_default_level_one_fields",
+                            'Make Searchable - Default Level 1 Fields',
+                            $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))
+                        ),
+                        HTMLReadonlyField::create(
+                            "search_engine_default_excluded_db_fields",
+                            'Make Searchable - Fields Excluded by Default',
+                            $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))
+                        ),
+                        HTMLReadonlyField::create(
+                            "class_groups",
+                            'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL',
+                            $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups"))
+                        ),
+                        HTMLReadonlyField::create(
+                            "class_group_limits",
+                            'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL',
+                            $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))
+                        ),
+                        HTMLReadonlyField::create(
+                            "classes_to_include",
+                            'Filter for class names list - OPTIONAL',
+                            $this->printNice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))
+                        ),
+                        HTMLReadonlyField::create(
+                            "get_js_keyword_file_name",
+                            'Location for saving Keywords as JSON for autocomplete',
+                            $this->printNice(SearchEngineKeyword::get_js_keyword_file_name())
+                        ),
+                        HTMLReadonlyField::create(
+                            "get_js_keyword_file_last_changed",
+                            'Keyword autocomplete last updated ... (see tasks to update keyword list) ',
+                            $jsLastChanged
+                        )
                     ),
                     new Tab(
                         'Tasks',
@@ -173,25 +228,31 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     protected function printNice($arr)
     {
         if (is_array($arr)) {
+
             return $this->array2ul($arr);
         } else {
-            $string = "<pre>".print_r($arr, true)."</pre>";
-            return $string;
+
+            return "<pre>".print_r($arr, true)."</pre>";
         }
     }
 
     //code by acmol
     protected function array2ul($array)
     {
-        $out="<ul>";
+        $out = '<ul>';
         foreach ($array as $key => $elem) {
             if (!is_array($elem)) {
-                $out = $out."<li><span><em>$key:</em> $elem</span></li>";
+                if($key === intval($key)) {
+                    $out .= '<li><span>'.$elem.'</span></li>';
+                } else {
+                    $out .= '<li><span><em>'.$key.' --- </em> '.$elem.'</span></li>';
+                }
             } else {
-                $out=$out."<li><span>$key</span>".$this->array2ul($elem)."</li>";
+                $out .= '<li><span>'.$key.'</span>'.$this->array2ul($elem).'</li>';
             }
         }
-        $out=$out."</ul>";
+        $out .= '</ul>';
+
         return $out;
     }
 
