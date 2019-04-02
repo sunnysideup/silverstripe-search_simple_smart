@@ -12,6 +12,13 @@ use SilverStripe\Core\Environment;
 
 class SearchEngineIndexAll extends BuildTask
 {
+    /**
+     * Set a custom url segment (to follow dev/tasks/)
+     *
+     * @config
+     * @var string
+     */
+    private static $segment = 'SearchEngineIndexAll';
 
     /**
      * @var int
@@ -111,4 +118,10 @@ class SearchEngineIndexAll extends BuildTask
             echo $message;
         }
     }
+
+    function Link()
+    {
+        return '/dev/tasks/'.$this->Config()->get('segment');
+    }
+
 }

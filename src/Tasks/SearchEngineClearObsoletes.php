@@ -15,6 +15,14 @@ class SearchEngineClearObsoletes extends BuildTask
 {
 
     /**
+     * Set a custom url segment (to follow dev/tasks/)
+     *
+     * @config
+     * @var string
+     */
+    private static $segment = 'SearchEngineClearObsoletes';
+
+    /**
      * @var int
      */
     protected $limit = 100000;
@@ -102,4 +110,11 @@ class SearchEngineClearObsoletes extends BuildTask
             echo $message;
         }
     }
+
+
+    function Link()
+    {
+        return '/dev/tasks/'.$this->Config()->get('segment');
+    }
+
 }

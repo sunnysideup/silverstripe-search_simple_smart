@@ -22,7 +22,11 @@ use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName;
 use SilverStripe\Forms\Tab;
+use Sunnysideup\SearchSimpleSmart\Tasks\SearchEngineIndexAll;
+use Sunnysideup\SearchSimpleSmart\Tasks\SearchEngineRemoveAll;
+use Sunnysideup\SearchSimpleSmart\Tasks\SearchEngineClearObsoletes;
 use Sunnysideup\SearchSimpleSmart\Tasks\SearchEngineCreateKeywordJS;
+use Sunnysideup\SearchSimpleSmart\Tasks\SearchEngineUpdateSearchIndex;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Forms\FieldList;
@@ -72,30 +76,44 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     {
         $form = parent::getEditForm();
         if ($this->modelClass == SearchEngineAdvancedSettings::class) {
-            Requirements::customScript("SearchEngineManifest();", "SearchEngineManifest");
-
-            $classNames = SearchEngineDataObject::searchable_class_names();
-            asort($classNames);
-            $manifest = "";
-            if (is_array($classNames) && count($classNames)) {
-                $manifest .= "<div id=\"SearchEngineManifest\"><ul>";
-                foreach ($classNames as $className => $classNameTitle) {
-                    $numberOfIndexedObjects = SearchEngineDataObject::get()->filter(array("DataObjectClassName" => $className))->count();
-                    $manifest .= "<li class=\"".($numberOfIndexedObjects ? "hasEntries" : "doesNotHaveEntries")."\"><h3>$classNameTitle ($numberOfIndexedObjects)</h3><ul>";
-                    $class = Injector::inst()->get($className);
-                    $manifest .= "<li><strong>Fields Indexed (level 1 / 2  is used to determine importance for relevance sorting):</strong>".$class->SearchEngineFieldsToBeIndexedHumanReadable()."</li>";
-                    $manifest .= "<li><strong>Templates:</strong>".$this->printNice($class->SearchEngineResultsTemplates(false))."</li>";
-                    $manifest .= "<li><strong>Templates (more details):</strong>".$this->printNice($class->SearchEngineResultsTemplates(true))."</li>";
-                    $manifest .= "<li><strong>Also trigger:</strong>".$this->printNice($class->SearchEngineAlsoTrigger())."</li>";
-                    $manifest .= "</ul></li>";
-                }
-                $manifest .= "</ul></div>";
-            }
             $jsLastChanged = "";
             if (file_exists(SearchEngineKeyword::get_js_keyword_file_name(true))) {
                 $jsLastChanged = Date("Y-m-d H:i", filemtime(SearchEngineKeyword::get_js_keyword_file_name(true)));
             } else {
                 $jsLastChanged = "unknown";
+            }
+            $tasks = [
+                SearchEngineRemoveAll::class,
+                SearchEngineIndexAll::class,
+                SearchEngineUpdateSearchIndex::class,
+                SearchEngineClearObsoletes::class,
+                SearchEngineCreateKeywordJS::class,
+            ];
+            $linkFields = [];
+            $linkFields[] = HTMLReadonlyField::create(
+                "DebugTestField",
+                "Debug Search", "
+                <h4>
+                To debug a search, please add ?searchenginedebug=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
+                <br /><br />
+                To bypass all caching please add ?flush=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
+                <br /><br />
+                Also please review the <a href=\"/searchenginemanifest\">full search manifest</a>.
+                </h4>"
+            );
+            foreach($tasks as $task) {
+                $taskObject = Injector::inst()->get($task);
+                $linkFields[] = HTMLReadonlyField::create(
+                    rand(0,333333),
+                    $taskObject->getTitle(),
+                    '
+                        <h4>
+                        '.$taskObject->getDescription().'
+                        <br /><br />
+                        <a href="'.$taskObject->Link().'">Run now .... (careful!)</a>
+                        </h4>
+                    '
+                );
             }
             $field = new FieldList(
                 new TabSet(
@@ -105,12 +123,12 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             "searchable_class_names",
                             'Searchable Class Names',
-                            $this->printNice((SearchEngineDataObject::searchable_class_names()))
+                            self::print_nice((SearchEngineDataObject::searchable_class_names()))
                         ),
                         HTMLReadonlyField::create(
                             "classes_to_exclude",
                             'Data Object - Classes To Exclude',
-                            $this->printNice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))
+                            self::print_nice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))
                         ),
                         HTMLReadonlyField::create(
                             "class_name_for_search_provision",
@@ -144,64 +162,49 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             "search_engine_default_level_one_fields",
                             'Make Searchable - Default Level 1 Fields',
-                            $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))
+                            self::print_nice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))
                         ),
                         HTMLReadonlyField::create(
                             "search_engine_default_excluded_db_fields",
                             'Make Searchable - Fields Excluded by Default',
-                            $this->printNice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))
+                            self::print_nice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))
                         ),
                         HTMLReadonlyField::create(
                             "class_groups",
                             'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL',
-                            $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups"))
+                            self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups"))
                         ),
                         HTMLReadonlyField::create(
                             "class_group_limits",
                             'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL',
-                            $this->printNice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))
+                            self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))
                         ),
                         HTMLReadonlyField::create(
                             "classes_to_include",
                             'Filter for class names list - OPTIONAL',
-                            $this->printNice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))
+                            self::print_nice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))
                         ),
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_name",
                             'Location for saving Keywords as JSON for autocomplete',
-                            $this->printNice(SearchEngineKeyword::get_js_keyword_file_name())
+                            self::print_nice(SearchEngineKeyword::get_js_keyword_file_name())
                         ),
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_last_changed",
                             'Keyword autocomplete last updated ... (see tasks to update keyword list) ',
                             $jsLastChanged
                         )
-                    ),
-                    new Tab(
-                        'Tasks',
-                        $removeAllField = HTMLReadonlyField::create("RemoveAllSearchData", "1. Remove All Search Data", "<h4><a href=\"/dev/tasks/SearchEngineRemoveAll\">Run Task: remove all</a></h4>"),
-                        $indexAllField = HTMLReadonlyField::create("IndexAllObjects", "2. Queue for indexing", "<h4><a href=\"/dev/tasks/SearchEngineIndexAll\">Run Task: list all for indexing</a></h4>"),
-                        $updateVerboseField = HTMLReadonlyField::create("UpdateSearchIndexVerbose", "3. Do index", "<h4><a href=\"/dev/tasks/SearchEngineUpdateSearchIndex?verbose=1&amp;oldonesonly=1\">Run Task: execute the to be indexed list</a></h4>"),
-                        $updateKeywordList = HTMLReadonlyField::create(SearchEngineCreateKeywordJS::class, "4. Update keywords", "<h4><a href=\"/dev/tasks/SearchEngineCreateKeywordJS\">Run Task: update keyword list</a></h4>"),
-                        $debugTestField = HTMLReadonlyField::create("DebugTestField", "5. Debug Search", "
-                            <h4>
-                            To debug a search, please add ?searchenginedebug=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
-                            <br /><br />
-                            To bypass all caching please add ?flush=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
-                        </h4>")
-                    ),
-                    new Tab(
-                        'Manifest',
-                        $manifestField = LiteralField::create("Manifest", $manifest)
                     )
                 )
             );
-            $removeAllField->setRightTitle("Careful - this will remove all the search engine index data.");
-            $indexAllField->setRightTitle("Careful - this will take signigicant time and resources.");
-            $updateVerboseField->setRightTitle("Updates all the search indexes with verbose set to true.");
-
             $form->setFields($field);
+            $form->Fields()->addFieldsToTab(
+                'Root.Links',
+                $linkFields
+            );
+
         } elseif ($this->modelClass == SearchEngineSearchRecordHistory::class) {
+
             $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
             $field = new FieldList(
                 new TabSet(
@@ -225,11 +228,11 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
      * @param array
      * @return string
      */
-    protected function printNice($arr)
+    public static function print_nice($arr)
     {
         if (is_array($arr)) {
 
-            return $this->array2ul($arr);
+            return self::array2ul($arr);
         } else {
 
             return "<pre>".print_r($arr, true)."</pre>";
@@ -237,7 +240,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     }
 
     //code by acmol
-    protected function array2ul($array)
+    public static function array2ul($array)
     {
         $out = '<ul>';
         foreach ($array as $key => $elem) {
@@ -248,7 +251,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                     $out .= '<li><span><em>'.$key.' --- </em> '.$elem.'</span></li>';
                 }
             } else {
-                $out .= '<li><span>'.$key.'</span>'.$this->array2ul($elem).'</li>';
+                $out .= '<li><span>'.$key.'</span>'.self::array2ul($elem).'</li>';
             }
         }
         $out .= '</ul>';

@@ -9,6 +9,16 @@ use SilverStripe\Dev\BuildTask;
 class SearchEngineCreateKeywordJS extends BuildTask
 {
 
+
+
+    /**
+     * Set a custom url segment (to follow dev/tasks/)
+     *
+     * @config
+     * @var string
+     */
+    private static $segment = 'SearchEngineCreateKeywordJS';
+
     /**
      * title of the task
      * @var string
@@ -44,4 +54,10 @@ class SearchEngineCreateKeywordJS extends BuildTask
             echo "<h2>======= DONE ===============</h2>";
         }
     }
+
+    function Link()
+    {
+        return '/dev/tasks/'.$this->Config()->get('segment');
+    }
+
 }

@@ -11,6 +11,13 @@ use SilverStripe\Core\Environment;
 
 class SearchEngineUpdateSearchIndex extends BuildTask
 {
+    /**
+     * Set a custom url segment (to follow dev/tasks/)
+     *
+     * @config
+     * @var string
+     */
+    private static $segment = 'SearchEngineUpdateSearchIndex';
 
     protected $recursions = 100;
 
@@ -130,5 +137,11 @@ class SearchEngineUpdateSearchIndex extends BuildTask
             echo $message;
         }
     }
+
+    function Link()
+    {
+        return '/dev/tasks/'.$this->Config()->get('segment');
+    }
+
 
 }
