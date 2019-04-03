@@ -208,6 +208,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             $obj->write();
         }
         SearchEngineSearchRecordHistory::add_entry($obj);
+
         return $obj;
     }
 
@@ -301,7 +302,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 $keywords = SearchEngineKeyword::get()
                     ->where($where)
                     ->exclude(array("ID" => $selectArray))
-                    ->limit(12);
+                    ->limit(999);
                 $selectArray += $keywords->map("ID", "ID")->toArray();
                 foreach ($selectArray as $id) {
                     if($id) {
