@@ -92,7 +92,7 @@ class SearchEngineMakeSearchable extends DataExtension
 
     /**
      * Indexed Full Content Data
-     * @return DataList|null
+     * @return DataList
      */
     public function SearchEngineDataObjectFullContent()
     {
@@ -102,13 +102,14 @@ class SearchEngineMakeSearchable extends DataExtension
             return $item->SearchEngineFullContents();
         } else {
 
-            return SearchEngineFullContent::get()->filter('ID', 0);
+            return SearchEngineFullContent::get()->filter(['ID' =>  0]);
         }
     }
 
+
     /**
      * Indexed Keywords
-     * @return DataList|null
+     * @return DataList
      */
     public function SearchEngineKeywordDataObjectMatches($level = 1)
     {
@@ -119,7 +120,7 @@ class SearchEngineMakeSearchable extends DataExtension
             return $item->$field();
         } else {
 
-            return SearchEngineKeyword::get()->filter('ID', 0);
+            return SearchEngineKeyword::get()->filter(['ID' => 0]);
         }
     }
 
@@ -373,6 +374,23 @@ class SearchEngineMakeSearchable extends DataExtension
         }
     }
 
+
+    /**
+     * Is this object indexed?
+     * @return bool
+     */
+    public function SearchEngineIsIndexed()
+    {
+        $item = SearchEngineDataObject::find_or_make($this->owner, false);
+        if($item && $item->exists()) {
+
+            return true;
+        } else {
+
+            return false;
+        }
+    }
+
     /**
      * @return boolean
      */
@@ -410,6 +428,7 @@ class SearchEngineMakeSearchable extends DataExtension
             // CAN NOT RUN THIS HERE!!!!
             // $this->SearchEngineDeleteFromIndexing();
         }
+
         return $exclude;
     }
 

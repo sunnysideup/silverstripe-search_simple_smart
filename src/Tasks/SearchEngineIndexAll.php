@@ -23,6 +23,11 @@ class SearchEngineIndexAll extends BuildTask
     /**
      * @var int
      */
+    protected $unindexed_only = false;
+
+    /**
+     * @var int
+     */
     protected $limit = 10000;
 
     /**
