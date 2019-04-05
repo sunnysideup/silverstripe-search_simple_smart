@@ -100,11 +100,6 @@ class SearchEngineKeyword extends DataObject implements Flushable
      */
     private static $default_sort = "\"Keyword\" ASC";
 
-    /**
-     * @var boolean
-     */
-    private static $remove_all_non_alpha_numeric = false;
-
     /*
      * @var array
      */

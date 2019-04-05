@@ -11,8 +11,11 @@ Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine:
   class_name_for_search_provision: SearchEngineProviderMYSQLFullText
 
 
-Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword:
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent:
   remove_all_non_alpha_numeric: false
+  remove_all_non_letters: false
+
+Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList:
   keyword_list_folder_name: "_searchengine_json"
 
 Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable:
@@ -26,9 +29,6 @@ Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable:
     - Email
   search_engine_default_excluded_db_fields:
     - Password
-
-Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent:
-  remove_all_non_alpha_numeric: false
 
 Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeywordFindAndRemove:
   add_stop_words: true
