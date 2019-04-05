@@ -559,7 +559,7 @@ class SearchEngineMakeSearchable extends DataExtension
     public function SearchEngineExcludeFromIndex()
     {
         $key = $this->owner->ClassName.'_'.$this->owner->ID;
-        if(! isset(self::$$_search_engine_exclude_from_index[$key])) {
+        if(! isset(self::$_search_engine_exclude_from_index[$key])) {
             if(! isset(self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName])) {
                 $exclude = false;
                 $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
