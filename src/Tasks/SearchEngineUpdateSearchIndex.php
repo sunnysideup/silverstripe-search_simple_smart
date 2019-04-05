@@ -52,7 +52,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
             if($searchEngineDataObjectsToBeIndexed->count() === 0) {
                 break;
             }
-            $this->flushNow('Running '.$this->step.' records of '.$count.', startiong from position '.$i);
+            $this->flushNow('Running '.$this->step.' records of '.$count.', starting from position '.$i);
             foreach ($searchEngineDataObjectsToBeIndexed as $searchEngineDataObjectToBeIndexed) {
                 $searchEngineDataObject = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
                 if ($searchEngineDataObject) {

@@ -183,12 +183,12 @@ class SearchEngineFullContent extends DataObject
     /**
      * @var bool
      */
-    private static $remove_all_non_alpha_numeric = false;
+    private static $remove_all_non_alpha_numeric = true;
 
     /**
      * @var bool
      */
-    private static $remove_all_non_letters = false;
+    private static $remove_all_non_letters = true;
 
     /**
      *
