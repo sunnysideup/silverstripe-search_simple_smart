@@ -181,6 +181,7 @@ class SearchEngineBaseTask extends BuildTask
                     <option value="searchengineupdatesearchindex">update search index</option>
                     <option value="searchengineclearobsoletes">clear obsoletes</option>
                     <option value="searchenginecreatekeywordjs">create keyword js</option>
+                    <option value="searchenginespecialkeywords">special keywords</option>
                 </select>
                 type
             </div>
