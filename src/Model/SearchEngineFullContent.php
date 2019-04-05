@@ -279,7 +279,7 @@ class SearchEngineFullContent extends DataObject
             $list = $item->$methodName();
             $list->removeAll();
             //add all keywords
-            foreach ($fullArray as $keywordObjectID => $arrayItems) {
+            foreach ($fullArray as $keywordObjectID => $a) {
                 $list->add( $a["Object"], array("Count" => $a["Count"]));
             }
         }
