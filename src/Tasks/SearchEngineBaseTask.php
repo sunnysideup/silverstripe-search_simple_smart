@@ -169,7 +169,7 @@ class SearchEngineBaseTask extends BuildTask
         <style>
             div {padding: 20px;}
         </style>
-        <form method="get">
+        <form method="get" action="/dev/tasks/searchenginebasetask/">
             <fieldset>
             <div>
                 <select name="task">
