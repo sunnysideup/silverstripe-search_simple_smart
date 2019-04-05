@@ -138,13 +138,20 @@ class SearchEngineKeywordFindAndRemove extends DataObject
         $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
     }
 
+    private static $_is_listed = [];
+
     /**
      * @return SearchEngineKeywordFindAndRemove
      */
     public static function is_listed($keyword)
     {
-        return SearchEngineKeywordFindAndRemove::get()
-            ->filter(array("Keyword" => $keyword))->count();
+        if(! isset(self::$_is_listed[$keyword])) {
+            self::$_is_listed[$keyword] =
+            SearchEngineKeywordFindAndRemove::get()
+                ->filter(array("Keyword" => $keyword))->count() ? true : false;
+        }
+
+        return self::$_is_listed[$keyword];
     }
 
     public function requireDefaultRecords()

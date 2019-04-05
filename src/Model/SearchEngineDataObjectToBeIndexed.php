@@ -94,7 +94,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      * @var array
      */
     private static $searchable_fields = [
-        'Completed' => 'ExtactMatchFilter'
+        'Completed' => 'ExactMatchFilter'
     ];
 
     /**
@@ -227,7 +227,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         if($searchEngineDataObject && $searchEngineDataObject->exists() && $searchEngineDataObject instanceof SearchEngineDataObject) {
             $sourceObject = $searchEngineDataObject->SourceObject();
             if($sourceObject && $sourceObject->exists()) {
-                $sourceObject->searchEngineIndex($searchEngineDataObject);
+                $sourceObject->doSearchEngineIndex($searchEngineDataObject);
                 $this->Completed = 1;
                 $this->write();
             } else {

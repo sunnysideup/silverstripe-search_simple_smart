@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Admin;
 
+use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
@@ -77,8 +78,9 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         $form = parent::getEditForm();
         if ($this->modelClass == SearchEngineAdvancedSettings::class) {
             $jsLastChanged = "";
-            if (file_exists(SearchEngineKeyword::get_js_keyword_file_name(true))) {
-                $jsLastChanged = Date("Y-m-d H:i", filemtime(SearchEngineKeyword::get_js_keyword_file_name(true)));
+            $fileName = ExportKeywordList::get_js_keyword_file_name(true);
+            if (file_exists($fileName)) {
+                $jsLastChanged = Date("Y-m-d H:i", filemtime($fileName));
             } else {
                 $jsLastChanged = "unknown";
             }
@@ -162,12 +164,12 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             "search_engine_default_level_one_fields",
                             'Make Searchable - Default Level 1 Fields',
-                            self::print_nice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields"))
+                            self::print_nice(Config::inst()->get(SearchEngineDataObject::class, "search_engine_default_level_one_fields"))
                         ),
                         HTMLReadonlyField::create(
                             "search_engine_default_excluded_db_fields",
                             'Make Searchable - Fields Excluded by Default',
-                            self::print_nice(Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields"))
+                            self::print_nice(Config::inst()->get(SearchEngineDataObject::class, "search_engine_default_excluded_db_fields"))
                         ),
                         HTMLReadonlyField::create(
                             "class_groups",
@@ -187,7 +189,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_name",
                             'Location for saving Keywords as JSON for autocomplete',
-                            self::print_nice(SearchEngineKeyword::get_js_keyword_file_name())
+                            self::print_nice(SearchEngineKeyword::get_js_keyword_file_name(true))
                         ),
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_last_changed",
