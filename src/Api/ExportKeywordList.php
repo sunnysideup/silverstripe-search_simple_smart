@@ -1,9 +1,15 @@
 <?php
 
 namespace Sunnysideup\SearchSimpleSmart\Api;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Convert;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Assets\Folder;
+use SilverStripe\Control\Director;
+use SilverStripe\Security\Security;
+use SilverStripe\ORM\DB;
 
 class ExportKeywordList
 {
