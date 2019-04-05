@@ -137,11 +137,6 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                             'Class or Search Provision',
                             Config::inst()->get(SearchEngineCoreSearchMachine::class, "class_name_for_search_provision")),
                         HTMLReadonlyField::create(
-                            "remove_all_non_alpha_numeric",
-                            'Keywords - Remove Non Alpha Numeric Keywords',
-                            Config::inst()->get(SearchEngineKeyword::class, "remove_all_non_alpha_numeric")? "True" : "False"
-                        ),
-                        HTMLReadonlyField::create(
                             "add_stop_words",
                             'Add Default Stop Words',
                             Config::inst()->get(SearchEngineKeywordFindAndRemove::class, "add_stop_words")? "True" : "False"
@@ -155,6 +150,11 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                             "remove_all_non_alpha_numeric_full_content",
                             'Full Content - Remove Non Alpha Numeric Keywords',
                             Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric")? "True" : "False"
+                        ),
+                        HTMLReadonlyField::create(
+                            "remove_all_non_letters",
+                            'Keywords - Remove Non Letter Characters',
+                            Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_letters")? "True" : "False"
                         ),
                         HTMLReadonlyField::create(
                             SearchEngineDataObjectToBeIndexed::class,
