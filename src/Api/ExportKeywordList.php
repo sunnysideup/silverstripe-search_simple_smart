@@ -1,6 +1,9 @@
 <?php
 
 namespace Sunnysideup\SearchSimpleSmart\Api;
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Extensible;
 
 class ExportKeywordList
 {
