@@ -21,6 +21,16 @@ use SilverStripe\Forms\ReadonlyField;
 
 class SearchEngineFullContent extends DataObject
 {
+
+    private static $default_punctuation_to_be_removed = [
+        '\'',
+        '"',
+        ';',
+        '.',
+        ',',
+        '&nbsp'
+    ];
+
     /**
      * Defines the database table name
      * @var string
@@ -50,7 +60,7 @@ class SearchEngineFullContent extends DataObject
      */
     private static $db = array(
         "Level" => "Int(1)",
-        "Content" => "Varchar(3000)"
+        "Content" => "Varchar(9999)"
     );
 
     /*
@@ -89,6 +99,7 @@ class SearchEngineFullContent extends DataObject
      * @var array
      */
     private static $summary_fields = array(
+        "LastEdited.Nice" => "Last Changed",
         "SearchEngineDataObject.Title" => "Searchable Object",
         "Level" => "Level",
         "ShortContent" => "Content"
@@ -99,7 +110,7 @@ class SearchEngineFullContent extends DataObject
      * @var array
      */
     private static $searchable_fields = [
-        'Level' => 'ExtactMatchFilter'
+        'Level' => 'ExactMatchFilter'
     ];
 
     /*
@@ -175,6 +186,11 @@ class SearchEngineFullContent extends DataObject
     private static $remove_all_non_alpha_numeric = false;
 
     /**
+     * @var bool
+     */
+    private static $remove_all_non_letters = false;
+
+    /**
      *
      * @param SearchEngineDataObject
      * @param array
@@ -224,7 +240,7 @@ class SearchEngineFullContent extends DataObject
     {
         parent::onBeforeWrite();
         $this->Level = SearchEngineKeyword::level_sanitizer($this->Level);
-        $this->Content = strip_tags($this->Content);
+        $this->Content = self::clean_content($this->Content);
     }
 
     public function onAfterWrite()
@@ -237,16 +253,17 @@ class SearchEngineFullContent extends DataObject
             //1. take full content.
             $content = $this->Content;
             //2. remove stuff that is not needed (e.g. strip_tags)
-            $content = SearchEngineFullContent::clean_content($content);
             $keywords = explode(" ", $content);
             foreach ($keywords as $keyword) {
-                $keyword = SearchEngineKeyword::clean_keyword($keyword);
+                // we know content is clean already!
+                // $keyword = SearchEngineKeyword::clean_keyword($keyword);
                 if (strlen($keyword) > 1) {
                     //check if it is a valid keyword.
                     if (SearchEngineKeywordFindAndRemove::is_listed($keyword)) {
+                        //not a valid keyword
                         continue;
                     }
-                    $keywordObject = SearchEngineKeyword::add_keyword($keyword);
+                    $keywordObject = SearchEngineKeyword::add_keyword($keyword, $runClean = false);
                     if (!isset($fullArray[$keywordObject->ID])) {
                         $fullArray[$keywordObject->ID] = array(
                             "Object" => $keywordObject,
@@ -259,13 +276,11 @@ class SearchEngineFullContent extends DataObject
             //remove All previous entries
             $this->Level = SearchEngineKeyword::level_sanitizer($this->Level);
             $methodName = "SearchEngineKeywords_Level".$this->Level;
-            $item->$methodName()->removeAll();
+            $list = $item->$methodName();
+            $list->removeAll();
             //add all keywords
             foreach ($fullArray as $keywordObjectID => $arrayItems) {
-                $keywordObject = $arrayItems["Object"];
-                $count = $arrayItems["Count"];
-                $methodName = "SearchEngineDataObjects_Level".$this->Level;
-                $keywordObject->$methodName()->add($item, array("Count" => $count));
+                $list->add( $a["Object"], array("Count" => $a["Count"]));
             }
         }
     }
@@ -284,27 +299,63 @@ class SearchEngineFullContent extends DataObject
      */
     public static function clean_content($content)
     {
-        if (!self::$_punctuation_objects) {
+
+        $content = strtolower($content);
+
+        //important!!!! - create space around tags ....
+        $content = str_replace('<', ' <', $content);
+        $content = str_replace('>', '> ', $content);
+
+        //remove tags!
+        $content = strip_tags($content);
+
+        //default punctuation removal
+        $defaultPuncs = Config::inst()->get(SearchEngineFullContent::class, "default_punctuation_to_be_removed");
+        foreach ($defaultPuncs as $defaultPunc) {
+            $content = str_replace($defaultPunc, " ", $content);
+        }
+
+        //custom punctuation removal
+        if (self::$_punctuation_objects === null) {
             self::$_punctuation_objects = SearchEnginePunctuationFindAndRemove::get();
+            if(self::$_punctuation_objects->count() === 0) {
+                self::$_punctuation_objects = false;
+            }
         }
-        foreach (self::$_punctuation_objects as $punctuationObject) {
-            $content = str_replace(self::$_punctuation_objects->Character, " ", $content);
+        if(self::$_punctuation_objects) {
+            foreach (self::$_punctuation_objects as $punctuationObject) {
+                $content = str_replace(self::$_punctuation_objects->Character, " ", $content);
+            }
         }
-        if (Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric") == true) {
+
+        //remove non-alpha
+        $removeNonAlphas = Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric");
+        if ($removeNonAlphas == true) {
             $content = preg_replace("/[^a-zA-Z 0-9]+/", " ", $content);
         }
-        $content = trim(
-            strtolower(
-                //remove all white space with single space
-                //see: http://stackoverflow.com/questions/5059996/php-preg-replace-with-unicode-chars
-                //see: http://stackoverflow.com/questions/11989482/how-to-replace-all-none-alphabetic-characters-in-php-with-utf-8-support
-                preg_replace(
-                    '/\P{L}+/u',
-                    ' ',
-                    strip_tags($content)
+
+        //remove non letters
+        //remove non-alpha
+        $removeNonLetters = Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_letters");
+        if ($removeNonLetters == true) {
+            $content = trim(
+                strtolower(
+                    //remove all white space with single space
+                    //see: http://stackoverflow.com/questions/5059996/php-preg-replace-with-unicode-chars
+                    //see: http://stackoverflow.com/questions/11989482/how-to-replace-all-none-alphabetic-characters-in-php-with-utf-8-support
+                    preg_replace(
+                        '/\P{L}+/u',
+                        ' ',
+                        $content
+                    )
                 )
-            )
-        );
+            );
+        }
+
+
+        //remove multiple white space
+        $content = trim(preg_replace( "/\s+/", " ", $content ));
+
         return $content;
     }
 

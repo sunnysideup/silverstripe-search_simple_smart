@@ -191,7 +191,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         }
     }
 
-    private static $_latest_search_cache = false;
+    private static $_latest_search_cache = null;
 
     /**
      *
@@ -199,8 +199,8 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     public static function get_latest_search()
     {
-        if (self::$_latest_search_cache === false) {
-            self::$_latest_search_cache = 0;
+        if (self::$_latest_search_cache === null) {
+            self::$_latest_search_cache = false;
             $id = intval(Controller::curr()->getRequest()->getSession()->get("SearchEngineSearchRecordHistoryID"))-0;
             if ($id) {
                 self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()->byID($id);

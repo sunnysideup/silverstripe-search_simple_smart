@@ -22,6 +22,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\CMS\Model\SiteTree;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
+use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use SilverStripe\ORM\DataExtension;
 
 /**
@@ -38,24 +39,18 @@ class SearchEngineMakeSearchable extends DataExtension
 {
 
 
-    /**
-     * List of Fields that are level one (most important)
-     * e.g. Title, Name, etc...
-     * @var Array
-     */
-    private static $search_engine_default_level_one_fields = [];
 
-    /**
-     * List of fields that should not be included by default
-     * @var Array
-     */
-    private static $search_engine_default_excluded_db_fields = array(
-        "ReportClass",
-        "CanViewType",
-        "ExtraMeta",
-        "CanEditType",
-        "Password"
-    );
+
+
+
+
+
+
+
+
+    ############################
+    # do stuff ....
+    ############################
 
     /**
      * deletes cached search results
@@ -66,7 +61,7 @@ class SearchEngineMakeSearchable extends DataExtension
      *                        Setting this to false means the stage will not be set
      *                        and the cache will not be cleared.
      */
-    public function searchEngineIndex($searchEngineDataObject = null, $withModeChange = true)
+    public function doSearchEngineIndex($searchEngineDataObject = null, $withModeChange = true)
     {
         //last check...
         if(! $searchEngineDataObject) {
@@ -78,34 +73,63 @@ class SearchEngineMakeSearchable extends DataExtension
             //do nothing
         }
         if($searchEngineDataObject) {
-            //clear search history
-            if($withModeChange) {
-                SearchEngineDataObject::start_indexing_mode();
-            }
-            $fullContentArray = $this->owner->SearchEngineFullContentForIndexing();
-            SearchEngineFullContent::add_data_object_array($searchEngineDataObject, $fullContentArray);
-            if($withModeChange) {
-                SearchEngineDataObject::end_indexing_mode();
-            }
+            $searchEngineDataObject->doSearchEngineIndex($this->owner, $withModeChange);
         }
     }
+
+
 
     /**
-     * Indexed Full Content Data
-     * @return DataList
+     * returns a full-text version of an object like this:
+     * array(
+     *   1 => 'bla',
+     *   2 => 'foo',
+     * );
+     * where 1 and 2 are the levels of importance of each string.
+     *
+     * @return array
      */
-    public function SearchEngineDataObjectFullContent()
+    public function SearchEngineFullContentForIndexingBuild($searchEngineDataObject = null)
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner);
-        if($item) {
-
-            return $item->SearchEngineFullContents();
-        } else {
-
-            return SearchEngineFullContent::get()->filter(['ID' =>  0]);
+        if(! $searchEngineDataObject) {
+            $searchEngineDataObject = SearchEngineDataObject::find_or_make($this->owner);
+        }
+        if($searchEngineDataObject) {
+            return $searchEngineDataObject->SearchEngineFullContentForIndexingBuild($this->owner);
         }
     }
 
+
+
+    /**
+     * returns a list of classnames + IDs
+     * that also need to be updated when this object is updated:
+     *     return array(
+     *          [0] => array('ClassName' => MyOtherClassname, 'ID' => 123),
+     *          [1] => array('ClassName' => FooClassName, 'ID' => 122)
+     *          [1] => array('ClassName' => BarClassName, 'ID' => 124)
+     *      )
+     * @return array
+     */
+    public function SearchEngineAlsoTrigger()
+    {
+        if ($this->owner->hasMethod('SearchEngineAlsoTriggerProvider')) {
+            return $this->owner->SearchEngineAlsoTriggerProvider();
+        }
+        return [];
+    }
+
+
+
+
+
+
+
+
+
+    ############################
+    # searches
+    ############################
 
     /**
      * Indexed Keywords
@@ -115,7 +139,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $item = SearchEngineDataObject::find_or_make($this->owner);
         if($item) {
-            $field = "SearchEngineKeywords_Level".$level;
+            $field = 'SearchEngineKeywords_Level'.$level;
 
             return $item->$field();
         } else {
@@ -123,6 +147,22 @@ class SearchEngineMakeSearchable extends DataExtension
             return SearchEngineKeyword::get()->filter(['ID' => 0]);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ############################
+    # display....
+    ############################
 
     /**
      * returns a template for formatting the object
@@ -134,67 +174,32 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineResultsTemplates($moreDetails = false)
     {
-        if ($this->owner->hasMethod("SearchEngineResultsTemplatesProvider")) {
-            return $this->owner->SearchEngineResultsTemplatesProvider($moreDetails);
-        } else {
-            $template = Config::inst()->get($this->owner->ClassName, "search_engine_results_templates");
-            if ($template) {
-                if ($moreDetails) {
-                    return array($template."_MoreDetails", $template);
-                } else {
-                    return array($template);
-                }
-            } else {
-                $arrayOfTemplates = [];
-                $parentClasses = class_parents($this->owner);
-                $firstTemplate = "SearchEngineResultItem_".$this->owner->ClassName;
-                if ($moreDetails) {
-                    $arrayOfTemplates = array($firstTemplate."_MoreDetails", $firstTemplate);
-                } else {
-                    $arrayOfTemplates = array($firstTemplate);
-                }
-                foreach ($parentClasses as $parent) {
-                    if ($parent == DataObject::class) {
-                        break;
-                    }
-                    if ($moreDetails) {
-                        $arrayOfTemplates[]= "SearchEngineResultItem_".$parent."_MoreDetails";
-                    }
-                    $arrayOfTemplates[]= "SearchEngineResultItem_".$parent;
-                }
-                if ($moreDetails) {
-                    $arrayOfTemplates[]= "SearchEngineResultItem_DataObject_MoreDetails";
-                }
-                $arrayOfTemplates[] = "SearchEngineResultItem_DataObject";
-
-                return $arrayOfTemplates;
-            }
+        $item = SearchEngineDataObject::find_or_make($this->owner);
+        if($item) {
+            $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
         }
     }
 
-    /**
-     * returns a list of classnames + IDs
-     * that also need to be updated when this object is updated:
-     *     return array(
-     *          [0] => array("ClassName" => MyOtherClassname, "ID" => 123),
-     *          [0] => array("ClassName" => FooClassName, "ID" => 122)
-     *      )
-     * @return array | null
-     */
-    public function SearchEngineAlsoTrigger()
-    {
-        if ($this->owner->hasMethod("SearchEngineAlsoTriggerProvider")) {
-            return $this->owner->SearchEngineAlsoTriggerProvider();
-        }
-    }
+
+
+
+
+
+
+
+
+
+    ############################
+    # CMS
+    ############################
 
     public function updateCMSFields(FieldList $fields)
     {
-        if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check("SEARCH_ENGINE_ADMIN")) {
-            if ($fields->fieldByName("Root")) {
-                $fields->findOrMakeTab("Root.Main");
-                $fields->removeFieldFromTab("Root.Main", "SearchEngineDataObjectID");
-                if (!$this->owner->hasMethod("getSettingsFields")) {
+        if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN')) {
+            if ($fields->fieldByName('Root')) {
+                $fields->findOrMakeTab('Root.Main');
+                $fields->removeFieldFromTab('Root.Main', 'SearchEngineDataObjectID');
+                if (!$this->owner->hasMethod('getSettingsFields')) {
                     return $this->updateSettingsFields($fields);
                 }
             }
@@ -203,55 +208,57 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function updateSettingsFields(FieldList $fields)
     {
-        if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check("SEARCH_ENGINE_ADMIN")) {
+        if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN')) {
             if ($this->SearchEngineExcludeFromIndex()) {
                 return;
             } else {
                 $item = SearchEngineDataObject::find_or_make($this->owner);
-                $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(array("SearchEngineDataObjectID" => $item->ID, "Completed" => 0))->count() ? "Yes" : "No";
-                $fields->addFieldToTab("Root.SearchEngine", $lastIndexed = new ReadonlyField("LastIndexed", "Approximately Last Index", $this->owner->LastEdited));
-                $fields->addFieldToTab("Root.SearchEngine", $toBeIndexed = new ReadonlyField("ToBeIndexed", "On the list to be indexed", $toBeIndexed));
+                $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
+                $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->owner->LastEdited));
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed));
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed));
                 $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
                 $fields->addFieldToTab(
-                    "Root.SearchEngine",
+                    'Root.SearchEngine',
                     $itemField = new LiteralField(
-                        "Levels",
+                        'Levels',
                         $this->owner->SearchEngineFieldsToBeIndexedHumanReadable(true)
                     )
                 );
                 $fields->addFieldToTab(
-                    "Root.SearchEngine",
+                    'Root.SearchEngine',
                     new GridField(
-                        "SearchEngineKeywords_Level1",
-                        "Keywords Level 1",
+                        'SearchEngineKeywords_Level1',
+                        'Keywords Level 1',
                         $this->owner->SearchEngineKeywordDataObjectMatches(1),
                         $config
                     )
                 );
                 $fields->addFieldToTab(
-                    "Root.SearchEngine",
+                    'Root.SearchEngine',
                     new GridField(
-                        "SearchEngineKeywords_Level2",
-                        "Keywords Level 2",
+                        'SearchEngineKeywords_Level2',
+                        'Keywords Level 2',
                         $this->owner->SearchEngineKeywordDataObjectMatches(2),
                         $config
                     )
                 );
                 $fields->addFieldToTab(
-                    "Root.SearchEngine",
+                    'Root.SearchEngine',
                     new GridField(
                         'SearchEngineFullContent',
-                        "Full Content",
+                        'Full Content',
                         $this->owner->SearchEngineDataObjectFullContent(),
                         $config
                     )
                 );
                 $fields->addFieldToTab(
-                    "Root.SearchEngine",
+                    'Root.SearchEngine',
                     $itemField = new GridField(
                         'SearchEngineDataObject',
-                        "Searchable Item",
-                        SearchEngineDataObject::get()->filter(array("DataObjectClassName" => $this->owner->ClassName, "DataObjectID" => $this->owner->ID)),
+                        'Searchable Item',
+                        SearchEngineDataObject::get()->filter(array('DataObjectClassName' => $this->owner->ClassName, 'DataObjectID' => $this->owner->ID)),
                         $config
                     )
                 );
@@ -261,40 +268,30 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function SearchEngineFieldsToBeIndexedHumanReadable($includeExample = false)
     {
-        $levels = $this->owner->SearchEngineFieldsForIndexing();
-        if (is_array($levels)) {
-            ksort($levels);
-            $fieldLabels = $this->owner->fieldLabels();
-            $str = "<ul>";
-            foreach ($levels as $level => $fieldArray) {
-                $str .= "<li><strong>$level</strong><ul>";
-                foreach ($fieldArray as $field) {
-                    if (isset($fieldLabels[$field])) {
-                        $title = $fieldLabels[$field]." [". $field ."]";
-                    } else {
-                        $title = "$field";
-                    }
-                    if ($includeExample) {
-                        $fields = explode(".", $field);
-                        $data = " ".$this->searchEngineRelObject($this->owner, $fields).' ';
-                        $str .= "<li> - <strong>$title</strong> <em>".$data."</em></li>";
-                    } else {
-                        $str .= "<li> - $title</li>";
-                    }
-                }
-                $str .= "</ul></li>";
-                //$str .= "<li>results in: <em>".$this->SearchEngineFullContentForIndexing()[$level]."</em></li></ol>";
-            }
-            $str .= "</ul>";
-        } else {
-            $str = _t("MakeSearchable.NO_FIElDS", "<p>No fields are listed for indexing.</p>");
+        $item = SearchEngineDataObject::find_or_make($this->owner);
+        if($item) {
+            return $item->SearchEngineFieldsToBeIndexedHumanReadable($this->owner, $includeExample);
         }
-        return $str;
     }
 
-    /**
-     *
-     */
+
+
+
+
+
+
+
+
+
+
+
+
+    ############################
+    # on Before And After CRUD ...
+    ############################
+
+
+
     public function onAfterPublish()
     {
         $this->onAfterWrite();
@@ -332,8 +329,8 @@ class SearchEngineMakeSearchable extends DataExtension
         $alsoTrigger = $this->owner->SearchEngineAlsoTrigger();
         if (is_array($alsoTrigger) && count($alsoTrigger)) {
             foreach ($alsoTrigger as $details) {
-                $className = $details["ClassName"];
-                $id = $details["ID"];
+                $className = $details['ClassName'];
+                $id = $details['ID'];
                 $obj = $className::get()->byID($id);
                 if($obj->hasExtension(Versioned::class)) {
                     if ($obj->isPublished()) {
@@ -366,71 +363,14 @@ class SearchEngineMakeSearchable extends DataExtension
             $item = SearchEngineDataObject::find_or_make($this->owner);
             $this->_onAfterWriteCount[$this->owner->ID]++;
             if ($item && $this->_onAfterWriteCount[$this->owner->ID] < 2) {
-                SearchEngineKeyword::export_keyword_list();
+                ExportKeywordList::export_keyword_list();
                 // $item->write();
-                // DB::query("UPDATE \"SearchEngineDataObject\" SET LastEdited = NOW() WHERE ID = ".(intval($item->ID)-0).";");
+                // DB::query('UPDATE \'SearchEngineDataObject\' SET LastEdited = NOW() WHERE ID = '.(intval($item->ID)-0).';');
                 SearchEngineDataObjectToBeIndexed::add($item);
             }
         }
     }
 
-
-    /**
-     * Is this object indexed?
-     * @return bool
-     */
-    public function SearchEngineIsIndexed()
-    {
-        $item = SearchEngineDataObject::find_or_make($this->owner, false);
-        if($item && $item->exists()) {
-
-            return true;
-        } else {
-
-            return false;
-        }
-    }
-
-    /**
-     * @return boolean
-     */
-    public function SearchEngineExcludeFromIndex()
-    {
-        $exclude = false;
-        $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
-        foreach($alwaysExcludeClassNames as $alwaysExcludeClassName) {
-            if (
-                $this->owner->ClassName === $alwaysExcludeClassName ||
-                is_subclass_of($this->owner->ClassName, $alwaysExcludeClassName)
-            ) {
-                $exclude = true;
-            }
-        }
-        if($exclude === false) {
-            if ($this->owner->hasMethod("SearchEngineExcludeFromIndexProvider")) {
-                $exclude = $this->owner->SearchEngineExcludeFromIndexProvider();
-            } else {
-                $exclude = Config::inst()->get($this->owner->ClassName, "search_engine_exclude_from_index");
-            }
-            //special case SiteTree
-            if ($this->owner->hasExtension(Versioned::class)) {
-                if ($this->owner->ShowInSearch && $this->owner->IsPublished()) {
-                    //do nothing - no need to exclude
-                } else {
-                    $exclude = true;
-                }
-            }
-        }
-        //if it is to be excluded then remove from
-        //search index.
-        if ($exclude) {
-            $exclude = true;
-            // CAN NOT RUN THIS HERE!!!!
-            // $this->SearchEngineDeleteFromIndexing();
-        }
-
-        return $exclude;
-    }
 
     public function SearchEngineDeleteFromIndexing()
     {
@@ -441,82 +381,55 @@ class SearchEngineMakeSearchable extends DataExtension
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+    #####################################
+    # get index data ...
+    #####################################
+
     /**
      * returns array like this:
-     * 1 => array("Title", "MenuTitle")
-     * 2 => array("Content")
+     * 1 => array('Title', 'MenuTitle')
+     * 2 => array('Content')
      * @return array
      */
     public function SearchEngineFieldsForIndexing()
     {
-        $levelFields = Config::inst()->get($this->owner->ClassName, "search_engine_full_contents_fields_array");
-        if (is_array($levelFields) && count($levelFields)) {
-            //do nothing
-        } else {
-            $levelOneFieldArray = Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_level_one_fields");
-            $excludedFieldArray = Config::inst()->get(SearchEngineMakeSearchable::class, "search_engine_default_excluded_db_fields");
-            $dbArray = $this->searchEngineRelFields($this->owner, "db");
-            $levelFields = array(SearchEngineKeyword::level_sanitizer(1) => array(), SearchEngineKeyword::level_sanitizer(2) => array());
-            foreach ($dbArray as $field => $type) {
-                //get without brackets ...
-                if (preg_match('/^(\w+)\(/', $type, $match)) {
-                    $type = $match[1];
-                }
-                if (is_subclass_of($type, 'StringField')) {
-                    if (in_array($field, $excludedFieldArray)) {
-                        //do nothing
-                    } else {
-                        $level = 2;
-                        if (in_array($field, $levelOneFieldArray)) {
-                            $level = 1;
-                        }
-                        $levelFields[$level][] = $field;
-                    }
-                }
-            }
-        }
+        $item = SearchEngineDataObject::find_or_make($this->owner);
+        if($item) {
 
-        return $levelFields;
+            return $item->SearchEngineFieldsForIndexing($this->owner);
+        }
+        return [
+            1 => [],
+            2 => []
+        ];
     }
 
     /**
-     * returns a full-text version of an object like this:
-     * array(
-     *   1 => "bla",
-     *   2 => "foo",
-     * );
-     * where 1 and 2 are the levels of importance of each string.
-     *
-     * @return array
+     * Indexed Full Content Data
+     * @return DataList
      */
-    public function SearchEngineFullContentForIndexing()
+    public function SearchEngineDataObjectFullContent()
     {
-        $finalArray = [];
-        if ($this->owner->hasMethod("SearchEngineFullContentForIndexingProvider")) {
-            $finalArray = $this->owner->SearchEngineFullContentForIndexingProvider();
-        } else {
-            $levels = Config::inst()->get($this->owner->ClassName, "search_engine_full_contents_fields_array");
-            if (is_array($levels)) {
-                //do nothing
-            } else {
-                $levels = $this->owner->SearchEngineFieldsForIndexing();
-            }
-            if (is_array($levels) && count($levels)) {
-                foreach ($levels as $level => $fieldArray) {
-                    $level = SearchEngineKeyword::level_sanitizer($level);
-                    $finalArray[$level] = "";
-                    if (is_array($fieldArray) && count($fieldArray)) {
-                        foreach ($fieldArray as $field) {
-                            $fields = explode(".", $field);
-                            $finalArray[$level] .= " ".$this->searchEngineRelObject($this->owner, $fields)." ";
-                        }
-                    }
-                }
-            }
-        }
-        return $finalArray;
-    }
+        $item = SearchEngineDataObject::find_or_make($this->owner);
+        if($item) {
 
+            return $item->SearchEngineFullContents();
+        } else {
+
+            return SearchEngineFullContent::get()->filter(['ID' =>  0]);
+        }
+    }
 
     /**
      * @param DataObject $object
@@ -526,50 +439,50 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @return array
      */
-    private function searchEngineRelObject($object, $fields, $str = "")
+    public function SearchEngineRelObject($object, $fields, $str = '')
     {
         if (count($fields) == 0 || !is_array($fields)) {
-            $str .= ' '.$object->getTitle()." ";
+            $str .= ' '.$object->getTitle().' ';
         } else {
             $fieldCount = count($fields);
             $possibleMethod = $fields[0];
             if(substr($possibleMethod, 0, 3) === 'get' &&  $object->hasMethod($possibleMethod) && $fieldCount == 1) {
-                $str .= ' '.$object->$possibleMethod()." ";
+                $str .= ' '.$object->$possibleMethod().' ';
             } else {
-                $dbArray = $this->searchEngineRelFields($object, "db");
+                $dbArray = $this->SearchEngineRelFields($object, 'db');
                 //db field
                 if (isset($dbArray[$fields[0]])) {
                     $dbField = $fields[0];
                     if ($fieldCount == 1) {
-                        $str .= ' '.$object->$dbField." ";
+                        $str .= ' '.$object->$dbField.' ';
                     } elseif ($fieldCount == 2) {
                         $method = $fields[1];
-                        $str .= ' '.$object->dbObject($dbField)->$method()." ";
+                        $str .= ' '.$object->dbObject($dbField)->$method().' ';
                     }
                 }
                 //has one relation
                 else {
                     $method = array_shift($fields);
                     $hasOneArray = array_merge(
-                        $this->searchEngineRelFields($object, "has_one"),
-                        $this->searchEngineRelFields($object, "belongs_to")
+                        $this->SearchEngineRelFields($object, 'has_one'),
+                        $this->SearchEngineRelFields($object, 'belongs_to')
                     );
                     //has_one relation
                     if (isset($hasOneArray[$method])) {
                         $foreignObject = $object->$method();
-                        $str .= ' '.$this->searchEngineRelObject($foreignObject, $fields)." ";
+                        $str .= ' '.$this->searchEngineRelObject($foreignObject, $fields).' ';
                     }
                     //many relation
                     else {
                         $manyArray = array_merge(
-                            $this->searchEngineRelFields($object, "has_many"),
-                            $this->searchEngineRelFields($object, "many_many"),
-                            $this->searchEngineRelFields($object, "belongs_many_many")
+                            $this->SearchEngineRelFields($object, 'has_many'),
+                            $this->SearchEngineRelFields($object, 'many_many'),
+                            $this->SearchEngineRelFields($object, 'belongs_many_many')
                         );
                         if (isset($manyArray[$method])) {
                             $foreignObjects = $object->$method()->limit(100);
                             foreach ($foreignObjects as $foreignObject) {
-                                $str .= ' '.$this->searchEngineRelObject($foreignObject, $fields)." ";
+                                $str .= ' '.$this->searchEngineRelObject($foreignObject, $fields).' ';
                             }
                         }
                     }
@@ -595,7 +508,7 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @return string
      */
-    private function searchEngineRelFields($object, $relType)
+    public function SearchEngineRelFields($object, $relType)
     {
         if (!isset($this->_array_of_relations[$object->ClassName])) {
             $this->_array_of_relations[$object->ClassName] = [];
@@ -605,4 +518,93 @@ class SearchEngineMakeSearchable extends DataExtension
         }
         return $this->_array_of_relations[$object->ClassName][$relType];
     }
+
+
+
+
+
+
+
+
+
+
+
+    ######################################
+    # Status
+    ######################################
+
+
+    /**
+     * Is this object indexed?
+     * @return bool
+     */
+    public function SearchEngineIsIndexed()
+    {
+        $item = SearchEngineDataObject::find_or_make($this->owner, false);
+        if($item && $item->exists()) {
+
+            return true;
+        } else {
+
+            return false;
+        }
+    }
+
+    private static $_search_engine_exclude_from_index = [];
+    private static $_search_engine_exclude_from_index_per_class = [];
+
+    /**
+     * @return boolean
+     */
+    public function SearchEngineExcludeFromIndex()
+    {
+        $key = $this->owner->ClassName.'_'.$this->owner->ID;
+        if(! isset(self::$$_search_engine_exclude_from_index[$key])) {
+            if(! isset(self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName])) {
+                $exclude = false;
+                $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
+                foreach($alwaysExcludeClassNames as $alwaysExcludeClassName) {
+                    if (
+                        $this->owner->ClassName === $alwaysExcludeClassName ||
+                        is_subclass_of($this->owner->ClassName, $alwaysExcludeClassName)
+                    ) {
+                        $exclude = true;
+                    }
+                }
+                self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName] = $exclude;
+            }
+            $exclude = self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName];
+            if($exclude === false) {
+                if ($this->owner->hasMethod('SearchEngineExcludeFromIndexProvider')) {
+                    $exclude = $this->owner->SearchEngineExcludeFromIndexProvider();
+                } else {
+                    $exclude = Config::inst()->get($this->owner->ClassName, 'search_engine_exclude_from_index');
+                }
+                //special case SiteTree
+                if ($this->owner->hasExtension(Versioned::class)) {
+                    if ($this->owner->ShowInSearch && $this->owner->IsPublished()) {
+                        //do nothing - no need to exclude
+                    } else {
+                        $exclude = true;
+                    }
+                }
+            }
+            //if it is to be excluded then remove from
+            //search index.
+            if ($exclude) {
+                $exclude = true;
+                // CAN NOT RUN THIS HERE!!!!
+                // $this->SearchEngineDeleteFromIndexing();
+            } else {
+                $exclude = false;
+            }
+
+            self::$_search_engine_exclude_from_index[$key] = $exclude;
+        }
+
+        return self::$_search_engine_exclude_from_index[$key];
+    }
+
+
+
 }

@@ -3,7 +3,9 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use SilverStripe\ORM\DB;
 use SilverStripe\Core\Convert;
@@ -33,7 +35,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     public static function flush()
     {
-        self::export_keyword_list();
+        ExportKeywordList::export_keyword_list();
     }
 
     /*
@@ -181,12 +183,6 @@ class SearchEngineKeyword extends DataObject implements Flushable
     }
 
     /**
-     *
-     * @var string
-     */
-    private static $keyword_list_folder_name = "";
-
-    /**
      * @casted variable
      * @return string
      */
@@ -198,78 +194,37 @@ class SearchEngineKeyword extends DataObject implements Flushable
         return "#{$this->ID}";
     }
 
-    public static function export_keyword_list()
-    {
-        $fileName = self::get_js_keyword_file_name(true);
-        if ($fileName) {
-            //only write once a minute
-            if (file_exists($fileName) && (time() -  filemtime($fileName) < 120)) {
-                return "no new file created as the current one is less than 120 seconds old.";
-            //do nothing
-            } else {
-                if(Security::database_is_ready()) {
-                    $rows = DB::query("SELECT \"Keyword\" FROM \"SearchEngineKeyword\" ORDER BY \"Keyword\";");
-                    $array = [];
-                    foreach ($rows as $row) {
-                        $array[] = str_replace('"', "", Convert::raw2js($row["Keyword"]));
-                    }
-                    $written = null;
-                    if ($fh = fopen($fileName, 'w')) {
-                        $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = [\"".implode("\",\"", $array)."\"];");
-                        fclose($fh);
-                    }
-                    if (!$written) {
-                        user_error("Could not write keyword list to $fileName", E_USER_NOTICE);
-                    }
-                    return "Writting: <br />".implode("<br />", $array);
-                }
-            }
-        } else {
-            return "no file name specified";
-        }
-    }
+    private static $_keyword_cache = [];
 
-    /**
-     * returns the location of the keyword file...
-     * @param Boolean $withoutBase
-     * @return string
-     */
-    public static function get_js_keyword_file_name($includeBase = false)
-    {
-        $myFolderName = Config::inst()->get(SearchEngineKeyword::class, "keyword_list_folder_name");
-        if (!$myFolderName) {
-            return false;
-        }
-        $myFolder = Folder::find_or_make($myFolderName);
-
-        $fileName = "keywords.js";
-        if ($includeBase) {
-            return Director::baseFolder().'/'.$myFolder->getFilename().'/'.$fileName;
-        } else {
-            return $myFolder->getFilename().'/'.$fileName;
-        }
-    }
+    private static $_keyword_cache_request_count = [];
 
     /**
      * @param string $keyword
      *
      * @return SearchEngineKeyword
      */
-    public static function add_keyword($keyword)
+    public static function add_keyword($keyword, $runClean = true)
     {
-        self::clean_keyword($keyword);
-        $fieldArray = array("Keyword" => $keyword);
-        $obj = DataObject::get_one(SearchEngineKeyword::class, $fieldArray);
-        if (! $obj) {
-            $obj = SearchEngineKeyword::create($fieldArray);
-            $obj->write();
+        if($runClean) {
+            self::clean_keyword($keyword);
+        }
+        if(! isset(self::$_keyword_cache_request_count[$keyword])) {
+            self::$_keyword_cache_request_count[$keyword] = 0;
+        }
+        self::$_keyword_cache_request_count[$keyword]++;
+        if(! isset(self::$_keyword_cache[$keyword])) {
+            $fieldArray = array("Keyword" => $keyword);
+            $obj = DataObject::get_one(SearchEngineKeyword::class, $fieldArray);
+            if (! $obj) {
+                $obj = SearchEngineKeyword::create($fieldArray);
+                $obj->write();
+            }
+
+            self::$_keyword_cache[$keyword] = $obj;
         }
 
-        return $obj;
+        return self::$_keyword_cache[$keyword];
     }
-
-
-    private static $_punctuation_objects = null;
 
     /*
      * @var array
@@ -284,34 +239,10 @@ class SearchEngineKeyword extends DataObject implements Flushable
      */
     public static function clean_keyword($keyword)
     {
-        if (isset(self::$_clean_keyword_cache[$keyword])) {
-            //do nothing
-        } else {
-            if (!self::$_punctuation_objects) {
-                self::$_punctuation_objects = SearchEnginePunctuationFindAndRemove::get();
-            }
-            foreach (self::$_punctuation_objects as $punctuationObject) {
-                $keyword = str_replace(self::$_punctuation_objects->Character, "", $keyword);
-            }
-            if (Config::inst()->get(SearchEngineKeyword::class, "remove_all_non_alpha_numeric")) {
-                $keyword = preg_replace("/[^a-zA-Z 0-9]+/", "", $keyword);
-            } else {
-
-                //$keyword = preg_replace("/\P{L}+/u", " ", $keyword);
-            }
-            self::$_clean_keyword_cache[$keyword] = trim(
-                strtolower(
-                    //see: http://stackoverflow.com/questions/5059996/php-preg-replace-with-unicode-chars
-                    //see: http://stackoverflow.com/questions/11989482/how-to-replace-all-none-alphabetic-characters-in-php-with-utf-8-support
-                    //remove all non letters with NO space....
-                    preg_replace(
-                        '/\P{L}+/u',
-                        '',
-                        strip_tags($keyword)
-                    )
-                )
-            );
+        if (! isset(self::$_clean_keyword_cache[$keyword])) {
+            self::$_clean_keyword_cache[$keyword] = SearchEngineFullContent::clean_content($keyword);
         }
+
         return self::$_clean_keyword_cache[$keyword];
     }
 
@@ -325,7 +256,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     {
         $level = str_ireplace("level", "", $level);
         $level = intval($level);
-        if ($level != 1 && $level != 2 && $level != 3) {
+        if (! in_array($level, [1,2,3])) {
             user_error("Level needs to be between 1 and 3", E_USER_WARNING);
             return 1;
         }

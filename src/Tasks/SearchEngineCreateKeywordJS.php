@@ -2,11 +2,11 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
+use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use SilverStripe\ORM\DB;
 use SilverStripe\Dev\BuildTask;
 
-class SearchEngineCreateKeywordJS extends BuildTask
+class SearchEngineCreateKeywordJS extends SearchEngineBaseTask
 {
 
 
@@ -17,7 +17,7 @@ class SearchEngineCreateKeywordJS extends BuildTask
      * @config
      * @var string
      */
-    private static $segment = 'SearchEngineCreateKeywordJS';
+    private static $segment = 'searchenginecreatekeywordjs';
 
     /**
      * title of the task
@@ -31,11 +31,6 @@ class SearchEngineCreateKeywordJS extends BuildTask
      */
     protected $description = "This list is used for the autocomplete function.";
 
-    /**
-     *
-     * @var boolean
-     */
-    protected $verbose = true;
 
     /**
      * this function runs the SearchEngineRemoveAll task
@@ -43,21 +38,16 @@ class SearchEngineCreateKeywordJS extends BuildTask
      */
     public function run($request)
     {
-        if ($this->verbose) {
-            echo "<h2>Starting</h2>";
-        }
-        $outcome = SearchEngineKeyword::export_keyword_list();
-        if ($this->verbose) {
-            DB::alteration_message($outcome, "created");
-        }
-        if ($this->verbose) {
-            echo "<h2>======= DONE ===============</h2>";
-        }
+        $this->runStart($request);
+
+        $outcome = ExportKeywordList::export_keyword_list();
+        DB::alteration_message($outcome, "created");
+
+        $this->runEnd($request);
     }
 
-    function Link()
-    {
-        return '/dev/tasks/'.$this->Config()->get('segment');
-    }
+
+
+
 
 }

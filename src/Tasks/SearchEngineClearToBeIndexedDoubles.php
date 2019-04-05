@@ -11,7 +11,7 @@ use SilverStripe\Dev\BuildTask;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Core\Environment;
 
-class SearchEngineClearObsoletes extends SearchEngineBaseTask
+class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
 {
 
     /**
@@ -20,19 +20,19 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
      * @config
      * @var string
      */
-    private static $segment = 'searchengineclearobsoletes';
+    private static $segment = 'searchenginecleartobeindexeddoubles';
 
     /**
      * title of the task
      * @var string
      */
-    protected $title = 'Remove obsolete entries';
+    protected $title = 'Remove to be indexed doubles';
 
     /**
      * description of the task
      * @var string
      */
-    protected $description = 'Go through all searchable objects and remove obsolete ones';
+    protected $description = 'Go through all searchable objects to be indexed and clear and double-ups';
 
     /**
      * this function runs the SearchEngineRemoveAll task
@@ -43,7 +43,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
         //set basics
         $this->runStart($request);
 
-        $count = SearchEngineDataObject::get()
+        $count = SearchEngineDataObjectToBeIndexed::get()
             ->count();
         $sort = null;
         if($count > $this->limit) {
@@ -51,19 +51,25 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
             $sort = DB::get_conn()->random().' ASC';
         }
         $this->flushNow('<h4>Found entries: '.$count.'</h4>');
-        for ($i = 0; $i <= $count; $i = $i + $this->step) {
-            $objects = SearchEngineDataObject::get()->limit($this->step, $i);
-            if($sort) {
-                $objects = $objects->sort($sort);
+
+        $ids = SearchEngineDataObjectToBeIndexed::get()
+            ->exclude(['Completed' => 1])
+            ->sort($sort)
+            ->map('ID', 'SearchEngineDataObjectID')
+            ->toArray();
+        $test = [];
+        $pos = 0;
+        foreach($ids as $id => $foreignID) {
+            if(isset($test[$foreignID])) {
+                $obj = SearchEngineDataObjectToBeIndexed::get()->byID($id);
+                $foreign = SearchEngineDataObject::get()->byID($foreignID);
+                $this->flushNow('Deleting '.$foreign->getTitle());
+                $obj->delete();
+            } else {
+                $this->flushNow('.');
+                $test[$foreignID] = [];
             }
-            foreach ($objects as $obj) {
-                if($obj->SourceObjectExists() === false) {
-                    $this->flushNow('DELETING '.$obj->ID);
-                    $obj->delete();
-                } else {
-                    $this->flushNow('OK ... '.$obj->ID);
-                }
-            }
+            $test[$foreignID][] = $id;
         }
 
         $this->runEnd($request);

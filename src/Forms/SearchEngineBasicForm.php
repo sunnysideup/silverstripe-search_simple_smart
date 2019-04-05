@@ -12,6 +12,7 @@ use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\View\Requirements;
+use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
@@ -239,9 +240,9 @@ class SearchEngineBasicForm extends Form
             if ($this->useAutoComplete) {
                 Requirements::javascript("sunnysideup/search_simple_smart: searchengine/javascript/awesomplete.min.js");
                 $this->customScript[]= 'SearchEngineInitFunctions.useAutoComplete = true;';
-                $keywordFile = SearchEngineKeyword::get_js_keyword_file_name($includeBase = false);
+                $keywordFile = ExportKeywordList::get_js_keyword_file_name($includeBase = false);
                 if ($keywordFile) {
-                    Requirements::javascript(SearchEngineKeyword::get_js_keyword_file_name($includeBase = false));
+                    Requirements::javascript(ExportKeywordList::get_js_keyword_file_name($includeBase = false));
                 }
             }
             if ($this->updateBrowserHistory) {
