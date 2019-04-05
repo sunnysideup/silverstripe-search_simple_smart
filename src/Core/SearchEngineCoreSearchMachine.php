@@ -285,19 +285,24 @@ class SearchEngineCoreSearchMachine
             $listOfIDsRAW = explode(',', $listOfIDsRAW);
             $listOfIDsSQL = explode(',', $listOfIDsSQL);
             $listOfIDsCUSTOM = explode(',', $listOfIDsCUSTOM);
-            $matches1 = (is_array($listOfIDsRAW) ? count($listOfIDsRAW).": <pre>".$this->fancyPrintR($listOfIDsRAW)."</pre>" : 0);
-            $matches2 = (is_array($listOfIDsSQL) ? count($listOfIDsSQL).": <pre>".$this->fancyPrintR($listOfIDsSQL)."</pre>" : 0);
-            $matches3 = (is_array($listOfIDsCUSTOM) ? count($listOfIDsCUSTOM).": <pre>".$this->fancyPrintR($listOfIDsCUSTOM)."</pre>" : 0);
+            $matches1 = (is_array($listOfIDsRAW) ? count($listOfIDsRAW).": <pre>".$this->fancyPrintIDList($listOfIDsRAW)."</pre>" : 0);
+            $matches2 = (is_array($listOfIDsSQL) ? count($listOfIDsSQL).": <pre>".$this->fancyPrintIDList($listOfIDsSQL)."</pre>" : 0);
+            $matches3 = (is_array($listOfIDsCUSTOM) ? count($listOfIDsCUSTOM).": <pre>".$this->fancyPrintIDList($listOfIDsCUSTOM)."</pre>" : 0);
 
             $this->debugArray[] = "STEP 1: RAW Filter $filter1";
             $this->debugArray[] = "... RAW matches $matches1";
+            $this->debugArray[] = "<hr />";
             $this->debugArray[] = "STEP 2: SQL Filter $filter2";
             $this->debugArray[] = "... SQL matches $matches2";
+            $this->debugArray[] = "<hr />";
             $this->debugArray[] = "STEP 3: CUSTOM Filter $filter3";
             $this->debugArray[] = "... CUSTOM matches $matches3";
+            $this->debugArray[] = "<hr />";
             $this->debugArray[] = "---------------- Sorting --------------";
+            $this->debugArray[] = "<hr />";
             $this->debugArray[] = "SQL SORT: <pre>".print_r($nonCustomSort, 1)."</pre>";
             $this->debugArray[] = "CUSTOM SORT: <pre>".((!empty($startTimeForCustomSort)) ? "YES - seconds taken: ".round($endTimeForCustomSort - $startTimeForCustomSort, 5) : "NO")."</pre>";
+            $this->debugArray[] = "<hr />";
         }
 
         return $dataList;
@@ -330,6 +335,20 @@ class SearchEngineCoreSearchMachine
         return "";
     }
 
+    private function fancyPrintIDList($array)
+    {
+        $newArray = [];
+        foreach($array as $key => $id) {
+            $obj = SearchEngineDataObject::get()->byID($id);
+            if($obj) {
+                $newArray[$key] = $obj->getTitle();
+            } else {
+                $newArray[$key] = "ERROR - could not find SearchEngineDataObject with ID: ".$id;
+            }
+        }
+
+        return $this->fancyPrintR($newArray, 10000);
+    }
 
     private function fancyPrintR($array, $limit = 50)
     {
