@@ -84,13 +84,6 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
             } else {
                 $jsLastChanged = "unknown";
             }
-            $tasks = [
-                SearchEngineRemoveAll::class,
-                SearchEngineIndexAll::class,
-                SearchEngineUpdateSearchIndex::class,
-                SearchEngineClearObsoletes::class,
-                SearchEngineCreateKeywordJS::class,
-            ];
             $linkFields = [];
             $linkFields[] = HTMLReadonlyField::create(
                 "DebugTestField",
@@ -103,20 +96,15 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 Also please review the <a href=\"/searchenginemanifest\">full search manifest</a>.
                 </h4>"
             );
-            foreach($tasks as $task) {
-                $taskObject = Injector::inst()->get($task);
-                $linkFields[] = HTMLReadonlyField::create(
-                    rand(0,333333),
-                    $taskObject->getTitle(),
-                    '
-                        <h4>
-                        '.$taskObject->getDescription().'
-                        <br /><br />
-                        <a href="'.$taskObject->Link().'">Run now .... (careful!)</a>
-                        </h4>
-                    '
-                );
-            }
+            $linkFields[] = HTMLReadonlyField::create(
+                rand(0,333333),
+                'Tasks',
+                '
+                <h4>
+                    <a href="/dev/tasks/searchenginebasetask/">Run tasks now .... (careful!)</a>
+                </h4>
+                '
+            );
             $field = new FieldList(
                 new TabSet(
                     'Root',
@@ -189,7 +177,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_name",
                             'Location for saving Keywords as JSON for autocomplete',
-                            self::print_nice(SearchEngineKeyword::get_js_keyword_file_name(true))
+                            self::print_nice(ExportKeywordList::get_js_keyword_file_name(true))
                         ),
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_last_changed",

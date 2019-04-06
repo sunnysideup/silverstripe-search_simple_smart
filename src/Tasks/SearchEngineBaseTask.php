@@ -127,33 +127,33 @@ class SearchEngineBaseTask extends BuildTask
 
         $verbose = intval($request->getVar('verbose'));
         if($verbose) {$this->verbose = $verbose;}
-        $this->flushNow('verbose: '.$this->verbose ? 'yes' : 'no');
+        $this->flushNow('<strong>verbose</strong>: '.($this->verbose ? 'yes' : 'no'));
 
         $limit = intval($request->getVar('limit'));
         if($limit) {$this->limit = $limit;}
-        $this->flushNow('limit: '.$this->limit);
+        $this->flushNow('<strong>limit</strong>: '.$this->limit);
 
         $step = intval($request->getVar('step'));
         if($step) {$this->step = $step;}
-        $this->flushNow('step: '.$this->step);
+        $this->flushNow('<strong>step</strong>: '.$this->step);
 
         $type = $request->getVar('type');
         if($type) {$this->type = $type;}
-        $this->flushNow('type: '.$this->type);
+        $this->flushNow('<strong>type</strong>: '.$this->type);
 
         $oldOnesOnly = $request->getVar('oldonesonly') ? true : false;
         if($oldOnesOnly) {$this->oldOnesOnly = $oldOnesOnly;}
-        $this->flushNow('old ones only: '.$this->oldOnesOnly ? 'yes' : 'no');
+        $this->flushNow('<strong>old ones only</strong>: '.($this->oldOnesOnly ? 'yes' : 'no'));
 
         $unindexedOnly = $request->getVar('unindexedonly') ? true : false;
         if($unindexedOnly) {$this->unindexedOnly = $unindexedOnly;}
-        $this->flushNow('unindexed only: '.$this->unindexedOnly ? 'yes' : 'no');
+        $this->flushNow('<strong>unindexed only</strong>: '.($this->unindexedOnly ? 'yes' : 'no'));
 
         $task = $request->getVar('task');
         if($task) {$this->task = $task;}
+        $this->flushNow('<strong>task</strong>: '.$this->task);
 
-        $this->flushNow('<h2>Starting</h2>', false);
-
+        $this->flushNow('==========================', false);
     }
 
     public function runEnd($request)

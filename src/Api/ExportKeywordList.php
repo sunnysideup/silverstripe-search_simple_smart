@@ -23,7 +23,7 @@ class ExportKeywordList
      *
      * @var string
      */
-    private static $keyword_list_folder_name = "";
+    private static $keyword_list_folder_name = 'keywords';
 
     public static function export_keyword_list()
     {
@@ -31,28 +31,29 @@ class ExportKeywordList
         if ($fileName) {
             //only write once a minute
             if (file_exists($fileName) && (time() -  filemtime($fileName) < 120)) {
-                return "no new file created as the current one is less than 120 seconds old.";
+                return 'no new file created as the current one is less than 120 seconds old: '.$fileName;
             //do nothing
             } else {
                 if(Security::database_is_ready()) {
-                    $rows = DB::query("SELECT \"Keyword\" FROM \"SearchEngineKeyword\" ORDER BY \"Keyword\";");
+                    $rows = DB::query('SELECT "Keyword" FROM "SearchEngineKeyword" ORDER BY "Keyword";');
                     $array = [];
                     foreach ($rows as $row) {
-                        $array[] = str_replace('"', "", Convert::raw2js($row["Keyword"]));
+                        $array[] = str_replace('\'', '', Convert::raw2js($row['Keyword']));
                     }
                     $written = null;
                     if ($fh = fopen($fileName, 'w')) {
-                        $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = [\"".implode("\",\"", $array)."\"];");
+                        $written = fwrite($fh, 'SearchEngineInitFunctions.keywordList = [\''.implode('\',\'', $array).'\'];');
                         fclose($fh);
                     }
                     if (!$written) {
-                        user_error("Could not write keyword list to $fileName", E_USER_NOTICE);
+                        user_error('Could not write keyword list to $fileName', E_USER_NOTICE);
                     }
-                    return "Writting: <br />".implode("<br />", $array);
+                    return 'Writing: <br />'.implode('<br />', $array);
                 }
             }
+
         } else {
-            return "no file name specified";
+            return 'no file name specified';
         }
     }
 
@@ -63,18 +64,24 @@ class ExportKeywordList
      */
     public static function get_js_keyword_file_name($includeBase = false)
     {
-        $myFolderName = Config::inst()->get(ExportKeywordList::class, "keyword_list_folder_name");
+        $myFolderName = Config::inst()->get(ExportKeywordList::class, 'keyword_list_folder_name');
         if (!$myFolderName) {
             return false;
         }
+        $myFolderName = 'public/assets/'.$myFolderName;
         $myFolder = Folder::find_or_make($myFolderName);
-
-        $fileName = "keywords.js";
+        $fileName = 'keywords.js';
         if ($includeBase) {
-            return Director::baseFolder().'/'.$myFolder->getFilename().'/'.$fileName;
+            $str = Director::baseFolder().'/'.$myFolder->getFilename();
         } else {
-            return $myFolder->getFilename().'/'.$fileName;
+            $str = $myFolder->getFilename();
         }
+        if(! file_exists($str)) {
+            mkdir($str);
+        }
+        $str = rtrim(str_replace('//', '/', $str),'/').'/'.$fileName;
+
+        return $str;
     }
 
 
