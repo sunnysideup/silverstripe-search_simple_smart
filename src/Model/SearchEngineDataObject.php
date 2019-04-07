@@ -256,7 +256,7 @@ class SearchEngineDataObject extends DataObject
     {
         SearchEngineSearchRecord::flush();
         self::$_original_mode = Versioned::get_stage();
-        Versioned::set_stage('Live');
+        Versioned::set_stage(Versioned::LIVE);
     }
 
     public static function end_indexing_mode()
