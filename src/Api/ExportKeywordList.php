@@ -20,10 +20,10 @@ class ExportKeywordList
    use Configurable;
 
     /**
-     *
+     * if this is not set, the list will NOT be exported!
      * @var string
      */
-    private static $keyword_list_folder_name = 'keywords';
+    private static $keyword_list_folder_name = '';
 
     public static function export_keyword_list()
     {
@@ -59,29 +59,30 @@ class ExportKeywordList
 
     /**
      * returns the location of the keyword file...
-     * @param Boolean $withoutBase
-     * @return string
+     * @param Boolean $includeBase
+     *
+     * @return string|null
      */
     public static function get_js_keyword_file_name($includeBase = false)
     {
         $myFolderName = Config::inst()->get(ExportKeywordList::class, 'keyword_list_folder_name');
-        if (!$myFolderName) {
-            return false;
-        }
-        $myFolderName = 'public/assets/'.$myFolderName;
-        $myFolder = Folder::find_or_make($myFolderName);
-        $fileName = 'keywords.js';
-        if ($includeBase) {
-            $str = Director::baseFolder().'/'.$myFolder->getFilename();
-        } else {
-            $str = $myFolder->getFilename();
-        }
-        if(! file_exists($str)) {
-            mkdir($str);
-        }
-        $str = rtrim(str_replace('//', '/', $str),'/').'/'.$fileName;
+        //without folder name we return null!
+        if ($myFolderName) {
+            $myFolderName = 'public/assets/'.$myFolderName;
+            $myFolder = Folder::find_or_make($myFolderName);
+            $fileName = 'keywords.js';
+            if ($includeBase) {
+                $str = Director::baseFolder().'/'.$myFolder->getFilename();
+            } else {
+                $str = $myFolder->getFilename();
+            }
+            if(! file_exists($str)) {
+                mkdir($str);
+            }
+            $str = rtrim(str_replace('//', '/', $str),'/').'/'.$fileName;
 
-        return $str;
+            return $str;
+        }
     }
 
 

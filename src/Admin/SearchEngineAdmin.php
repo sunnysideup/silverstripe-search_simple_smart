@@ -79,7 +79,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         if ($this->modelClass == SearchEngineAdvancedSettings::class) {
             $jsLastChanged = "";
             $fileName = ExportKeywordList::get_js_keyword_file_name(true);
-            if (file_exists($fileName)) {
+            if ($fileName && file_exists($fileName)) {
                 $jsLastChanged = Date("Y-m-d H:i", filemtime($fileName));
             } else {
                 $jsLastChanged = "unknown";
@@ -177,7 +177,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_name",
                             'Location for saving Keywords as JSON for autocomplete',
-                            self::print_nice(ExportKeywordList::get_js_keyword_file_name(true))
+                            self::print_nice((ExportKeywordList::get_js_keyword_file_name(true) ? : '--- not set ---'))
                         ),
                         HTMLReadonlyField::create(
                             "get_js_keyword_file_last_changed",
