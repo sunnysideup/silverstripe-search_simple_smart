@@ -74,27 +74,10 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
             //do nothing
         } else {
 
-            //sort by DataObjectDate
-            $sql = '
-                SELECT
-                    "SearchEngineDataObject"."ID" AS MyID,
-                FROM "SearchEngineDataObject"
-                WHERE
-                    "SearchEngineDataObject"."ID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                ORDER BY
-                    "DataObjectDate" DESC
-                ;';
-            $rows = DB::query($sql);
-            $ids = [];
-            foreach ($rows as $row) {
-                $id = $row["MyID"];
-                $ids[$id] = $id;
-            }
-
             //retrieve objects
             $objects = SearchEngineDataObject::get()
-                ->filter(["ID" => $ids])
-                ->sort("FIELD(\"ID\", ".implode(",", $ids).")");
+                ->filter(['ID' => explode(',', $searchRecord->ListOfIDsCUSTOM)])
+                ->sort(['DataObjectDate' => 'DESC']);
 
             //group results!
             $objects = $this->makeClassGroups($objects);
