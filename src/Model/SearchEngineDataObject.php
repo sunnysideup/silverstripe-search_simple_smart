@@ -105,6 +105,17 @@ class SearchEngineDataObject extends DataObject
         'Password'
     );
 
+    /**
+     * Order of fields that can be used to establish a SORT date for the
+     * source object.
+     * @var Array
+     */
+    private static $search_engine_date_fields_for_sorting = array(
+        'PublishDate',
+        'Created',
+        'LastEdited'
+    );
+
 
     /**
      *
@@ -149,7 +160,8 @@ class SearchEngineDataObject extends DataObject
     private static $db = array(
         'DataObjectClassName' => 'Varchar(150)',
         'DataObjectID' => 'Int',
-        'Recalculate' => 'Boolean'
+        'Recalculate' => 'Boolean',
+        'DataObjectDate' => 'Datetime'
     );
 
     /**
@@ -194,7 +206,8 @@ class SearchEngineDataObject extends DataObject
      */
     private static $indexes = array(
         'DataObjectClassName' => true,
-        'DataObjectID' => true
+        'DataObjectID' => true,
+        'DataObjectDate' => true
     );
 
     /**
@@ -228,6 +241,7 @@ class SearchEngineDataObject extends DataObject
     private static $summary_fields = array(
         'Title' => 'Title',
         'LastEdited.Nice' => 'Last Updated',
+        'DataObjectDate.Nice' => 'Sort Date',
         'SearchEngineDataObjectToBeIndexed.Count' => 'Indexed Times',
         'SearchEngineKeywords_Level1.Count' => 'Level1 Keywords',
         'SearchEngineKeywords_Level2.Count' => 'Level2 Keywords'
@@ -246,6 +260,7 @@ class SearchEngineDataObject extends DataObject
     private static $field_labels = array(
         'DataObjectClassName' => 'Object',
         'DataObjectID' => 'ID',
+        'DataObjectDate' => 'Sort Date',
         'SearchEngineDataObjectToBeIndexed' => 'Listed for indexing'
     );
 
@@ -437,6 +452,24 @@ class SearchEngineDataObject extends DataObject
      */
     private static $_search_engine_fields_for_indexing = [];
 
+    public function SearchEngineSourceObjectSortDate($sourceObject = null)
+    {
+        if(! $sourceObject) {
+            $sourceObject = $this->SourceObject();
+        }
+        if($sourceObject) {
+            if($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
+                return $sourceObject->SearchEngineSourceObjectSortDate();
+            } else {
+                $fieldsToCheck = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_date_fields_for_sorting');
+                foreach($fieldsToCheck as $field) {
+                    if(! empty($sourceObject->$field)) {
+                        return $sourceObject->$field;
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * returns array like this:
@@ -922,6 +955,9 @@ class SearchEngineDataObject extends DataObject
             if($withModeChange) {
                 SearchEngineDataObject::start_indexing_mode();
             }
+
+            $this->DataObjectDate = $this->SearchEngineSourceObjectSortDate($sourceObject);
+
             if($timeMeasure) {
                 $startTime = microtime(true);
             }
