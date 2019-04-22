@@ -18,7 +18,15 @@ Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent:
 Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList:
   keyword_list_folder_name: "_searchengine_json"
 
-Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable:
+
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeywordFindAndRemove:
+  add_stop_words: true
+
+Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject:
+  classes_to_exclude:
+    - ErrorPage
+    - RedirectorPage
+    - VirtualPage
   search_engine_default_level_one_fields:
     - Title
     - Name
@@ -29,15 +37,12 @@ Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable:
     - Email
   search_engine_default_excluded_db_fields:
     - Password
+  search_engine_date_fields_for_sorting:
+    - PublishDate
+    - Created
+    - LastEdited
 
-Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeywordFindAndRemove:
-  add_stop_words: true
 
-Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject:
-  classes_to_exclude:
-    - ErrorPage
-    - RedirectorPage
-    - VirtualPage
 
 Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed:
   cron_job_running: true
@@ -59,6 +64,7 @@ Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm:
   full_results_page_type: "MySearchResultsPage"
   sort_by_options:
     - Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance
+    - Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByDate
     - Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByLastEdited
   filter_for_options:
     - Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName

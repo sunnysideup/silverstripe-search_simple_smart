@@ -402,6 +402,9 @@ class SearchEngineMakeSearchable extends DataExtension
      * returns array like this:
      * 1 => array('Title', 'MenuTitle')
      * 2 => array('Content')
+     *
+     * can be replaced by a method in the object itself!
+     *
      * @return array
      */
     public function SearchEngineFieldsForIndexing()

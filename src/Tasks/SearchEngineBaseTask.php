@@ -150,7 +150,11 @@ class SearchEngineBaseTask extends BuildTask
         $this->flushNow('<strong>unindexed only</strong>: '.($this->unindexedOnly ? 'yes' : 'no'));
 
         $task = $request->getVar('task');
-        if($task) {$this->task = $task;}
+        if($task) {
+            $this->task = $task;
+        } else {
+            $this->task = self::$segment;
+        }
         $this->flushNow('<strong>task</strong>: '.$this->task);
 
         $this->flushNow('==========================', false);
@@ -179,6 +183,7 @@ class SearchEngineBaseTask extends BuildTask
                     <option value="searchenginecleardataobjectdoubles">dataobject doubles</option>
                     <option value="searchenginecleartobeindexeddoubles">remove index double</option>
                     <option value="searchengineupdatesearchindex">update search index</option>
+                    <option value="searchenginesetsortdate">update search sort dates</option>
                     <option value="searchengineclearobsoletes">clear obsoletes</option>
                     <option value="searchenginecreatekeywordjs">create keyword js</option>
                     <option value="searchenginespecialkeywords">special keywords</option>

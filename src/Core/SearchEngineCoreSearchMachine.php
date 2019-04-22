@@ -12,6 +12,7 @@ use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance;
+use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByDate;
 use SilverStripe\View\ViewableData;
 
 use SilverStripe\Core\Config\Configurable;
