@@ -111,7 +111,10 @@ class SearchEngineKeyword extends DataObject implements Flushable
      * @var array
      */
     private static $summary_fields = array(
-        "Keyword" => "Keyword"
+        "Keyword" => "Keyword",
+        'SearchEngineDataObjects_Level1.Count' => 'Level 1 Mentions',
+        'SearchEngineDataObjects_Level2.Count' => 'Level 2 Mentions',
+        'SearchEngineSearchRecords.Count' => 'Included In Results',
     );
 
     /*
