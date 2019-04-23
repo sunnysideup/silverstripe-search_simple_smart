@@ -26,7 +26,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
      * title of the task
      * @var string
      */
-    protected $title = 'Remove to be search engine data object doubles';
+    protected $title = 'Remove search engine data object doubles';
 
     /**
      * description of the task

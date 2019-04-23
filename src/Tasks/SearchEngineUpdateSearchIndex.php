@@ -41,7 +41,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
         $this->runStart($request);
         SearchEngineDataObject::start_indexing_mode();
 
-        $count = SearchEngineDataObjectToBeIndexed::get()->count();
+        $count = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, 99999999)->count();
         if($count > $this->limit) {
             $count = $this->limit;
             $sort = DB::get_conn()->random().' ASC';

@@ -195,21 +195,21 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
 
         } elseif ($this->modelClass == SearchEngineSearchRecordHistory::class) {
 
-            $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
-            $field = new FieldList(
-                new TabSet(
-                    'Root',
-                    new Tab(
-                        'Graph',
-                        SearchEngineSearchHistoryFormField::create("SearchHistoryTable")
-                    ),
-                    new Tab(
-                        'Log',
-                        $gridField
-                    )
-                )
-            );
-            $form->setFields($field);
+            // $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
+            // $field = new FieldList(
+            //     new TabSet(
+            //         'Root',
+            //         new Tab(
+            //             'Graph',
+            //             SearchEngineSearchHistoryFormField::create("SearchHistoryTable")
+            //         ),
+            //         new Tab(
+            //             'Log',
+            //             $gridField
+            //         )
+            //     )
+            // );
+            // $form->setFields($field);
         }
         return $form;
     }
