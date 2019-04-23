@@ -67,9 +67,11 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
                 $obj->delete();
             } else {
                 $this->flushNow('.');
-                $test[$foreignID] = [];
+                if(! isset($test[$foreignID])) {
+                    $test[$foreignID] = [];
+                }
             }
-            $test[$foreignID][] = $id;
+            $test[$foreignID][$id] = $id;
         }
 
         $this->runEnd($request);

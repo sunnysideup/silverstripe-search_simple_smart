@@ -956,18 +956,26 @@ class SearchEngineDataObject extends DataObject
                 SearchEngineDataObject::start_indexing_mode();
             }
 
+            //add date!
             $this->DataObjectDate = $this->SearchEngineSourceObjectSortDate($sourceObject);
+            $this->write();
 
             if($timeMeasure) {
                 $startTime = microtime(true);
             }
+
+            //get the full content
             $fullContentArray = $this->SearchEngineFullContentForIndexingBuild($sourceObject);
             if($timeMeasure) {
                 $endTime = microtime(true);
                 $this->timeMeasure['FullContentBuild'] = $endTime - $startTime;
                 $startTime = microtime(true);
             }
+
+            //add the full content
             SearchEngineFullContent::add_data_object_array($this, $fullContentArray);
+
+
             if($timeMeasure) {
                 $endTime = microtime(true);
                 $this->timeMeasure['AddContent'] = $endTime - $startTime;

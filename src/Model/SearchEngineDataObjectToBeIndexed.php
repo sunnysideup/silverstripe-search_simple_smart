@@ -247,13 +247,15 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     public static function to_run($oldOnesOnly = false, $limit = 10)
     {
         $objects = SearchEngineDataObjectToBeIndexed::get()
-            ->exclude(array("SearchEngineDataObjectID" => 0))
-            ->filter(array("Completed" => 0))
+            ->exclude(["SearchEngineDataObjectID" => 0])
+            ->filter(["Completed" => 0])
             ->sort(DB::get_conn()->random().' ASC')
             ->limit($limit);
+
         if ($oldOnesOnly) {
             $objects = $objects->where("UNIX_TIMESTAMP(\"Created\") < ".strtotime("5 minutes ago"));
         }
+
         return $objects;
     }
 
