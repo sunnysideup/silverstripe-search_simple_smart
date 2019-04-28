@@ -50,25 +50,29 @@ class SearchEngineManifest extends Controller
                             <h3>$classNameTitle ($numberOfIndexedObjects)</h3>
                             <ul>";
                 $class = Injector::inst()->get($className);
+                $example = $className::get()->first();
+                if(! $example) {
+                    $example = $class;
+                }
                 $manifest .=
                                 "<li>
                                     <strong>Fields Indexed (level 1 / 2  is used to determine importance for relevance sorting):</strong>".
-                                    $class->SearchEngineFieldsToBeIndexedHumanReadable().
+                                    $example->SearchEngineFieldsToBeIndexedHumanReadable().
                                 "</li>";
                 $manifest .=
                                 "<li>
                                     <strong>Templates:</strong>".
-                                    $this->printNice($class->SearchEngineResultsTemplates(false)).
+                                    $this->printNice($example->SearchEngineResultsTemplates(false)).
                                 "</li>";
                 $manifest .=
                                 "<li>
                                     <strong>Templates (more details):</strong>".
-                                    $this->printNice($class->SearchEngineResultsTemplates(true)).
+                                    $this->printNice($example->SearchEngineResultsTemplates(true)).
                                 "</li>";
                 $manifest .=
                                 "<li>
                                     <strong>Also trigger:</strong>".
-                                    $this->printNice($class->SearchEngineAlsoTrigger()).
+                                    $this->printNice($example->SearchEngineAlsoTrigger()).
                                 "</li>";
                 $manifest .=
                             "</ul>
