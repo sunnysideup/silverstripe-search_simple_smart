@@ -10,6 +10,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Core\Environment;
+use SilverStripe\Control\Director;
 use SilverStripe\Control\Controller;
 
 class SearchEngineBaseTask extends BuildTask
@@ -167,53 +168,54 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>======================</h2>');
 
+        if(! Director::is_cli()) {
+            $html =
+            '
+            <style>
+                div {padding: 20px;}
+            </style>
+            <form method="get" action="/dev/tasks/searchenginebasetask/">
+                <fieldset>
+                <div>
+                    <select name="task">
+                        <option value="">--- choose task ---</option>
+                        <option value="searchengineremoveall">search engine removeall</option>
+                        <option value="searchengineindexall">index all</option>
+                        <option value="searchenginecleardataobjectdoubles">dataobject doubles</option>
+                        <option value="searchenginecleartobeindexeddoubles">remove index double</option>
+                        <option value="searchengineupdatesearchindex">update search index</option>
+                        <option value="searchenginesetsortdate">update search sort dates</option>
+                        <option value="searchengineclearobsoletes">clear obsoletes</option>
+                        <option value="searchenginecreatekeywordjs">create keyword js</option>
+                        <option value="searchenginespecialkeywords">special keywords</option>
+                    </select>
+                    type
+                </div>
 
-        $html =
-        '
-        <style>
-            div {padding: 20px;}
-        </style>
-        <form method="get" action="/dev/tasks/searchenginebasetask/">
-            <fieldset>
-            <div>
-                <select name="task">
-                    <option value="">--- choose task ---</option>
-                    <option value="searchengineremoveall">search engine removeall</option>
-                    <option value="searchengineindexall">index all</option>
-                    <option value="searchenginecleardataobjectdoubles">dataobject doubles</option>
-                    <option value="searchenginecleartobeindexeddoubles">remove index double</option>
-                    <option value="searchengineupdatesearchindex">update search index</option>
-                    <option value="searchenginesetsortdate">update search sort dates</option>
-                    <option value="searchengineclearobsoletes">clear obsoletes</option>
-                    <option value="searchenginecreatekeywordjs">create keyword js</option>
-                    <option value="searchenginespecialkeywords">special keywords</option>
-                </select>
-                type
-            </div>
+                <div><input name="verbose" checked="checked" type="checkbox" /> verbose</div>
+                <div><input name="limit" value="100000" type="number" /> limit</div>
+                <div><input name="step" value="10" type="number" /> step</div>
+                <div><input name="unindexedonly" checked="checked" type="checkbox" /> unindexed only</div>
+                <div><input name="oldonesonly" checked="checked" type="checkbox" /> old ones only</div>
+                <div>
+                    <select name="type">
+                        <option value="">--- choose type ---</option>
+                        <option value="history">history</option>
+                        <option value="indexes">indexes</option>
+                        <option value="all">all</option>
+                    </select>
+                    type
+                </div>
+                </fieldset>
+                <fieldset>
+                <div><input name="submit" value="go" type="submit"/></div>
+                </fieldset>
+            </form>
 
-            <div><input name="verbose" checked="checked" type="checkbox" /> verbose</div>
-            <div><input name="limit" value="100000" type="number" /> limit</div>
-            <div><input name="step" value="10" type="number" /> step</div>
-            <div><input name="unindexedonly" checked="checked" type="checkbox" /> unindexed only</div>
-            <div><input name="oldonesonly" checked="checked" type="checkbox" /> old ones only</div>
-            <div>
-                <select name="type">
-                    <option value="">--- choose type ---</option>
-                    <option value="history">history</option>
-                    <option value="indexes">indexes</option>
-                    <option value="all">all</option>
-                </select>
-                type
-            </div>
-            </fieldset>
-            <fieldset>
-            <div><input name="submit" value="go" type="submit"/></div>
-            </fieldset>
-        </form>
+            ';
 
-        ';
-
-        $this->flushNow($html);
+            $this->flushNow($html);
+        }
 
         $this->flushNow('<h2>------ END -----------</h2>');
         $this->flushNow('<h2>======================</h2>');
