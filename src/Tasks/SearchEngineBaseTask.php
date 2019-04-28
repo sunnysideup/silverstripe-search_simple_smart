@@ -81,7 +81,7 @@ class SearchEngineBaseTask extends BuildTask
         //set basics
         $this->runStart($request);
 
-        if($this->task) {
+        if($this->task && $this->task !== 'searchenginebasetask') {
             unset($_GET['task']);
             unset($_GET['submit']);
             return Controller::curr()->redirect('/dev/tasks/'.$this->task.'/?'.http_build_query($_GET));
