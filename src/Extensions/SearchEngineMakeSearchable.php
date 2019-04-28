@@ -331,6 +331,10 @@ class SearchEngineMakeSearchable extends DataExtension
             foreach ($alsoTrigger as $details) {
                 $className = $details['ClassName'];
                 $id = $details['ID'];
+                if($this->owner->ID == $id && $this->owner->ClassName = $className) {
+                    user_error('Object can not trigger itself');
+                    die();
+                }
                 $obj = $className::get()->byID($id);
                 if($obj->hasExtension(Versioned::class)) {
                     $doPublish = $obj->isPublished();
@@ -356,7 +360,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function onAfterWrite()
     {
-        if ($this->SearchEngineExcludeFromIndex()) {
+        if ($this->owner->SearchEngineExcludeFromIndex()) {
             //do nothing...
         } else {
             if(!isset($this->_onAfterWriteCount[$this->owner->ID])) {
@@ -364,10 +368,11 @@ class SearchEngineMakeSearchable extends DataExtension
             }
             $item = SearchEngineDataObject::find_or_make($this->owner);
             $this->_onAfterWriteCount[$this->owner->ID]++;
-            if ($item && $this->_onAfterWriteCount[$this->owner->ID] < 2) {
-                ExportKeywordList::export_keyword_list();
-                // $item->write();
-                // DB::query('UPDATE \'SearchEngineDataObject\' SET LastEdited = NOW() WHERE ID = '.(intval($item->ID)-0).';');
+            if ($item && $this->_onAfterWriteCount[$this->owner->ID] < 3) {
+                // ExportKeywordList::export_keyword_list();
+                
+                $item->write();
+                
                 SearchEngineDataObjectToBeIndexed::add($item);
             }
         }
@@ -547,8 +552,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $item = SearchEngineDataObject::find_or_make($this->owner, false);
         if($item && $item->exists()) {
-
-            return true;
+            return $item->SearchEngineDataObjectToBeIndexed()->filter(['Completed' => true])->count();
         } else {
 
             return false;
@@ -563,6 +567,9 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineExcludeFromIndex()
     {
+        if(empty($this->owner->ID) || empty($this->owner->ClassName)) {
+            return true;
+        }
         $key = $this->owner->ClassName.'_'.$this->owner->ID;
         if(! isset(self::$_search_engine_exclude_from_index[$key])) {
             if(! isset(self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName])) {
