@@ -891,19 +891,19 @@ class SearchEngineDataObject extends DataObject
                 $fieldLabels = $sourceObject->fieldLabels();
                 $str = '<ul>';
                 foreach ($levels as $level => $fieldArray) {
-                    $str .= '<li><strong>$level</strong><ul>';
+                    $str .= '<li><strong>'.$level.'</strong><ul>';
                     foreach ($fieldArray as $field) {
                         if (isset($fieldLabels[$field])) {
                             $title = $fieldLabels[$field].' ['. $field .']';
                         } else {
-                            $title = '$field';
+                            $title = $field;
                         }
                         if ($includeExample) {
                             $fields = explode('.', $field);
                             $data = ' '.$sourceObject->SearchEngineRelObject($sourceObject, $fields).' ';
-                            $str .= '<li> - <strong>$title</strong> <em>'.$data.'</em></li>';
+                            $str .= '<li> - <strong>'.$title.'</strong> <em>'.$data.'</em></li>';
                         } else {
-                            $str .= '<li> - $title</li>';
+                            $str .= '<li> - '.$title.'</li>';
                         }
                     }
                     $str .= '</ul></li>';
