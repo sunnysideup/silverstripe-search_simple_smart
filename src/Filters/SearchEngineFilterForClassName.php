@@ -47,14 +47,6 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     {
         $array = [];
         $filterArray = SearchEngineDataObject::searchable_class_names();
-        $includeInGeneral = Config::inst()->get(SearchEngineDataObject::class, "classes_to_include");
-        if (!is_array($includeInGeneral)) {
-            $includeInGeneral = [];
-        }
-        $exclude = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
-        if (!is_array($exclude)) {
-            $exclude = [];
-        }
         $checkInclusion = false;
         $myInclusions = $this->Config()->get("classes_to_include");
         if (is_array($myInclusions) && count($myInclusions)) {
@@ -62,18 +54,14 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         }
 
         foreach ($filterArray as $className => $title) {
-            if(count($includeInGeneral) === 0 || in_array($className, $includeInGeneral)) {
-                if (! in_array($className, $exclude)) {
-                    if ($checkInclusion) {
-                        if (in_array($className, $myInclusions)) {
-                            $array[$className] = $title;
-                        } elseif (isset($myInclusions[$className])) {
-                            $array[$className] = $myInclusions[$className];
-                        }
-                    } else {
-                        $array[$className] = $title;
-                    }
+            if ($checkInclusion) {
+                if (in_array($className, $myInclusions)) {
+                    $array[$className] = $title;
+                } elseif (isset($myInclusions[$className])) {
+                    $array[$className] = $myInclusions[$className];
                 }
+            } else {
+                $array[$className] = $title;
             }
         }
 

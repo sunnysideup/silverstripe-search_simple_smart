@@ -570,39 +570,12 @@ class SearchEngineMakeSearchable extends DataExtension
         if(empty($this->owner->ID) || empty($this->owner->ClassName)) {
             return true;
         }
+
         $key = $this->owner->ClassName.'_'.$this->owner->ID;
         if(! isset(self::$_search_engine_exclude_from_index[$key])) {
             if(! isset(self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName])) {
-                //starting point
-                $exclude = false;
-
-                //check if there are includes
-                //if there are includes, then only include these ones
-                $onlyIncludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
-                if(is_array($onlyIncludeClassNames) && count($onlyIncludeClassNames)) {
-                    $exclude = true;
-                    foreach($onlyIncludeClassNames as $onlyIncludeClassName) {
-                        if (
-                            $this->owner->ClassName === $onlyIncludeClassName ||
-                            is_subclass_of($this->owner->ClassName, $onlyIncludeClassName)
-                        ) {
-                            $exclude = false;
-                        }
-                    }
-                }
-
-                //check if there are any classes to exclude if includes has not rules the out yet.
-                if($exclude === false) {
-                    $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
-                    foreach($alwaysExcludeClassNames as $alwaysExcludeClassName) {
-                        if (
-                            $this->owner->ClassName === $alwaysExcludeClassName ||
-                            is_subclass_of($this->owner->ClassName, $alwaysExcludeClassName)
-                        ) {
-                            $exclude = true;
-                        }
-                    }
-                }
+                $classNameList = array_keys(SearchEngineDataObject::searchable_class_names());
+                $exclude = isset($classNameList[$this->owner->ClassName]) ? false : true;
                 self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName] = $exclude;
             }
             $exclude = self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName];

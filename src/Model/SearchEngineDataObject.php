@@ -552,26 +552,59 @@ class SearchEngineDataObject extends DataObject
     public static function searchable_class_names()
     {
         if(self::$_searchable_class_names === null) {
-            $classes = ClassInfo::subclassesFor(DataObject::class);
-            $array = [];
+            $allClasses = ClassInfo::subclassesFor(DataObject::class);
+            //specifically include
+            $includeClassNames = [];
+            //specifically exclude
+            $excludeClassNames = [];
+            //ones we test for the extension
+            $testArray = [];
+            //the final list
+            $finalClasses = [];
+
+            //check for inclusions
             $include = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
-            $exclude = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
-            foreach ($classes as $className) {
-                if (count($include) === 0 || in_array($className, $include)) {
-                    if (! in_array($className, $exclude)) {
-                        if ($className::has_extension(SearchEngineMakeSearchable::class)) {
-                            if (isset(self::$_object_class_name[$className])) {
-                                $objectClassName = self::$_object_class_name[$className];
-                            } else {
-                                $objectClassName = Injector::inst()->get($className)->singular_name();
-                                self::$_object_class_name[$className] = $objectClassName;
-                            }
-                            $array[$className] = $objectClassName;
+            if(is_array($include) && count($include)) {
+                foreach($include as $includeOne) {
+                    $includeClassNames = array_merge($includeClassNames, ClassInfo::subclassesFor($includeOne));
+                }
+            }
+            $includeClassNames = array_unique($includeClassNames);
+
+            //if we have inclusions then this is the final list
+            if(count($includeClassNames)) {
+                $testArray = $includeClassNames;
+            } else {
+                //lets see which ones are excluded from full list.
+                $testArray = $allClasses;
+                $exclude = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
+                if(is_array($exclude) && count($exclude)) {
+                    foreach($exclude as $excludeOne) {
+                        $excludeClassNames = array_merge($excludeClassNames, ClassInfo::subclassesFor($excludeOne));
+                    }
+                }
+                $excludeClassNames = array_unique($excludeClassNames);
+                if(count($excludeClassNames)) {
+                    foreach($testArray as $classNameKey => $classNameValue) {
+                        foreach($excludedClassNames as $excludeOne) {
+                            unset($testArray[$excludeOne]);
                         }
                     }
                 }
             }
-            self::$_searchable_class_names = $array;
+            foreach ($testArray as $className) {
+                //does it have the extension?
+                if ($className::has_extension(SearchEngineMakeSearchable::class)) {
+                    if (isset(self::$_object_class_name[$className])) {
+                        $objectClassName = self::$_object_class_name[$className];
+                    } else {
+                        $objectClassName = Injector::inst()->get($className)->singular_name();
+                        self::$_object_class_name[$className] = $objectClassName;
+                    }
+                    $finalClasses[$className] = $objectClassName;
+                }
+            }
+            self::$_searchable_class_names = $finalClasses;
         }
 
         return self::$_searchable_class_names;
