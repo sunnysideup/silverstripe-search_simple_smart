@@ -574,10 +574,8 @@ class SearchEngineMakeSearchable extends DataExtension
         $key = $this->owner->ClassName.'_'.$this->owner->ID;
         if(! isset(self::$_search_engine_exclude_from_index[$key])) {
             if(! isset(self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName])) {
-                $classNameList = array_keys(SearchEngineDataObject::searchable_class_names());
-                print_r(SearchEngineDataObject::searchable_class_names());
+                $classNameList = SearchEngineDataObject::searchable_class_names();
                 $exclude = isset($classNameList[$this->owner->ClassName]) ? false : true;
-                echo isset($classNameList[$this->owner->ClassName]) ? $this->owner->ClassName.' is in list' : $this->owner->ClassName.' is NOT in list';
                 self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName] = $exclude;
             }
             $exclude = self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName];
