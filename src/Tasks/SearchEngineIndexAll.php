@@ -77,6 +77,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                             SearchEngineDataObjectToBeIndexed::add($item, false);
                         } else {
                             if($obj->SearchEngineExcludeFromIndex()) {
+                                die('asdf');
                                 $this->flushNow('Object is excluded from search index: '.$obj->getTitle());
                             } else {
                                 $this->flushNow('Error that needs to be investigating .... object is ....'.$obj->getTitle());
