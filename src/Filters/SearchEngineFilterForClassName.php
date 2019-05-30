@@ -13,7 +13,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 
 
     /**
-     * list of classes that should be included in no values are set
+     * list of classes that should be included if no values are set
      * @var array
      */
     private static $classes_to_include = [];
@@ -47,29 +47,36 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     {
         $array = [];
         $filterArray = SearchEngineDataObject::searchable_class_names();
+        $includeInGeneral = Config::inst()->get(SearchEngineDataObject::class, "classes_to_include");
+        if (!is_array($includeInGeneral)) {
+            $includeInGeneral = [];
+        }
         $exclude = Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude");
         if (!is_array($exclude)) {
             $exclude = [];
         }
         $checkInclusion = false;
-        $include = $this->Config()->get("classes_to_include");
-        if (is_array($include) && count($include)) {
+        $myInclusions = $this->Config()->get("classes_to_include");
+        if (is_array($myInclusions) && count($myInclusions)) {
             $checkInclusion = true;
         }
 
         foreach ($filterArray as $className => $title) {
-            if (!in_array($className, $exclude)) {
-                if ($checkInclusion) {
-                    if (in_array($className, $include)) {
+            if(count($includeInGeneral) === 0 || in_array($className, $includeInGeneral)) {
+                if (!in_array($className, $exclude)) {
+                    if ($checkInclusion) {
+                        if (in_array($className, $myInclusions)) {
+                            $array[$className] = $title;
+                        } elseif (isset($myInclusions[$className])) {
+                            $array[$className] = $myInclusions[$className];
+                        }
+                    } else {
                         $array[$className] = $title;
-                    } elseif (isset($inclusion[$className])) {
-                        $array[$className] = $inclusion[$className];
                     }
-                } else {
-                    $array[$className] = $title;
                 }
             }
         }
+
         return $array;
     }
 
