@@ -177,7 +177,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                             self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits"))
                         ),
                         HTMLReadonlyField::create(
-                            "classes_to_include",
+                            "classes_to_include_for_filter",
                             'Filter for class names list - OPTIONAL',
                             self::print_nice(Config::inst()->get(SearchEngineFilterForClassName::class, "classes_to_include"))
                         ),
