@@ -121,6 +121,12 @@ class SearchEngineDataObject extends DataObject
      *
      * @var Array
      */
+    private static $classes_to_include =[];
+
+    /**
+     *
+     * @var Array
+     */
     private static $classes_to_exclude = array(
         ErrorPage::class,
         VirtualPage::class,
@@ -548,16 +554,20 @@ class SearchEngineDataObject extends DataObject
         if(self::$_searchable_class_names === null) {
             $classes = ClassInfo::subclassesFor(DataObject::class);
             $array = [];
+            $include = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
+            $exclude = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
             foreach ($classes as $className) {
-                if (!in_array($className, Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude'))) {
-                    if ($className::has_extension(SearchEngineMakeSearchable::class)) {
-                        if (isset(self::$_object_class_name[$className])) {
-                            $objectClassName = self::$_object_class_name[$className];
-                        } else {
-                            $objectClassName = Injector::inst()->get($className)->singular_name();
-                            self::$_object_class_name[$className] = $objectClassName;
+                if (count($include) === 0 || in_array($className, $include)) {
+                    if (! in_array($className, $exclude)) {
+                        if ($className::has_extension(SearchEngineMakeSearchable::class)) {
+                            if (isset(self::$_object_class_name[$className])) {
+                                $objectClassName = self::$_object_class_name[$className];
+                            } else {
+                                $objectClassName = Injector::inst()->get($className)->singular_name();
+                                self::$_object_class_name[$className] = $objectClassName;
+                            }
+                            $array[$className] = $objectClassName;
                         }
-                        $array[$className] = $objectClassName;
                     }
                 }
             }
