@@ -63,7 +63,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 
         foreach ($filterArray as $className => $title) {
             if(count($includeInGeneral) === 0 || in_array($className, $includeInGeneral)) {
-                if (!in_array($className, $exclude)) {
+                if (! in_array($className, $exclude)) {
                     if ($checkInclusion) {
                         if (in_array($className, $myInclusions)) {
                             $array[$className] = $title;
