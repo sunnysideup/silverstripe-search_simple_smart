@@ -370,9 +370,9 @@ class SearchEngineMakeSearchable extends DataExtension
             $this->_onAfterWriteCount[$this->owner->ID]++;
             if ($item && $this->_onAfterWriteCount[$this->owner->ID] < 3) {
                 // ExportKeywordList::export_keyword_list();
-                
+
                 $item->write();
-                
+
                 SearchEngineDataObjectToBeIndexed::add($item);
             }
         }
@@ -573,14 +573,35 @@ class SearchEngineMakeSearchable extends DataExtension
         $key = $this->owner->ClassName.'_'.$this->owner->ID;
         if(! isset(self::$_search_engine_exclude_from_index[$key])) {
             if(! isset(self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName])) {
+                //starting point
                 $exclude = false;
-                $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
-                foreach($alwaysExcludeClassNames as $alwaysExcludeClassName) {
-                    if (
-                        $this->owner->ClassName === $alwaysExcludeClassName ||
-                        is_subclass_of($this->owner->ClassName, $alwaysExcludeClassName)
-                    ) {
-                        $exclude = true;
+
+                //check if there are includes
+                //if there are includes, then only include these ones
+                $includeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
+                if(is_array($includeClassNames) && count($includeClassNames)) {
+                    $exclude = true;
+                    foreach($includeClassNames as $includeClassName) {
+                        if (
+                            $this->owner->ClassName === $includeClassName ||
+                            is_subclass_of($this->owner->ClassName, $includeClassNames)
+                        ) {
+                            $exclude = false;
+                        }
+                    }
+                    self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName] = $exclude;
+                }
+
+                //check if there are any classes to exclude if includes has not rules the out yet.
+                if($exclude === false) {
+                    $alwaysExcludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
+                    foreach($alwaysExcludeClassNames as $alwaysExcludeClassName) {
+                        if (
+                            $this->owner->ClassName === $alwaysExcludeClassName ||
+                            is_subclass_of($this->owner->ClassName, $alwaysExcludeClassName)
+                        ) {
+                            $exclude = true;
+                        }
                     }
                 }
                 self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName] = $exclude;
@@ -592,9 +613,17 @@ class SearchEngineMakeSearchable extends DataExtension
                 } else {
                     $exclude = Config::inst()->get($this->owner->ClassName, 'search_engine_exclude_from_index');
                 }
+                
                 //special case SiteTree
+                if(isset($this->owner->ShowInSearch)) {
+                    if(! $this->owner->ShowInSearch) {
+                        $exclude = true;
+                    }
+                }
+
+                //important! has it been published?
                 if ($this->owner->hasExtension(Versioned::class)) {
-                    if ($this->owner->ShowInSearch && $this->owner->IsPublished()) {
+                    if ($this->owner->IsPublished()) {
                         //do nothing - no need to exclude
                     } else {
                         $exclude = true;
