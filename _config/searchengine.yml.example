@@ -76,8 +76,7 @@ Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName:
   classes_to_include:
     - MyDataObjectFooBarThing
     - MyOtherPage
-# OR !
-Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName:
-  classes_to_include:
-    MyDataObjectFooBarThing: 'Title goes here'
-    MyOtherPage: 'Title goes here'
+    # OR !
+  #classes_to_include:
+    #MyDataObjectFooBarThing: 'Title goes here'
+    #MyOtherPage: 'Title goes here'
