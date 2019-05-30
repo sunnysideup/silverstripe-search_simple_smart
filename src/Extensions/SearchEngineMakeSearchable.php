@@ -578,18 +578,17 @@ class SearchEngineMakeSearchable extends DataExtension
 
                 //check if there are includes
                 //if there are includes, then only include these ones
-                $includeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
-                if(is_array($includeClassNames) && count($includeClassNames)) {
+                $onlyIncludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
+                if(is_array($onlyIncludeClassNames) && count($onlyIncludeClassNames)) {
                     $exclude = true;
-                    foreach($includeClassNames as $includeClassName) {
+                    foreach($onlyIncludeClassNames as $onlyIncludeClassName) {
                         if (
-                            $this->owner->ClassName === $includeClassName ||
-                            is_subclass_of($this->owner->ClassName, $includeClassNames)
+                            $this->owner->ClassName === $onlyIncludeClassName ||
+                            is_subclass_of($this->owner->ClassName, $onlyIncludeClassName)
                         ) {
                             $exclude = false;
                         }
                     }
-                    self::$_search_engine_exclude_from_index_per_class[$this->owner->ClassName] = $exclude;
                 }
 
                 //check if there are any classes to exclude if includes has not rules the out yet.
@@ -613,7 +612,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 } else {
                     $exclude = Config::inst()->get($this->owner->ClassName, 'search_engine_exclude_from_index');
                 }
-                
+
                 //special case SiteTree
                 if(isset($this->owner->ShowInSearch)) {
                     if(! $this->owner->ShowInSearch) {

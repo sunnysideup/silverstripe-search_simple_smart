@@ -27,6 +27,8 @@ Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject:
     - ErrorPage
     - RedirectorPage
     - VirtualPage
+  classes_to_include:
+    - ContentPage
   search_engine_default_level_one_fields:
     - Title
     - Name

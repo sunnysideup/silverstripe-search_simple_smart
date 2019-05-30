@@ -119,7 +119,14 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                             "classes_to_exclude",
                             'Data Object - Classes To Exclude',
                             self::print_nice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_exclude"))
-                        ),
+                        )
+                            ->setDescription('All classes are included, except these ones'),
+                        HTMLReadonlyField::create(
+                            "classes_to_include",
+                            'Data Object - Classes To Include',
+                            self::print_nice(Config::inst()->get(SearchEngineDataObject::class, "classes_to_include"))
+                        )
+                            ->setDescription('Only these classes are included'),
                         HTMLReadonlyField::create(
                             "class_name_for_search_provision",
                             'Class or Search Provision',

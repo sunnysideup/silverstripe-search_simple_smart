@@ -204,11 +204,12 @@ class SearchEngineBaseTask extends BuildTask
                         <option value="indexes">indexes</option>
                         <option value="all">all</option>
                     </select>
-                    type
+                    type (only applicable to deletes)
                 </div>
                 </fieldset>
+
                 <fieldset>
-                <div><input name="submit" value="go" type="submit"/></div>
+                    <div><input name="submit" value="go" type="submit"/></div>
                 </fieldset>
             </form>
 
