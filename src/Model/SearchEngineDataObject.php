@@ -586,7 +586,7 @@ class SearchEngineDataObject extends DataObject
                 $excludeClassNames = array_unique($excludeClassNames);
                 if(count($excludeClassNames)) {
                     foreach($testArray as $classNameKey => $classNameValue) {
-                        foreach($excludedClassNames as $excludeOne) {
+                        foreach($excludeClassNames as $excludeOne) {
                             unset($testArray[$excludeOne]);
                         }
                     }
