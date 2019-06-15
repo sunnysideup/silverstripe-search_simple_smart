@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
+use SilverStripe\Forms\HeaderField;
 use SilverStripe\Control\Email\Email;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use SilverStripe\Versioned\Versioned;
@@ -201,6 +202,18 @@ class SearchEngineMakeSearchable extends DataExtension
                 $fields->removeFieldFromTab('Root.Main', 'SearchEngineDataObjectID');
                 if (!$this->owner->hasMethod('getSettingsFields')) {
                     return $this->updateSettingsFields($fields);
+                } elseif($this->owner instanceof SiteTree) {
+                    $fields->addFieldToTab(
+                        'Root.Main',
+                        LiteralField::create(
+                            'SearchEngineHeader',
+                            '<h2>
+                                See
+                                <a href="/admin/pages/settings/show/'.$this->owner->ID.'/">Settings Tab<a>
+                                for Search Engine Details
+                            </h2>'
+                        )
+                    );
                 }
             }
         }
