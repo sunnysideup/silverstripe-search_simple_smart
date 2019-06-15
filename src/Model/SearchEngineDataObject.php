@@ -392,6 +392,8 @@ class SearchEngineDataObject extends DataObject
         $this->flushCache();
     }
 
+    private $recalculateCount = 0;
+
     /**
      * Event handler called before writing to the database.
      */
@@ -399,7 +401,7 @@ class SearchEngineDataObject extends DataObject
     {
         parent::onBeforeWrite();
         if($this->Recalculate) {
-            //make sure onAfterWrite gets run!
+            //in databas object, make sure onAfterWrite runs!
             $this->forceChange();
         }
     }
@@ -410,8 +412,11 @@ class SearchEngineDataObject extends DataObject
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        if($this->Recalculate) {
+        if($this->Recalculate && $this->recalculateCount < 2) {
+            $this->recalculateCount++;
             $this->doSearchEngineIndex();
+            $this->write();
+        } elseif($this->Recalculate) {
             $this->Recalculate = false;
             $this->write();
         }
@@ -784,7 +789,7 @@ class SearchEngineDataObject extends DataObject
                 )
             );
         }
-        if($object && $object->hasMethod('Link')) {
+        if($object && ($object->hasMethod('Link'))) {
             $fields->addFieldToTab(
                 'Root.Main',
                 ReadonlyField::create(
