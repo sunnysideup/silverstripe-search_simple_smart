@@ -241,6 +241,8 @@ class SearchEngineFullContent extends DataObject
         parent::onBeforeWrite();
         $this->Level = SearchEngineKeyword::level_sanitizer($this->Level);
         $this->Content = self::clean_content($this->Content);
+        //make sure that onAfterWrite is also written ... 
+        $this->forceChange();
     }
 
     public function onAfterWrite()
