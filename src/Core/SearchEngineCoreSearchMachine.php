@@ -254,7 +254,8 @@ class SearchEngineCoreSearchMachine
         $this->runFilterAndSortUsingCustom();
 
         if ($this->debug) {
-            $this->runDebugPrep();
+            $this->runDebugPrep1();
+            $this->runDebugPrep2();
             $this->runDebugOutput();
         }
 
@@ -426,7 +427,7 @@ class SearchEngineCoreSearchMachine
         }
     }
 
-    protected function runDebugPrep()
+    protected function runDebugPrep1()
     {
         $this->endTimeForRun = microtime(true);
         $this->keywordArray = [];
@@ -447,6 +448,10 @@ class SearchEngineCoreSearchMachine
             'YES - seconds taken: ' . round($this->endTimeForCustomSort - $this->startTimeForCustomSort, 5)
             :
             'NO') . '</pre>';
+    }
+
+    protected function runDebugPrep2()
+    {
         $this->filter1 = ' (' . ($this->filterExecutedRAW ? 'executed ' : 'from cache') . '): carried out by: ' . $this->searchProviderName . '';
         $this->filter2 = ' (' . ($this->filterExecutedSQL ? 'executed' : 'from cache') . '): <pre>' . print_r($this->filterStringForDebug, 1) . '</pre>';
         $this->filter3 = ' (' . ($this->filterExecutedCustom ? 'executed' : 'from cache') . '): ' . $this->customFilterTime;
