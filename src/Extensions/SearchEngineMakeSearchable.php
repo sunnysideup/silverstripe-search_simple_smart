@@ -17,6 +17,7 @@ use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
@@ -67,7 +68,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         //last check...
         if (! $searchEngineDataObject) {
-            $searchEngineDataObject = SearchEngineDataObject::find_or_make($this->owner);
+            $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($this->owner);
         } else {
             if ($this->SearchEngineExcludeFromIndex()) {
                 $searchEngineDataObject = null;
@@ -92,7 +93,7 @@ class SearchEngineMakeSearchable extends DataExtension
     public function SearchEngineFullContentForIndexingBuild($searchEngineDataObject = null)
     {
         if (! $searchEngineDataObject) {
-            $searchEngineDataObject = SearchEngineDataObject::find_or_make($this->owner);
+            $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($this->owner);
         }
         if ($searchEngineDataObject) {
             return $searchEngineDataObject->SearchEngineFullContentForIndexingBuild($this->owner);
@@ -127,7 +128,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineKeywordDataObjectMatches($level = 1)
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner);
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         if ($item) {
             $field = 'SearchEngineKeywords_Level' . $level;
 
@@ -151,7 +152,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineResultsTemplates($moreDetails = false)
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner);
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         if ($item) {
             $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
         }
@@ -192,7 +193,7 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($this->SearchEngineExcludeFromIndex()) {
                 return;
             }
-            $item = SearchEngineDataObject::find_or_make($this->owner);
+            $item = SearchEngineDataObjectApi::find_or_make($this->owner);
             $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
             $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
             $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->owner->LastEdited));
@@ -247,7 +248,7 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function SearchEngineFieldsToBeIndexedHumanReadable($includeExample = false)
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner);
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         if ($item) {
             return $item->SearchEngineFieldsToBeIndexedHumanReadable($this->owner, $includeExample);
         }
@@ -322,7 +323,7 @@ class SearchEngineMakeSearchable extends DataExtension
             if (! isset($this->_onAfterWriteCount[$this->owner->ID])) {
                 $this->_onAfterWriteCount[$this->owner->ID] = 0;
             }
-            $item = SearchEngineDataObject::find_or_make($this->owner);
+            $item = SearchEngineDataObjectApi::find_or_make($this->owner);
             $this->_onAfterWriteCount[$this->owner->ID]++;
             if ($item && $this->_onAfterWriteCount[$this->owner->ID] < 3) {
                 // ExportKeywordList::export_keyword_list();
@@ -336,7 +337,7 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function SearchEngineDeleteFromIndexing()
     {
-        if ($item = SearchEngineDataObject::find_or_make($this->owner, $doNotMake = true)) {
+        if ($item = SearchEngineDataObjectApi::find_or_make($this->owner, $doNotMake = true)) {
             if ($item && $item->exists()) {
                 $item->delete();
             }
@@ -358,7 +359,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineFieldsForIndexing()
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner);
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         if ($item) {
             return $item->SearchEngineFieldsForIndexing($this->owner);
         }
@@ -374,7 +375,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineDataObjectFullContent()
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner);
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         if ($item) {
             return $item->SearchEngineFullContents();
         }
@@ -472,7 +473,7 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineIsIndexed()
     {
-        $item = SearchEngineDataObject::find_or_make($this->owner, false);
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner, false);
         if ($item && $item->exists()) {
             return $item->SearchEngineDataObjectToBeIndexed()->filter(['Completed' => true])->count();
         }

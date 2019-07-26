@@ -17,6 +17,7 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\Versioned;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 
@@ -201,8 +202,6 @@ class SearchEngineDataObject extends DataObject
         'SearchEngineDataObjectToBeIndexed' => 'Listed for indexing',
     ];
 
-    private static $_original_mode = null;
-
     private $recalculateCount = 0;
 
     /**
@@ -217,12 +216,6 @@ class SearchEngineDataObject extends DataObject
      */
     private static $_object_class_name = [];
 
-    /**
-     * used for caching...
-     * @var array
-     */
-    private static $_searchable_class_names = [];
-
     private static $_source_objects = [];
 
     private static $_source_objects_exists = [];
@@ -235,59 +228,7 @@ class SearchEngineDataObject extends DataObject
 
     private $timeMeasure = [];
 
-    #############################################
-    # QUICK STUFF
-    #############################################
 
-    /**
-     * @param DataObject $obj
-     * @param bool $doNotMake
-     * @return SearchEngineDataObject|null
-     */
-    public static function find_or_make($obj, $doNotMake = false)
-    {
-        if ($obj->hasExtension(SearchEngineMakeSearchable::class)) {
-            if ($obj->SearchEngineExcludeFromIndex()) {
-                return null;
-            }
-            $fieldArray = [
-                'DataObjectClassName' => $obj->ClassName,
-                'DataObjectID' => $obj->ID,
-            ];
-            $item = DataObject::get_one(self::class, $fieldArray);
-            if ($item || $doNotMake) {
-                //do nothing;
-            } else {
-                $item = self::create($fieldArray);
-                $item->write();
-            }
-
-            return $item;
-        }
-        user_error('DataObject expected, instead, the following was provided: ' . var_dump($obj));
-    }
-
-    public function i18n_singular_name()
-    {
-        return $this->Config()->get('singular_name');
-    }
-
-    public function i18n_plural_name()
-    {
-        return $this->Config()->get('plural_name');
-    }
-
-    public static function start_indexing_mode()
-    {
-        SearchEngineSearchRecord::flush();
-        self::$_original_mode = Versioned::get_stage();
-        Versioned::set_stage(Versioned::LIVE);
-    }
-
-    public static function end_indexing_mode()
-    {
-        Versioned::set_stage(self::$_original_mode);
-    }
 
     #############################################
     # CRUD
@@ -312,7 +253,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function canEdit($member = null)
     {
-        return parent::canEdit($member, $context) && Permission::check('SEARCH_ENGINE_ADMIN');
+        return parent::canEdit($member) && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -323,7 +264,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function canDelete($member = null)
     {
-        return parent::canDelete($member, $context) && Permission::check('SEARCH_ENGINE_ADMIN');
+        return parent::canDelete($member) && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -337,16 +278,7 @@ class SearchEngineDataObject extends DataObject
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
-    /**
-     * @param DataObject $obj
-     */
-    public static function remove($obj)
-    {
-        $item = self::find_or_make($obj, $doNotMake = true);
-        if ($item && $item->exists()) {
-            $item->delete();
-        }
-    }
+
 
     /**
      * make sure all the references are deleted as well
@@ -467,73 +399,6 @@ class SearchEngineDataObject extends DataObject
         }
 
         return self::$_search_engine_fields_for_indexing[$className];
-    }
-
-    /**
-     * returns it like this:
-     *
-     *     Page => General Page
-     *     HomePage => Home Page
-     *
-     * @return array
-     */
-    public static function searchable_class_names()
-    {
-        if (count(self::$_searchable_class_names) === 0) {
-            $allClasses = ClassInfo::subclassesFor(DataObject::class);
-            //specifically include
-            $includeClassNames = [];
-            //specifically exclude
-            $excludeClassNames = [];
-            //ones we test for the extension
-            $testArray = [];
-            //the final list
-            $finalClasses = [];
-
-            //check for inclusions
-            $include = Config::inst()->get(self::class, 'classes_to_include');
-            if (is_array($include) && count($include)) {
-                foreach ($include as $includeOne) {
-                    $includeClassNames = array_merge($includeClassNames, ClassInfo::subclassesFor($includeOne));
-                }
-            }
-            $includeClassNames = array_unique($includeClassNames);
-
-            //if we have inclusions then this is the final list
-            if (count($includeClassNames)) {
-                $testArray = $includeClassNames;
-            } else {
-                //lets see which ones are excluded from full list.
-                $testArray = $allClasses;
-                $exclude = Config::inst()->get(self::class, 'classes_to_exclude');
-                if (is_array($exclude) && count($exclude)) {
-                    foreach ($exclude as $excludeOne) {
-                        $excludeClassNames = array_merge($excludeClassNames, ClassInfo::subclassesFor($excludeOne));
-                    }
-                }
-                $excludeClassNames = array_unique($excludeClassNames);
-                if (count($excludeClassNames)) {
-                    foreach ($excludeClassNames as $excludeOne) {
-                        unset($testArray[$excludeOne]);
-                    }
-                }
-            }
-            foreach ($testArray as $className) {
-                //does it have the extension?
-                if ($className::has_extension(SearchEngineMakeSearchable::class)) {
-                    if (isset(self::$_object_class_name[$className])) {
-                        $objectClassName = self::$_object_class_name[$className];
-                    } else {
-                        $objectClassName = Injector::inst()->get($className)->singular_name();
-                        self::$_object_class_name[$className] = $objectClassName;
-                    }
-                    $finalClasses[$className] = $objectClassName;
-                }
-            }
-            self::$_searchable_class_names = $finalClasses;
-        }
-
-        return self::$_searchable_class_names;
     }
 
     /**
@@ -853,7 +718,7 @@ class SearchEngineDataObject extends DataObject
         }
         if ($sourceObject) {
             if ($withModeChange) {
-                self::start_indexing_mode();
+                SearchEngineDataObjectApi::start_indexing_mode();
             }
 
             //add date!
@@ -880,7 +745,7 @@ class SearchEngineDataObject extends DataObject
                 $this->timeMeasure['AddContent'] = $endTime - $startTime;
             }
             if ($withModeChange) {
-                self::end_indexing_mode();
+                SearchEngineDataObjectApi::end_indexing_mode();
             }
         }
     }
