@@ -240,7 +240,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         return $out . '</ul>';
     }
 
-    public function canView($member = null, $context = [])
+    public function canView($member = null)
     {
         return SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN');
     }

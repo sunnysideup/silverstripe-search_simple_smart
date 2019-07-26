@@ -54,7 +54,7 @@ class SearchEngineAdvancedSettings extends DataObject
      * affect whether (or where) this object could be created.
      * @return boolean
      */
-    public function canEdit($member = null, $context = [])
+    public function canEdit($member = null)
     {
         return false;
     }
@@ -65,7 +65,7 @@ class SearchEngineAdvancedSettings extends DataObject
      * affect whether (or where) this object could be created.
      * @return boolean
      */
-    public function canDelete($member = null, $context = [])
+    public function canDelete($member = null)
     {
         return false;
     }
@@ -76,7 +76,7 @@ class SearchEngineAdvancedSettings extends DataObject
      * affect whether (or where) this object could be created.
      * @return boolean
      */
-    public function canView($member = null, $context = [])
+    public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }

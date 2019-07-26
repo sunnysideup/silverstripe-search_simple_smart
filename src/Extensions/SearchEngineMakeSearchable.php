@@ -40,8 +40,14 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private $_array_of_relations = [];
 
+    /**
+     * @var array
+     */
     private static $_search_engine_exclude_from_index = [];
 
+    /**
+     * @var array
+     */
     private static $_search_engine_exclude_from_index_per_class = [];
 
     ############################
@@ -53,7 +59,7 @@ class SearchEngineMakeSearchable extends DataExtension
      * sets stage to LIVE
      * indexes the current object.
      * @param SearchEngineDataObject $searchEngineDataObject
-     * @param do $withModeChange everything necessary for indexings.
+     * @param DataObject $withModeChange everything necessary for indexings.
      *                        Setting this to false means the stage will not be set
      *                        and the cache will not be cleared.
      */
@@ -139,9 +145,9 @@ class SearchEngineMakeSearchable extends DataExtension
      * returns a template for formatting the object
      * in the search results.
      *
-     * @param boolean $moreDetails
+     * @param bool $moreDetails
      *
-     * @return array
+     * @return null|array
      */
     public function SearchEngineResultsTemplates($moreDetails = false)
     {

@@ -228,11 +228,17 @@ class SearchEngineCoreSearchMachine
      * @param string $searchPhrase
      * @param array $filterProviders
      * @param string $sortProvider
+     * @param object $sortProviderValues
      *
      * @return DataList
      */
     public function run($searchPhrase, $filterProviders = [], $sortProvider = '', $sortProviderValues = null)
     {
+        $this->searchPhrase = $searchPhrase;
+        $this->filterProviders = $filterProviders;
+        $this->sortProvider = $sortProvider;
+        $this->sortProviderValues = $sortProviderValues;
+
         $this->runGetGetVars();
 
         $this->runInitVars();
@@ -283,10 +289,10 @@ class SearchEngineCoreSearchMachine
 
     protected function runGetGetVars()
     {
-        if ((! empty($this->_GET['searchenginedebug']) || SiteConfig::current_site_config()->SearchEngineDebug) && Permission::check('SEARCH_ENGINE_ADMIN')) {
+        if ((! empty($_GET['searchenginedebug']) || SiteConfig::current_site_config()->SearchEngineDebug) && Permission::check('SEARCH_ENGINE_ADMIN')) {
             $this->debug = true;
         }
-        if (isset($this->_GET['flush'])) {
+        if (isset($_GET['flush'])) {
             $this->bypassCaching = true;
         }
     }
@@ -318,11 +324,9 @@ class SearchEngineCoreSearchMachine
 
     protected function runGetPreviouslySavedData()
     {
-
-        //check previously saved data.
         $this->listOfIDsAsArray = $this->searchRecord->getListOfIDs('RAW');
         $this->searchProviderName = 'not set';
-        if ($this->listOfIDsAsArray) {
+        if (is_array($this->listOfIDsAsArray) && count($this->listOfIDsAsArray)) {
             $this->listOfIDsAsString = implode(',', $this->listOfIDsAsArray);
             $this->dataList = SearchEngineDataObject::get()
                 ->filter(['ID' => $this->listOfIDsAsArray])
@@ -355,7 +359,7 @@ class SearchEngineCoreSearchMachine
     {
         $this->listOfIDsSQLAsArray = $this->searchRecord->getListOfIDs('SQL');
         $this->filterStringForDebug = '';
-        if ($this->listOfIDsSQLAsArray) {
+        if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
             $this->listOfIDsSQLString = implode(',', $this->listOfIDsSQLAsArray);
             $this->dataList = SearchEngineDataObject::get()
                 ->filter(['ID' => $this->listOfIDsSQLString])
