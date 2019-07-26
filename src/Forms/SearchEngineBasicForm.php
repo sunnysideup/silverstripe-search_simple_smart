@@ -87,16 +87,19 @@ class SearchEngineBasicForm extends Form
     protected $outputAsJSON = false;
 
     /**
-     * for internal use...
      * @var array
      */
     protected $customScript = [];
 
     /**
-     * for internal use...
      * @var string
      */
     protected $keywords = '';
+
+    /**
+     * @var bool
+     */
+    protected $setLimitToZero = false;
 
     /**
      * @var string
@@ -423,49 +426,15 @@ class SearchEngineBasicForm extends Form
      */
     protected function workOutResults($data)
     {
-        // Submitted data is available as a map.
-        $searchMachine = Injector::inst()->create(SearchEngineCoreSearchMachine::class);
-        //filter for is an array!
-        $filterForArray = [];
-        $setLimitToZero = false;
-        if (isset($data['FilterFor'])) {
-            foreach (array_keys($data['FilterFor']) as $filterForClass) {
-                $filterForArray[$filterForClass] = $filterForClass;
-            }
-        }
-        $sortBy = (! empty($data['SortBy']) && class_exists($data['SortBy']) ? $data['SortBy'] : '');
-        $this->start = (isset($_GET['start']) ? intval($_GET['start']) : 0);
-        if ($this->totalNumberOfItemsToReturn && $this->totalNumberOfItemsToReturn < $this->start) {
-            //$results = SearchEngineDataObject::get()->filter("ID", -1);
-            $setLimitToZero = true;
-        } else {
-            $results = $searchMachine->run(
-                $data['SearchEngineKeywords'],
-                $filterForArray,
-                $sortBy
-            );
-            if ($this->totalNumberOfItemsToReturn && $this->totalNumberOfItemsToReturn < ($this->start + $this->numberOfResultsPerPage)) {
-                $this->numberOfResultsPerPage = $this->totalNumberOfItemsToReturn - $this->start;
-                if ($this->numberOfResultsPerPage < 1) {
-                    $this->numberOfResultsPerPage = 1;
-                    $setLimitToZero = true;
-                }
-            }
-        }
-        //paginate
+        $results = $this->workOutResultsFilterAndSort($data);
         $count = 0;
         if ($results) {
             $count = $results->count();
         }
         SearchEngineSearchRecordHistory::add_number_of_results($count);
-        if ($setLimitToZero) {
-            $results = $results->limit(0);
-        } else {
-            $results = $results->limit($this->totalNumberOfItemsToReturn);
-        }
-        $results = PaginatedList::create($results, ['start' => $this->start]);
 
-        $results->setPageLength($this->numberOfResultsPerPage);
+        $resultsPaginated = $this->workOutResultsPaginated($results);
+
         // After dealing with the data you can redirect the user back.
         $link = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
         $fullResultsLink = '';
@@ -483,14 +452,14 @@ class SearchEngineBasicForm extends Form
         $arrayData = new ArrayData(
             [
                 'SearchedFor' => Convert::raw2xml($data['SearchEngineKeywords']),
-                'Results' => $results,
-                'ResultsGrouped' => GroupedList::create($results),
+                'Results' => $resultsPaginated,
+                'ResultsGrouped' => GroupedList::create($resultsPaginated),
                 'Count' => $count,
                 'Link' => $link,
                 'IsMoreDetailsResult' => $this->isMoreDetailsResult,
                 'FullResultsLink' => $fullResultsLink,
                 'NumberOfItemsPerPage' => $this->numberOfResultsPerPage,
-                'DebugHTML' => $searchMachine->getDebugString(),
+                // 'DebugHTML' => $searchMachine->getDebugString(),
             ]
         );
         $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups');
@@ -498,6 +467,58 @@ class SearchEngineBasicForm extends Form
             return $arrayData->renderWith('SearchEngineSearchResultsOuterWithSpecialSortGrouping');
         }
         return $arrayData->renderWith('SearchEngineSearchResultsOuter');
+    }
+
+    protected function workOutResultsFilterAndSort($data)
+    {
+        $results = null;
+        $searchMachine = Injector::inst()->create(SearchEngineCoreSearchMachine::class);
+        //filter for is an array!
+        $filterForArray = [];
+        $this->setLimitToZero = false;
+        if (isset($data['FilterFor'])) {
+            foreach (array_keys($data['FilterFor']) as $filterForClass) {
+                $filterForArray[$filterForClass] = $filterForClass;
+            }
+        }
+        $sortBy = (! empty($data['SortBy']) && class_exists($data['SortBy']) ? $data['SortBy'] : '');
+        $this->start = (isset($_GET['start']) ? intval($_GET['start']) : 0);
+        if ($this->totalNumberOfItemsToReturn && $this->totalNumberOfItemsToReturn < $this->start) {
+            //$results = SearchEngineDataObject::get()->filter("ID", -1);
+            $this->setLimitToZero = true;
+        } else {
+            $results = $searchMachine->run(
+                $data['SearchEngineKeywords'],
+                $filterForArray,
+                $sortBy
+            );
+            if ($this->totalNumberOfItemsToReturn && $this->totalNumberOfItemsToReturn < ($this->start + $this->numberOfResultsPerPage)) {
+                $this->numberOfResultsPerPage = $this->totalNumberOfItemsToReturn - $this->start;
+                if ($this->numberOfResultsPerPage < 1) {
+                    $this->numberOfResultsPerPage = 1;
+                    $this->setLimitToZero = true;
+                }
+            }
+        }
+        if (! $results) {
+            $results = ArrayList::create();
+        }
+        return $results;
+    }
+
+    protected function workOutResultsPaginated($results): PaginatedList
+    {
+        //paginate
+        if ($this->setLimitToZero) {
+            $results = $results->limit(0);
+        } else {
+            $results = $results->limit($this->totalNumberOfItemsToReturn);
+        }
+        $resultsPaginated = PaginatedList::create($results, ['start' => $this->start]);
+
+        $resultsPaginated->setPageLength($this->numberOfResultsPerPage);
+
+        return $resultsPaginated;
     }
 
     /**
