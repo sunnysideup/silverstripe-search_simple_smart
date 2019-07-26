@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 
 class SearchEngineIndexAll extends SearchEngineBaseTask
@@ -66,7 +67,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                         $run = true;
                     }
                     if ($run) {
-                        $item = SearchEngineDataObject::find_or_make($obj);
+                        $item = SearchEngineDataObjectApi::find_or_make($obj);
                         if ($item) {
                             $this->flushNow('Queueing: ' . $obj->getTitle() . ' for indexing');
                             SearchEngineDataObjectToBeIndexed::add($item, false);

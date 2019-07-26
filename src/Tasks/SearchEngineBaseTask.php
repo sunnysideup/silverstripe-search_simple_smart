@@ -116,7 +116,7 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        $this->verbose = intval($request->getVar('verbose'));
+        $this->verbose = $request->getVar('verbose') ? true : false;
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
 
         if($request->getVar('limit')) {
