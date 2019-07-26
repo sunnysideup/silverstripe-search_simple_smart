@@ -22,7 +22,7 @@ class SearchEngineRecordClick extends Controller
         $itemID = $request->param('ID');
         $item = SearchEngineDataObject::get()->byID(intval($itemID));
         if ($item) {
-            $obj = SearchEngineSearchRecordHistory::register_click($item);
+            SearchEngineSearchRecordHistory::register_click($item);
             return $this->redirect($item->SourceObject()->Link());
         }
         $url = isset($_GET['finaldestination']) ? $_GET['finaldestination'] : '404';

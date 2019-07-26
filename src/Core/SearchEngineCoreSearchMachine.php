@@ -129,7 +129,7 @@ class SearchEngineCoreSearchMachine
             $startTime = microtime(true);
             $filterExecutedRAW = false;
             $filterExecutedSQL = false;
-            $filterExecutedCUSTOM = false;
+            $filterExecutedCustom = false;
         }
 
         //add record
@@ -175,7 +175,6 @@ class SearchEngineCoreSearchMachine
         //get cached value for SQL ID List.
         $listOfIDsSQLAsArray = $searchRecord->getListOfIDs('SQL');
         $filterStringForDebug = '';
-        $filterClassesWithValues = [];
         if ($listOfIDsSQLAsArray) {
             $listOfIDsSQL = implode(',', $listOfIDsSQLAsArray);
             $dataList = SearchEngineDataObject::get()
@@ -215,7 +214,7 @@ class SearchEngineCoreSearchMachine
         $listOfIDsCustomAsArray = $searchRecord->getListOfIDs('CUSTOM');
         if ($listOfIDsCustomAsArray === null) {
             if ($this->debug) {
-                $filterExecutedCUSTOM = true;
+                $filterExecutedCustom = true;
             }
             foreach ($this->filterProviders as $filterClassName => $filterValues) {
                 if ($filterObjects[$filterClassName]->hasCustomFilter($filterValues)) {
@@ -268,17 +267,28 @@ class SearchEngineCoreSearchMachine
             foreach ($keywordArray as $position => $keywords) {
                 $keywordArray[$position] = implode(' OR ', $keywords);
             }
+            $customFilterTime = (! empty($startTimeForCustomFilter) ?
+                'YES - seconds taken: ' . round($endTimeForCustomFilter - $startTimeForCustomSort, 5)
+                :
+                'NO') . '';
+            $customSortTime = (! empty($startTimeForCustomSort) ?
+                'YES - seconds taken: ' . round($endTimeForCustomSort - $startTimeForCustomSort, 5)
+                :
+                'NO') . '</pre>';
             $this->debugArray[] = 'Keywords SQL (excludes keywords that are not in index): <pre> (' . implode(') AND (', $keywordArray) . ')</pre>';
             $this->debugArray[] = '---------------- Filters --------------';
             $filter1 = ' (' . ($filterExecutedRAW ? 'executed ' : 'from cache') . '): carried out by: ' . $searchProviderName . '';
             $filter2 = ' (' . ($filterExecutedSQL ? 'executed' : 'from cache') . '): <pre>' . print_r($filterStringForDebug, 1) . '</pre>';
-            $filter3 = ' (' . ($filterExecutedCUSTOM ? 'executed' : 'from cache') . '): ' . (! empty($startTimeForCustomFilter) ? 'YES - seconds taken: ' . round($endTimeForCustomSort - $startTimeForCustomSort, 5) : 'NO') . '';
+            $filter3 = ' (' . ($filterExecutedCustom ? 'executed' : 'from cache') . '): ' . $customFilterTime;
             $listOfIDsRAW = explode(',', $listOfIDsRAW);
             $listOfIDsSQL = explode(',', $listOfIDsSQL);
             $listOfIDsCustom = explode(',', $listOfIDsCustom);
-            $matches1 = (is_array($listOfIDsRAW) ? count($listOfIDsRAW) . ': <pre>' . $this->fancyPrintIDList($listOfIDsRAW) . '</pre>' : 0);
-            $matches2 = (is_array($listOfIDsSQL) ? count($listOfIDsSQL) . ': <pre>' . $this->fancyPrintIDList($listOfIDsSQL) . '</pre>' : 0);
-            $matches3 = (is_array($listOfIDsCustom) ? count($listOfIDsCustom) . ': <pre>' . $this->fancyPrintIDList($listOfIDsCustom) . '</pre>' : 0);
+            $matches1 = (is_array($listOfIDsRAW) ?
+                count($listOfIDsRAW) . ': <pre>' . $this->fancyPrintIDList($listOfIDsRAW) . '</pre>' : 0);
+            $matches2 = (is_array($listOfIDsSQL) ?
+                count($listOfIDsSQL) . ': <pre>' . $this->fancyPrintIDList($listOfIDsSQL) . '</pre>' : 0);
+            $matches3 = (is_array($listOfIDsCustom) ?
+                count($listOfIDsCustom) . ': <pre>' . $this->fancyPrintIDList($listOfIDsCustom) . '</pre>' : 0);
 
             $this->debugArray[] = "STEP 1: RAW Filter ${filter1}";
             $this->debugArray[] = "... RAW matches ${matches1}";
@@ -292,7 +302,7 @@ class SearchEngineCoreSearchMachine
             $this->debugArray[] = '---------------- Sorting --------------';
             $this->debugArray[] = '<hr />';
             $this->debugArray[] = 'SQL SORT: <pre>' . print_r($nonCustomSort, 1) . '</pre>';
-            $this->debugArray[] = 'CUSTOM SORT: <pre>' . (! empty($startTimeForCustomSort) ? 'YES - seconds taken: ' . round($endTimeForCustomSort - $startTimeForCustomSort, 5) : 'NO') . '</pre>';
+            $this->debugArray[] = 'CUSTOM SORT: <pre>' . $customSortTime;
             $this->debugArray[] = '<hr />';
         }
 
