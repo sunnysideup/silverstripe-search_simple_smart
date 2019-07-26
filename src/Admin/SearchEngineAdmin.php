@@ -237,9 +237,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 $out .= '<li><span>' . $key . '</span>' . self::array2ul($elem) . '</li>';
             }
         }
-        $out .= '</ul>';
-
-        return $out;
+        return $out . '</ul>';
     }
 
     public function canView($member = null, $context = [])

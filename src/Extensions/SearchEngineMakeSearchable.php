@@ -404,9 +404,8 @@ class SearchEngineMakeSearchable extends DataExtension
                         $method = $fields[1];
                         $str .= ' ' . $object->dbObject($dbField)->{$method}() . ' ';
                     }
-                }
-                //has one relation
-                else {
+                } else {
+                    //has one relation
                     $method = array_shift($fields);
                     $hasOneArray = array_merge(
                         $this->SearchEngineRelFields($object, 'has_one'),
@@ -416,9 +415,8 @@ class SearchEngineMakeSearchable extends DataExtension
                     if (isset($hasOneArray[$method])) {
                         $foreignObject = $object->{$method}();
                         $str .= ' ' . $this->searchEngineRelObject($foreignObject, $fields) . ' ';
-                    }
-                    //many relation
-                    else {
+                    } else {
+                        //many relation
                         $manyArray = array_merge(
                             $this->SearchEngineRelFields($object, 'has_many'),
                             $this->SearchEngineRelFields($object, 'many_many'),

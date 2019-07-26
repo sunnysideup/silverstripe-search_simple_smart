@@ -65,8 +65,8 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
      {
 
         //1. find keywords
-         $filterArray = [];
-         $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('" . $this->searchRecord->FinalPhrase . "')");
+         // $filterArray = [];
+         // $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('" . $this->searchRecord->FinalPhrase . "')");
          $dataObjectArray = [];
          $max = substr_count($this->searchRecord->FinalPhrase, ' ') + 2;
          for ($i = 1; $i < $max; $i++) {

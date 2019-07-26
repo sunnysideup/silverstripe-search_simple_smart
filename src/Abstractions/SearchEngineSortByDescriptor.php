@@ -104,14 +104,14 @@ abstract class SearchEngineSortByDescriptor
         return '<ul><li>' . implode('</li>li><li>', $this->debugArray) . '</li></ul>';
     }
 
-    protected function groupCustomSort($objects)
-    {
-        if ($this->hasClassGroups()) {
-            //retrieve objects
-            $keys = array_keys($finalArray);
-        }
-        return $objects;
-    }
+    // protected function groupCustomSort($objects)
+    // {
+    //     if ($this->hasClassGroups()) {
+    //         //retrieve objects
+    //         $keys = array_keys($finalArray);
+    //     }
+    //     return $objects;
+    // }
 
     /**
      * @param  [type] $objects an array if IDs,
