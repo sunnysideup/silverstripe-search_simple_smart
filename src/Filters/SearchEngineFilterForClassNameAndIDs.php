@@ -2,21 +2,19 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescriptor
 {
-
     /**
-     * @return String
+     * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineFilterForClassNameAndIDs.TITLE", "Seleted Items from Type");
+        return _t('SearchEngineFilterForClassNameAndIDs.TITLE', 'Seleted Items from Type');
     }
 
     /**
@@ -25,11 +23,11 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      *    LARGE => Large Pages
      *    SMALL => Small Pages
      *    RED => Red Pages
-     * @return Array
+     * @return array
      */
     public function getFilterList()
     {
-        return array("TYPE" => "Selection of items");
+        return ['TYPE' => 'Selection of items'];
     }
 
     /**
@@ -46,19 +44,17 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      */
     public function getSqlFilterArray($list)
     {
-        if(! $filterArray) {
+        if (! $filterArray) {
             return null;
-        }
-        elseif(is_array($filterArray) && count($filterArray) === 0) {
+        } elseif (is_array($filterArray) && count($filterArray) === 0) {
             return null;
-        }
-        elseif($filterArray instanceof SS_List) {
+        } elseif ($filterArray instanceof SS_List) {
             $ids = $list->column('ID');
             $classNames = $list->column('ClassName');
             $preFilter = [];
-            foreach($ids as $position => $id) {
+            foreach ($ids as $position => $id) {
                 $className = $classNames[$position];
-                if(! isset($preFilter[$className])) {
+                if (! isset($preFilter[$className])) {
                     $preFilter[$className] = [];
                 }
                 $preFilter[$className][$id] = $id;
@@ -90,5 +86,4 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
     {
         return false;
     }
-
 }

@@ -13,9 +13,8 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 interface SearchEngineSearchEngineProvider
 {
-
     /**
-     * @param SearchEngineSearchRecord
+     * @param SearchEngineSearchRecord $searchRecord
      */
     public function setSearchRecord(SearchEngineSearchRecord $searchRecord);
 

@@ -2,25 +2,21 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\ClassInfo;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
 {
-
     /**
-     * @return String
+     * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineFilterForIDs.TITLE", "Custom Selection limited to one type");
+        return _t('SearchEngineFilterForIDs.TITLE', 'Custom Selection limited to one type');
     }
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     public function getDescription()
     {
@@ -33,7 +29,7 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      *    LARGE => Large Pages
      *    SMALL => Small Pages
      *    RED => Red Pages
-     * @return Array
+     * @return array
      */
     public function getFilterList()
     {
@@ -53,7 +49,7 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      */
     public function getSqlFilterArray($filterArray)
     {
-        return ["DataObjectID" => $filterArray];
+        return ['DataObjectID' => $filterArray];
     }
 
     /**
@@ -68,5 +64,4 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
     {
         return false;
     }
-
 }

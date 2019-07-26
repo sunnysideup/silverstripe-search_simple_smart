@@ -2,21 +2,18 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use SilverStripe\Security\Permission;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
-use SilverStripe\ORM\DB;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Security\Permission;
 
 /**
  * presents a list of dataobjects
  * that need to be reindexed, because they have changed.
  *
  * Once they have been indexed, they will be removed again.
- *
  */
 
 class SearchEngineDataObjectToBeIndexed extends DataObject
@@ -30,87 +27,99 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     /**
      * @var string
      */
-    private static $singular_name = "To Be (re)Indexed";
-    public function i18n_singular_name()
-    {
-        return $this->Config()->get('singular_name');
-    }
+    private static $singular_name = 'To Be (re)Indexed';
 
     /**
      * @var string
      */
-    private static $plural_name = "To Be (re)Indexed";
-    public function i18n_plural_name()
-    {
-        return $this->Config()->get('plural_name');
-    }
+    private static $plural_name = 'To Be (re)Indexed';
 
     /**
      * @var array
      */
-    private static $db = array(
-        "Completed" => "Boolean(1)",
-    );
+    private static $db = [
+        'Completed' => 'Boolean(1)',
+    ];
 
     /**
      * @var array
      */
-    private static $indexes = array(
-        "Completed" => true
-    );
+    private static $indexes = [
+        'Completed' => true,
+    ];
 
     /**
      * @var array
      */
-    private static $has_one = array(
-        "SearchEngineDataObject" => SearchEngineDataObject::class,
-    );
+    private static $has_one = [
+        'SearchEngineDataObject' => SearchEngineDataObject::class,
+    ];
 
     /**
      * @var array
      */
-    private static $required_fields = array(
-        "SearchEngineDataObject"
-    );
+    private static $required_fields = [
+        'SearchEngineDataObject',
+    ];
 
     /**
      * @var array
      */
-    private static $field_labels = array(
-        "SearchEngineDataObject" => "Searchable Object"
-    );
+    private static $field_labels = [
+        'SearchEngineDataObject' => 'Searchable Object',
+    ];
 
     /**
      * @var array
      */
-    private static $summary_fields = array(
-        "Title" => "Searchable Object",
-        "Created" => "Added On",
-        "Completed.Nice" => "Completed"
-    );
+    private static $summary_fields = [
+        'Title' => 'Searchable Object',
+        'Created' => 'Added On',
+        'Completed.Nice' => 'Completed',
+    ];
 
     /**
      * Defines a default list of filters for the search context
      * @var array
      */
     private static $searchable_fields = [
-        'Completed' => 'ExactMatchFilter'
+        'Completed' => 'ExactMatchFilter',
     ];
 
     /**
      * @var array
      */
-    private static $casting = array(
-        "Title" => "Varchar"
-    );
+    private static $casting = [
+        'Title' => 'Varchar',
+    ];
 
     /**
      * @var array
      */
-    private static $default_sort = array(
-        "Completed" => "ASC",
-        "Created" => "DESC"
-    );
+    private static $default_sort = [
+        'Completed' => 'ASC',
+        'Created' => 'DESC',
+    ];
+
+    /**
+     * you must set this to true once you have your cron job
+     * up and running.
+     * The cron job runs this task every ?? minutes.
+     * @var bool
+     */
+    private static $cron_job_running = false;
+
+    private static $_cache_for_items = [];
+
+    public function i18n_singular_name()
+    {
+        return $this->Config()->get('singular_name');
+    }
+
+    public function i18n_plural_name()
+    {
+        return $this->Config()->get('plural_name');
+    }
 
     /**
      * @param Member $member
@@ -142,7 +151,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     public function canDelete($member = null, $context = [])
     {
-        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -153,16 +162,8 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     public function canView($member = null, $context = [])
     {
-        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
-
-    /**
-     * you must set this to true once you have your cron job
-     * up and running.
-     * The cron job runs this task every ?? minutes.
-     * @var boolean
-     */
-    private static $cron_job_running = false;
 
     /**
      * @casted variable
@@ -175,58 +176,54 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
                 return $obj->getTitle();
             }
         }
-        return "ERROR";
+        return 'ERROR';
     }
 
-    private static $_cache_for_items = [];
-
     /**
-     *
-     * @param SearchEngineDataObject $item
+     * @param SearchEngineDataObject $searchEngineDataObject
      * @return SearchEngineDataObjectToBeIndexed
      */
     public static function add(SearchEngineDataObject $searchEngineDataObject, $alsoIndex = true)
     {
-        if($searchEngineDataObject && $searchEngineDataObject->exists()) {
-            if(! isset(self::$_cache_for_items[$searchEngineDataObject->ID])) {
+        if ($searchEngineDataObject && $searchEngineDataObject->exists()) {
+            if (! isset(self::$_cache_for_items[$searchEngineDataObject->ID])) {
                 $fieldArray = [
-                    "SearchEngineDataObjectID" => $searchEngineDataObject->ID,
-                    "Completed" => 0
+                    'SearchEngineDataObjectID' => $searchEngineDataObject->ID,
+                    'Completed' => 0,
                 ];
                 $objToBeIndexedRecord = DataObject::get_one(
-                    SearchEngineDataObjectToBeIndexed::class,
+                    self::class,
                     $fieldArray
                 );
                 if ($objToBeIndexedRecord && $objToBeIndexedRecord->exists()) {
                     //do nothing
                 } else {
-                    $objToBeIndexedRecord = SearchEngineDataObjectToBeIndexed::create($fieldArray);
+                    $objToBeIndexedRecord = self::create($fieldArray);
                     $objToBeIndexedRecord->write();
                 }
-                if (Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, "cron_job_running")) {
+                if (Config::inst()->get(self::class, 'cron_job_running')) {
                     //cron will take care of it...
                 } else {
                     //do it immediately...
-                    if($alsoIndex) {
+                    if ($alsoIndex) {
                         $objToBeIndexedRecord->IndexNow($searchEngineDataObject);
                     }
                 }
                 self::$_cache_for_items[$searchEngineDataObject->ID] = $objToBeIndexedRecord;
             }
             return self::$_cache_for_items[$searchEngineDataObject->ID];
-        } else {
-            user_error('The SearchEngineDataObject needs to exist');
         }
+        user_error('The SearchEngineDataObject needs to exist');
     }
 
     public function IndexNow(SearchEngineDataObject $searchEngineDataObject = null)
     {
-        if(! $searchEngineDataObject) {
-            $searchEngineDataObject  = $this->SearchEngineDataObject();
+        if (! $searchEngineDataObject) {
+            $searchEngineDataObject = $this->SearchEngineDataObject();
         }
-        if($searchEngineDataObject && $searchEngineDataObject->exists() && $searchEngineDataObject instanceof SearchEngineDataObject) {
+        if ($searchEngineDataObject && $searchEngineDataObject->exists() && $searchEngineDataObject instanceof SearchEngineDataObject) {
             $sourceObject = $searchEngineDataObject->SourceObject();
-            if($sourceObject && $sourceObject->exists()) {
+            if ($sourceObject && $sourceObject->exists()) {
                 $sourceObject->doSearchEngineIndex($searchEngineDataObject);
                 $this->Completed = 1;
                 $this->write();
@@ -241,19 +238,19 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     /**
      * returns all the items that are more than five minutes old
-     * @param bool
+     * @param bool $oldOnesOnly
      * @return DataList
      */
     public static function to_run($oldOnesOnly = false, $limit = 10)
     {
-        $objects = SearchEngineDataObjectToBeIndexed::get()
-            ->exclude(["SearchEngineDataObjectID" => 0])
-            ->filter(["Completed" => 0])
-            ->sort(DB::get_conn()->random().' ASC')
+        $objects = self::get()
+            ->exclude(['SearchEngineDataObjectID' => 0])
+            ->filter(['Completed' => 0])
+            ->sort(DB::get_conn()->random() . ' ASC')
             ->limit($limit);
 
         if ($oldOnesOnly) {
-            $objects = $objects->where("UNIX_TIMESTAMP(\"Created\") < ".strtotime("5 minutes ago"));
+            $objects = $objects->where('UNIX_TIMESTAMP("Created") < ' . strtotime('5 minutes ago'));
         }
 
         return $objects;
@@ -276,7 +273,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        if($obj = $this->SearchEngineDataObject()) {
+        if ($obj = $this->SearchEngineDataObject()) {
             $fields->replaceField(
                 'SearchEngineDataObjectID',
                 ReadonlyField::create(
@@ -284,7 +281,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
                     'Object',
                     DBField::create_field(
                         'HTMLText',
-                        '<a href="'.$obj->CMSEditLink().'">'.$obj->getTitle().'</a>'
+                        '<a href="' . $obj->CMSEditLink() . '">' . $obj->getTitle() . '</a>'
                     )
                 )
             );

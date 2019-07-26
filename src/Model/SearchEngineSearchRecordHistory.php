@@ -2,84 +2,84 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
-use SilverStripe\Security\Member;
-use SilverStripe\Security\Permission;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
 
 /**
  * the DataObject ClassName + ID is recorded separately
  * so that the log is not affected if the SearchEngineDataObject is deleted.
- *
  */
 
 class SearchEngineSearchRecordHistory extends DataObject
 {
-
     /**
      * Defines the database table name
      * @var string
      */
     private static $table_name = 'SearchEngineSearchRecordHistory';
 
+    /**
+     * @var string
+     */
+    private static $singular_name = 'Search History';
 
     /**
      * @var string
      */
-    private static $singular_name = "Search History";
+    private static $plural_name = 'Search History';
+
+    /**
+     * @var array
+     */
+    private static $db = [
+        'Phrase' => 'Varchar(150)',
+        'DataObjectClassName' => 'Varchar(150)',
+        'DataObjectID' => 'Int',
+        'NumberOfResults' => 'Int',
+        'Session' => 'Varchar(32)',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $has_one = [
+        'SearchEngineSearchRecord' => SearchEngineSearchRecord::class,
+        'Member' => Member::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $summary_fields = [
+        'Created' => 'Created',
+        'Phrase' => 'Phrase',
+        'DataObjectClassName' => 'Class',
+        'DataObjectID' => 'ID',
+        'NumberOfResults' => 'Result Count',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $indexes = [
+        'Phrase' => true,
+        'DataObjectClassName' => true,
+        'DataObjectID' => true,
+    ];
+
+    private static $_latest_search_cache = null;
+
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
-    /**
-     * @var string
-     */
-    private static $plural_name = "Search History";
     public function i18n_plural_name()
     {
         return $this->Config()->get('plural_name');
     }
-
-    /**
-     * @var array
-     */
-    private static $db = array(
-        "Phrase" => "Varchar(150)",
-        "DataObjectClassName" => "Varchar(150)",
-        "DataObjectID" => "Int",
-        "NumberOfResults" => "Int",
-        "Session" => "Varchar(32)"
-    );
-
-    /**
-     * @var array
-     */
-    private static $has_one = array(
-        "SearchEngineSearchRecord" => SearchEngineSearchRecord::class,
-        "Member" => Member::class
-    );
-
-    /**
-     * @var array
-     */
-    private static $summary_fields = array(
-        "Created" => "Created",
-        "Phrase" => "Phrase",
-        "DataObjectClassName" => "Class",
-        "DataObjectID" => "ID",
-        "NumberOfResults" => "Result Count"
-    );
-
-    /**
-     * @var array
-     */
-    private static $indexes = array(
-        "Phrase" => true,
-        "DataObjectClassName" => true,
-        "DataObjectID" => true
-    );
 
     /**
      * @param Member $member
@@ -122,36 +122,35 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     public function canView($member = null, $context = [])
     {
-        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
-     *
      * add an entry SearchEngineSearchRecordHistory entry
-     * @param SearchEngineSearchRecord
+     * @param SearchEngineSearchRecord $searchEngineSearchRecord
      */
     public static function add_entry($searchEngineSearchRecord)
     {
         //a real request - lets start a new search record history ...
-        $fieldArray = array(
-            "SearchEngineSearchRecordID" => $searchEngineSearchRecord->ID,
-            "MemberID" => intval(Member::currentUserID())-0,
-            "Session" => session_id()
-        );
+        $fieldArray = [
+            'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
+            'MemberID' => intval(Member::currentUserID()) - 0,
+            'Session' => session_id(),
+        ];
         //update latest search
         $obj = self::get_latest_search();
         if ($obj) {
             foreach ($fieldArray as $field => $value) {
-                $obj->$field = $value;
+                $obj->{$field} = $value;
             }
         } else {
-            $obj = DataObject::get_one(SearchEngineSearchRecordHistory::class, $fieldArray);
-            if (!$obj) {
-                $obj = SearchEngineSearchRecordHistory::create($fieldArray);
+            $obj = DataObject::get_one(self::class, $fieldArray);
+            if (! $obj) {
+                $obj = self::create($fieldArray);
             }
         }
 
-        Controller::curr()->getRequest()->getSession()->set("SearchEngineSearchRecordHistoryID", $obj->write());
+        Controller::curr()->getRequest()->getSession()->set('SearchEngineSearchRecordHistoryID', $obj->write());
         return $obj;
     }
 
@@ -178,7 +177,6 @@ class SearchEngineSearchRecordHistory extends DataObject
      * @param SearchEngineDataObject $item
      *
      * @return SearchEngineSearchRecordHistory | null
-
      */
     public static function register_click($item)
     {
@@ -191,19 +189,16 @@ class SearchEngineSearchRecordHistory extends DataObject
         }
     }
 
-    private static $_latest_search_cache = null;
-
     /**
-     *
      * @return SearchEngineSearchRecordHistory | null
      */
     public static function get_latest_search()
     {
         if (self::$_latest_search_cache === null) {
             self::$_latest_search_cache = false;
-            $id = intval(Controller::curr()->getRequest()->getSession()->get("SearchEngineSearchRecordHistoryID"))-0;
+            $id = intval(Controller::curr()->getRequest()->getSession()->get('SearchEngineSearchRecordHistoryID')) - 0;
             if ($id) {
-                self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()->byID($id);
+                self::$_latest_search_cache = self::get()->byID($id);
             }
         }
         return self::$_latest_search_cache;

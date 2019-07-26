@@ -3,39 +3,41 @@
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
 
 abstract class SearchEngineFilterForDescriptor
 {
-
     use Extensible;
     use Injectable;
     use Configurable;
 
-    /**
-     * returns the name - e.g. "Pages Only", "Files Only"
-     * @return String
-     */
-    abstract public function getShortTitle();
-
-
-    /**
-     * returns the description - e.g. "sort by the last Edited date"
-     * @return String
-     */
-    public function getDescription()
-    {
-        return $this->getShortTitle();
-    }
-
-
-
     protected $debug = false;
+
+    /**
+     * retains debug information if turned on.
+     * @var array
+     */
+    protected $debugArray = [];
 
     public function __construct($debug = false)
     {
         $this->debug = $debug;
+    }
+
+    /**
+     * returns the name - e.g. "Pages Only", "Files Only"
+     * @return string
+     */
+    abstract public function getShortTitle();
+
+    /**
+     * returns the description - e.g. "sort by the last Edited date"
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->getShortTitle();
     }
 
     /**
@@ -44,7 +46,7 @@ abstract class SearchEngineFilterForDescriptor
      *    LARGE => Large Pages
      *    SMALL => Small Pages
      *    RED => Red Pages
-     * @return Array|null
+     * @return array|null
      */
     abstract public function getFilterList();
 
@@ -75,7 +77,6 @@ abstract class SearchEngineFilterForDescriptor
     abstract public function hasCustomFilter($filterArray);
 
     /**
-     *
      * Does any custom filtering
      * @param SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
@@ -83,23 +84,16 @@ abstract class SearchEngineFilterForDescriptor
      *
      * @return SS_List
      */
-
-     public function doCustomFilter($objects, $searchRecord, $filterArray)
-     {
-         return $objects;
-     }
-
-    /**
-     * retains debug information if turned on.
-     * @var array
-     */
-    protected $debugArray = [];
+    public function doCustomFilter($objects, $searchRecord, $filterArray)
+    {
+        return $objects;
+    }
 
     /**
      * @return string (html)
      */
     public function getDebugArray()
     {
-        return "<ul><li>".implode("</li>li><li>", $this->debugArray)."</li></ul>";
+        return '<ul><li>' . implode('</li>li><li>', $this->debugArray) . '</li></ul>';
     }
 }

@@ -9,9 +9,8 @@ namespace Sunnysideup\SearchSimpleSmart\Abstractions;
  *
  */
 
-interface SearchEngineMakeSearchableInterface
+interface SearchEngineMakeSearchable
 {
-
     /**
      * This array should look like this:
      *     array(
@@ -40,7 +39,7 @@ interface SearchEngineMakeSearchableInterface
 
     /**
      * Should this object type be excluded
-     * @var boolean
+     * @var bool
      */
     // private static $search_engine_exclude_from_index;
 
@@ -49,7 +48,7 @@ interface SearchEngineMakeSearchableInterface
      * @param string $action
      * @return string
      */
-    public function Link($action = "");
+    public function Link($action = '');
 
     /**
      * returns a full-text version of an object like this:

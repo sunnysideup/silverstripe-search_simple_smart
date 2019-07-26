@@ -2,16 +2,12 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\ClassInfo;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 {
-
-
-
     /**
      * list of classes that should be included if no values are set
      * @var array
@@ -19,16 +15,16 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     private static $classes_to_include = [];
 
     /**
-     * @return String
+     * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineFilterForClassName.TITLE", "Type");
+        return _t('SearchEngineFilterForClassName.TITLE', 'Type');
     }
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     public function getDescription()
     {
@@ -41,21 +37,21 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      *    LARGE => Large Pages
      *    SMALL => Small Pages
      *    RED => Red Pages
-     * @return Array
+     * @return array
      */
     public function getFilterList()
     {
         $array = [];
         $filterArray = SearchEngineDataObject::searchable_class_names();
         $checkInclusion = false;
-        $myInclusions = $this->Config()->get("classes_to_include");
+        $myInclusions = $this->Config()->get('classes_to_include');
         if (is_array($myInclusions) && count($myInclusions)) {
             $checkInclusion = true;
         }
 
         foreach ($filterArray as $className => $title) {
             if ($checkInclusion) {
-                if (in_array($className, $myInclusions)) {
+                if (in_array($className, $myInclusions, true)) {
                     $array[$className] = $title;
                 } elseif (isset($myInclusions[$className])) {
                     $array[$className] = $myInclusions[$className];
@@ -81,7 +77,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      */
     public function getSqlFilterArray($filterArray)
     {
-        if(! $filterArray) {
+        if (! $filterArray) {
             $filterArray = array_keys($this->getFilterList());
         }
         $array = [];
@@ -89,7 +85,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         foreach ($filterArray as $className) {
             $array += ClassInfo::subclassesFor($className);
         }
-        return array("DataObjectClassName" => $array);
+        return ['DataObjectClassName' => $array];
     }
 
     /**
@@ -104,5 +100,4 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     {
         return false;
     }
-
 }

@@ -2,11 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use SilverStripe\Security\Permission;
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEnginePunctuationFindAndRemove;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\Security\Permission;
 
 class SearchEnginePunctuationFindAndRemove extends DataObject
 {
@@ -19,65 +18,65 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     /**
      * @var string
      */
-    private static $singular_name = "Punctuation to Remove";
+    private static $singular_name = 'Punctuation to Remove';
+
+    /**
+     * @var string
+     */
+    private static $plural_name = 'Punctuations to Remove';
+
+    /**
+     * @var array
+     */
+    private static $db = [
+        'Character' => 'Varchar(3)',
+        'Custom' => 'Boolean(1)',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $defaults = [
+        '\'s',
+        'Custom' => 1,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $indexes = [
+        'Character' => true,
+    ];
+
+    /**
+     * @var string
+     */
+    private static $default_sort = '"Custom" DESC, "Character" ASC';
+
+    /**
+     * @var array
+     */
+    private static $required_fields = [
+        'Character',
+    ];
+
+    /**
+     * @var array
+     */
+    private static $summary_fields = [
+        'Character' => 'Character',
+        'Custom.Nice' => 'Manually Entered',
+    ];
+
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
-    /**
-     * @var string
-     */
-    private static $plural_name = "Punctuations to Remove";
     public function i18n_plural_name()
     {
         return $this->Config()->get('plural_name');
     }
-
-    /**
-     * @var array
-     */
-    private static $db = array(
-        "Character" => "Varchar(3)",
-        "Custom" => "Boolean(1)"
-    );
-
-    /**
-     * @var array
-     */
-    private static $defaults = array(
-        '\'s',
-        "Custom" => 1
-    );
-
-    /**
-     * @var array
-     */
-    private static $indexes = array(
-        "Character" => true
-    );
-
-    /**
-     * @var string
-     */
-    private static $default_sort = "\"Custom\" DESC, \"Character\" ASC";
-
-    /**
-     * @var array
-     */
-    private static $required_fields = array(
-        "Character"
-    );
-
-    /**
-     * @var array
-     */
-    private static $summary_fields = array(
-        "Character" => "Character",
-        "Custom.Nice" => "Manually Entered"
-    );
-
-
 
     /**
      * @param Member $member
@@ -87,7 +86,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      */
     public function canCreate($member = null, $context = [])
     {
-        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -98,7 +97,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      */
     public function canEdit($member = null, $context = [])
     {
-        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -109,7 +108,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      */
     public function canDelete($member = null, $context = [])
     {
-        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -120,7 +119,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      */
     public function canView($member = null, $context = [])
     {
-        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -129,18 +128,18 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      */
     public static function is_listed($character)
     {
-        return SearchEnginePunctuationFindAndRemove::get()
-            ->filter(array("Character" => $character))->count();
+        return self::get()
+            ->filter(['Character' => $character])->count();
     }
 
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        if (Config::inst()->get(SearchEnginePunctuationFindAndRemove::class, "add_defaults") === true) {
+        if (Config::inst()->get(self::class, 'add_defaults') === true) {
             foreach ($defaults as $default) {
-                if (!self::is_listed($default)) {
-                    DB::alteration_message("Creating a punctuation: $default", "created");
-                    $obj = SearchEnginePunctuationFindAndRemove::create();
+                if (! self::is_listed($default)) {
+                    DB::alteration_message("Creating a punctuation: ${default}", 'created');
+                    $obj = self::create();
                     $obj->Character = $default;
                     $obj->Custom = false;
                     $obj->write();
