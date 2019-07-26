@@ -2,32 +2,26 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
-use SilverStripe\Core\Convert;
-use SilverStripe\ORM\DB;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 /**
  * default sort option
- *
- *
  */
 
 class SearchEngineSortByDate extends SearchEngineSortByDescriptor
 {
-
-
     /**
      * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineSortByDate.TITLE", "Best Sortable Date");
+        return _t('SearchEngineSortByDate.TITLE', 'Best Sortable Date');
     }
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     public function getDescription()
     {
@@ -52,7 +46,6 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
     }
 
     /**
-     *
      * @return boolean
      */
     public function hasCustomSort($sortProviderValues = null)
@@ -73,7 +66,6 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
         if ($objects->count() < 2) {
             //do nothing
         } else {
-
             //retrieve objects
             $objects = SearchEngineDataObject::get()
                 ->filter(['ID' => explode(',', $searchRecord->ListOfIDsCUSTOM)])

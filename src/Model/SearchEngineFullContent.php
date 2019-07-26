@@ -2,14 +2,12 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use SilverStripe\Security\Permission;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\Connect\MySQLSchemaManager;
-use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\Connect\MySQLSchemaManager;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Security\Permission;
 
 /**
  * Full Content for each dataobject, separated by level of importance.
@@ -21,14 +19,13 @@ use SilverStripe\Forms\ReadonlyField;
 
 class SearchEngineFullContent extends DataObject
 {
-
     private static $default_punctuation_to_be_removed = [
         '\'',
         '"',
         ';',
         '.',
         ',',
-        '&nbsp'
+        '&nbsp',
     ];
 
     /**
@@ -40,101 +37,114 @@ class SearchEngineFullContent extends DataObject
     /*
      * @var string
      */
-    private static $singular_name = "Full Content";
-    public function i18n_singular_name()
-    {
-        return $this->Config()->get('singular_name');
-    }
+    private static $singular_name = 'Full Content';
 
     /*
      * @var string
      */
-    private static $plural_name = "Full Contents";
-    public function i18n_plural_name()
-    {
-        return $this->Config()->get('plural_name');
-    }
+    private static $plural_name = 'Full Contents';
 
     /*
      * @var array
      */
-    private static $db = array(
-        "Level" => "Int(1)",
-        "Content" => "Varchar(9999)"
-    );
+    private static $db = [
+        'Level' => 'Int(1)',
+        'Content' => 'Varchar(9999)',
+    ];
 
     /*
      * @var array
      */
-    private static $has_one = array(
-        "SearchEngineDataObject" => SearchEngineDataObject::class
-    );
+    private static $has_one = [
+        'SearchEngineDataObject' => SearchEngineDataObject::class,
+    ];
 
     /*
      * @var array
      */
-    private static $indexes = array(
-        "Level" => true,
-        'SearchFields' => array(
+    private static $indexes = [
+        'Level' => true,
+        'SearchFields' => [
             'type' => 'fulltext',
             'name' => 'SearchFields',
-            'columns' => ['Content']
-        )
-    );
+            'columns' => ['Content'],
+        ],
+    ];
 
     /*
      * @var string
      */
-    private static $default_sort = "\"Level\" ASC, \"Content\" ASC";
+    private static $default_sort = '"Level" ASC, "Content" ASC';
 
     /*
      * @var array
      */
-    private static $required_fields = array(
-        "Level",
-        "Content"
-    );
+    private static $required_fields = [
+        'Level',
+        'Content',
+    ];
 
     /*
      * @var array
      */
-    private static $summary_fields = array(
-        "LastEdited.Nice" => "Last Changed",
-        "SearchEngineDataObject.Title" => "Searchable Object",
-        "Level" => "Level",
-        "ShortContent" => "Content"
-    );
+    private static $summary_fields = [
+        'LastEdited.Nice' => 'Last Changed',
+        'SearchEngineDataObject.Title' => 'Searchable Object',
+        'Level' => 'Level',
+        'ShortContent' => 'Content',
+    ];
 
     /**
      * Defines a default list of filters for the search context
      * @var array
      */
     private static $searchable_fields = [
-        'Level' => 'ExactMatchFilter'
+        'Level' => 'ExactMatchFilter',
     ];
 
     /*
      * @var array
      */
-    private static $field_labels = array(
-        "SearchEngineDataObject" => "Data Object"
-    );
+    private static $field_labels = [
+        'SearchEngineDataObject' => 'Data Object',
+    ];
 
     /*
      * @var array
      */
-    private static $casting = array(
-        "ShortContent" => "Varchar"
-    );
-
+    private static $casting = [
+        'ShortContent' => 'Varchar',
+    ];
 
     /**
      * this is very important to allow Mysql FullText Searches
      * @var array
      */
-    private static $create_table_options = array(
-        MySQLSchemaManager::ID => 'ENGINE=MyISAM'
-    );
+    private static $create_table_options = [
+        MySQLSchemaManager::ID => 'ENGINE=MyISAM',
+    ];
+
+    /**
+     * @var bool
+     */
+    private static $remove_all_non_alpha_numeric = true;
+
+    /**
+     * @var bool
+     */
+    private static $remove_all_non_letters = true;
+
+    private static $_punctuation_objects = null;
+
+    public function i18n_singular_name()
+    {
+        return $this->Config()->get('singular_name');
+    }
+
+    public function i18n_plural_name()
+    {
+        return $this->Config()->get('plural_name');
+    }
 
     /**
      * @param Member $member
@@ -166,7 +176,7 @@ class SearchEngineFullContent extends DataObject
      */
     public function canDelete($member = null, $context = [])
     {
-        return parent::canDelete() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
@@ -177,23 +187,12 @@ class SearchEngineFullContent extends DataObject
      */
     public function canView($member = null, $context = [])
     {
-        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
     /**
-     * @var bool
-     */
-    private static $remove_all_non_alpha_numeric = true;
-
-    /**
-     * @var bool
-     */
-    private static $remove_all_non_letters = true;
-
-    /**
-     *
-     * @param SearchEngineDataObject
-     * @param array
+     * @param SearchEngineDataObject $item
+     * @param array $fullAray
      *     1 => content
      *     2 => content
      *     3 => content
@@ -218,10 +217,10 @@ class SearchEngineFullContent extends DataObject
         $level = SearchEngineKeyword::level_sanitizer($level);
         //you dont want to clean keywords now as this will remove all the spaces!
         //$content = SearchEngineKeyword::clean_keyword($content);
-        $fieldArray = array("SearchEngineDataObjectID" => $item->ID, "Level" => $level);
-        $obj = DataObject::get_one(SearchEngineFullContent::class, $fieldArray);
-        if (!$obj) {
-            $obj = SearchEngineFullContent::create($fieldArray);
+        $fieldArray = ['SearchEngineDataObjectID' => $item->ID, 'Level' => $level];
+        $obj = DataObject::get_one(self::class, $fieldArray);
+        if (! $obj) {
+            $obj = self::create($fieldArray);
         }
         $obj->Content = $content;
         $obj->write();
@@ -241,7 +240,7 @@ class SearchEngineFullContent extends DataObject
         parent::onBeforeWrite();
         $this->Level = SearchEngineKeyword::level_sanitizer($this->Level);
         $this->Content = self::clean_content($this->Content);
-        //make sure that onAfterWrite is also written ... 
+        //make sure that onAfterWrite is also written ...
         $this->forceChange();
     }
 
@@ -255,7 +254,7 @@ class SearchEngineFullContent extends DataObject
             //1. take full content.
             $content = $this->Content;
             //2. remove stuff that is not needed (e.g. strip_tags)
-            $keywords = explode(" ", $content);
+            $keywords = explode(' ', $content);
             foreach ($keywords as $keyword) {
                 // we know content is clean already!
                 // $keyword = SearchEngineKeyword::clean_keyword($keyword);
@@ -266,32 +265,26 @@ class SearchEngineFullContent extends DataObject
                         continue;
                     }
                     $keywordObject = SearchEngineKeyword::add_keyword($keyword, $runClean = false);
-                    if (!isset($fullArray[$keywordObject->ID])) {
-                        $fullArray[$keywordObject->ID] = array(
-                            "Object" => $keywordObject,
-                            "Count" => 0
-                        );
+                    if (! isset($fullArray[$keywordObject->ID])) {
+                        $fullArray[$keywordObject->ID] = [
+                            'Object' => $keywordObject,
+                            'Count' => 0,
+                        ];
                     }
-                    $fullArray[$keywordObject->ID]["Count"]++;
+                    $fullArray[$keywordObject->ID]['Count']++;
                 }
             }
             //remove All previous entries
             $this->Level = SearchEngineKeyword::level_sanitizer($this->Level);
-            $methodName = "SearchEngineKeywords_Level".$this->Level;
-            $list = $item->$methodName();
+            $methodName = 'SearchEngineKeywords_Level' . $this->Level;
+            $list = $item->{$methodName}();
             $list->removeAll();
             //add all keywords
-            foreach ($fullArray as $keywordObjectID => $a) {
-                $list->add( $a["Object"], array("Count" => $a["Count"]));
+            foreach ($fullArray as $a) {
+                $list->add($a['Object'], ['Count' => $a['Count']]);
             }
         }
     }
-
-    /*
-     *
-     */
-    private static $_punctuation_objects = null;
-
 
     /**
      * cleans a string
@@ -301,7 +294,6 @@ class SearchEngineFullContent extends DataObject
      */
     public static function clean_content($content)
     {
-
         $content = strtolower($content);
 
         //important!!!! - create space around tags ....
@@ -312,34 +304,34 @@ class SearchEngineFullContent extends DataObject
         $content = strip_tags($content);
 
         //default punctuation removal
-        $defaultPuncs = Config::inst()->get(SearchEngineFullContent::class, "default_punctuation_to_be_removed");
+        $defaultPuncs = Config::inst()->get(self::class, 'default_punctuation_to_be_removed');
         foreach ($defaultPuncs as $defaultPunc) {
-            $content = str_replace($defaultPunc, " ", $content);
+            $content = str_replace($defaultPunc, ' ', $content);
         }
 
         //custom punctuation removal
         if (self::$_punctuation_objects === null) {
             self::$_punctuation_objects = SearchEnginePunctuationFindAndRemove::get();
-            if(self::$_punctuation_objects->count() === 0) {
+            if (self::$_punctuation_objects->count() === 0) {
                 self::$_punctuation_objects = false;
             }
         }
-        if(self::$_punctuation_objects) {
+        if (self::$_punctuation_objects) {
             foreach (self::$_punctuation_objects as $punctuationObject) {
-                $content = str_replace(self::$_punctuation_objects->Character, " ", $content);
+                $content = str_replace($punctuationObject->Character, ' ', $content);
             }
         }
 
         //remove non-alpha
-        $removeNonAlphas = Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_alpha_numeric");
-        if ($removeNonAlphas == true) {
-            $content = preg_replace("/[^a-zA-Z 0-9]+/", " ", $content);
+        $removeNonAlphas = Config::inst()->get(self::class, 'remove_all_non_alpha_numeric');
+        if ($removeNonAlphas === true) {
+            $content = preg_replace('/[^a-zA-Z 0-9]+/', ' ', $content);
         }
 
         //remove non letters
         //remove non-alpha
-        $removeNonLetters = Config::inst()->get(SearchEngineFullContent::class, "remove_all_non_letters");
-        if ($removeNonLetters == true) {
+        $removeNonLetters = Config::inst()->get(self::class, 'remove_all_non_letters');
+        if ($removeNonLetters === true) {
             $content = trim(
                 strtolower(
                     //remove all white space with single space
@@ -354,11 +346,8 @@ class SearchEngineFullContent extends DataObject
             );
         }
 
-
         //remove multiple white space
-        $content = trim(preg_replace( "/\s+/", " ", $content ));
-
-        return $content;
+        return trim(preg_replace("/\s+/", ' ', $content));
     }
 
     /**
@@ -368,7 +357,7 @@ class SearchEngineFullContent extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        if($obj = $this->SearchEngineDataObject()) {
+        if ($obj = $this->SearchEngineDataObject()) {
             $fields->replaceField(
                 'SearchEngineDataObjectID',
                 ReadonlyField::create(
@@ -376,14 +365,11 @@ class SearchEngineFullContent extends DataObject
                     'Object',
                     DBField::create_field(
                         'HTMLText',
-                        '<a href="'.$obj->CMSEditLink().'">'.$obj->getTitle().'</a>'
+                        '<a href="' . $obj->CMSEditLink() . '">' . $obj->getTitle() . '</a>'
                     )
                 )
             );
         }
         return $fields;
     }
-
-
-
 }

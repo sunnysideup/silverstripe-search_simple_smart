@@ -2,28 +2,14 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
-use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\DB;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use SilverStripe\CMS\Model\SiteTree;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
-use SilverStripe\Dev\BuildTask;
-use SilverStripe\Versioned\Versioned;
-use SilverStripe\Core\Environment;
-use SilverStripe\Control\Director;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Environment;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DB;
 
 class SearchEngineBaseTask extends BuildTask
 {
-
-    /**
-     * Set a custom url segment (to follow dev/tasks/)
-     *
-     * @config
-     * @var string
-     */
-    private static $segment = 'searchenginebasetask';
-
     /**
      * @var string
      */
@@ -57,7 +43,6 @@ class SearchEngineBaseTask extends BuildTask
     protected $description = 'Does not do anything special, just sets up the task.';
 
     /**
-     *
      * @var bool
      */
     protected $verbose = true;
@@ -73,6 +58,14 @@ class SearchEngineBaseTask extends BuildTask
     protected $oldOnesOnly = false;
 
     /**
+     * Set a custom url segment (to follow dev/tasks/)
+     *
+     * @config
+     * @var string
+     */
+    private static $segment = 'searchenginebasetask';
+
+    /**
      * this function runs the SearchEngineRemoveAll task
      * @param var $request
      */
@@ -81,20 +74,18 @@ class SearchEngineBaseTask extends BuildTask
         //set basics
         $this->runStart($request);
 
-        if($this->task && $this->task !== 'searchenginebasetask') {
+        if ($this->task && $this->task !== 'searchenginebasetask') {
             unset($_GET['task']);
             unset($_GET['submit']);
-            return Controller::curr()->redirect('/dev/tasks/'.$this->task.'/?'.http_build_query($_GET));
+            return Controller::curr()->redirect('/dev/tasks/' . $this->task . '/?' . http_build_query($_GET));
         }
 
         $this->runEnd($request);
     }
 
-
-
     public function flushNow($message, $type = '', $bullet = true)
     {
-        if($this->verbose) {
+        if ($this->verbose) {
             echo '';
             // check that buffer is actually set before flushing
             if (ob_get_length()) {
@@ -111,10 +102,9 @@ class SearchEngineBaseTask extends BuildTask
         }
     }
 
-
-    function Link()
+    public function Link()
     {
-        return '/dev/tasks/'.$this->Config()->get('segment');
+        return '/dev/tasks/' . $this->Config()->get('segment');
     }
 
     public function runStart($request)
@@ -127,48 +117,57 @@ class SearchEngineBaseTask extends BuildTask
         $this->flushNow('<h2>Starting</h2>', false);
 
         $verbose = intval($request->getVar('verbose'));
-        if($verbose) {$this->verbose = $verbose;}
-        $this->flushNow('<strong>verbose</strong>: '.($this->verbose ? 'yes' : 'no'));
+        if ($verbose) {
+            $this->verbose = $verbose;
+        }
+        $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
 
         $limit = intval($request->getVar('limit'));
-        if($limit) {$this->limit = $limit;}
-        $this->flushNow('<strong>limit</strong>: '.$this->limit);
+        if ($limit) {
+            $this->limit = $limit;
+        }
+        $this->flushNow('<strong>limit</strong>: ' . $this->limit);
 
         $step = intval($request->getVar('step'));
-        if($step) {$this->step = $step;}
-        $this->flushNow('<strong>step</strong>: '.$this->step);
+        if ($step) {
+            $this->step = $step;
+        }
+        $this->flushNow('<strong>step</strong>: ' . $this->step);
 
         $type = $request->getVar('type');
-        if($type) {$this->type = $type;}
-        $this->flushNow('<strong>type</strong>: '.$this->type);
+        if ($type) {
+            $this->type = $type;
+        }
+        $this->flushNow('<strong>type</strong>: ' . $this->type);
 
         $oldOnesOnly = $request->getVar('oldonesonly') ? true : false;
-        if($oldOnesOnly) {$this->oldOnesOnly = $oldOnesOnly;}
-        $this->flushNow('<strong>old ones only</strong>: '.($this->oldOnesOnly ? 'yes' : 'no'));
+        if ($oldOnesOnly) {
+            $this->oldOnesOnly = $oldOnesOnly;
+        }
+        $this->flushNow('<strong>old ones only</strong>: ' . ($this->oldOnesOnly ? 'yes' : 'no'));
 
         $unindexedOnly = $request->getVar('unindexedonly') ? true : false;
-        if($unindexedOnly) {$this->unindexedOnly = $unindexedOnly;}
-        $this->flushNow('<strong>unindexed only</strong>: '.($this->unindexedOnly ? 'yes' : 'no'));
+        if ($unindexedOnly) {
+            $this->unindexedOnly = $unindexedOnly;
+        }
+        $this->flushNow('<strong>unindexed only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
 
         $task = $request->getVar('task');
-        if($task) {
+        if ($task) {
             $this->task = $task;
         } else {
             $this->task = self::$segment;
         }
-        $this->flushNow('<strong>task</strong>: '.$this->task);
+        $this->flushNow('<strong>task</strong>: ' . $this->task);
 
         $this->flushNow('==========================', false);
     }
 
     public function runEnd($request)
     {
-
-
-
         $this->flushNow('<h2>======================</h2>');
 
-        if(! Director::is_cli()) {
+        if (! Director::is_cli()) {
             $html =
             '
             <style>
@@ -221,5 +220,4 @@ class SearchEngineBaseTask extends BuildTask
         $this->flushNow('<h2>------ END -----------</h2>');
         $this->flushNow('<h2>======================</h2>');
     }
-
 }

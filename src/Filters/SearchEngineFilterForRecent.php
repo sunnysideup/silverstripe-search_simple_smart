@@ -6,20 +6,19 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
 {
-
     private static $recent_string = '-1 week';
 
     /**
-     * @return String
+     * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineFilterForPage.TITLE", "Recent");
+        return _t('SearchEngineFilterForPage.TITLE', 'Recent');
     }
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     public function getDescription()
     {
@@ -32,11 +31,11 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      *    LARGE => Large Pages
      *    SMALL => Small Pages
      *    RED => Red Pages
-     * @return Array
+     * @return array
      */
     public function getFilterList()
     {
-        return array("WEEK" => "Updated in last week");
+        return ['WEEK' => 'Updated in last week'];
     }
 
     /**
@@ -54,7 +53,7 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
     {
         $recentTS = strtotime($this->Config()->get('recent_string'));
 
-        return array("LastEdited:GreaterThan" => date("Y-m-d", $recentTS));
+        return ['LastEdited:GreaterThan' => date('Y-m-d', $recentTS)];
     }
 
     /**
@@ -69,5 +68,4 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
     {
         return false;
     }
-
 }

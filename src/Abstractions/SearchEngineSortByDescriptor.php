@@ -3,18 +3,24 @@
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
 
 abstract class SearchEngineSortByDescriptor
 {
-
     use Extensible;
     use Injectable;
     use Configurable;
+
+    protected $debug = false;
+
+    /**
+     * retains debug information if turned on.
+     * @var array
+     */
+    protected $debugArray = [];
 
     /**
      * this is a metasorter, allowing you to always
@@ -38,15 +44,20 @@ abstract class SearchEngineSortByDescriptor
      */
     private static $class_group_limits = [];
 
+    public function __construct($debug = false)
+    {
+        $this->debug = $debug;
+    }
+
     /**
      * returns the name - e.g. "Date", "Relevance"
-     * @return String
+     * @return string
      */
     abstract public function getShortTitle();
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     abstract public function getDescription();
 
@@ -64,14 +75,6 @@ abstract class SearchEngineSortByDescriptor
      */
     abstract public function getSqlSortArray($sortProviderValues = null);
 
-
-    protected $debug = false;
-
-    public function __construct($debug = false)
-    {
-        $this->debug = $debug;
-    }
-
     /**
      * Do we need to do custom sorting?
      * @return boolean
@@ -88,42 +91,48 @@ abstract class SearchEngineSortByDescriptor
     /**
      * Do any custom sorting
      *
-     *
-     * @param array $array - id => ClassName
+     * @param array $objects - id => ClassName
      * @return SS_List
      */
     abstract public function doCustomSort($objects, $searchRecord);
 
-    protected function groupCustomSort($objects) {
-        if($this->hasClassGroups()) {
+    /**
+     * @return string (html)
+     */
+    public function getDebugArray()
+    {
+        return '<ul><li>' . implode('</li>li><li>', $this->debugArray) . '</li></ul>';
+    }
+
+    protected function groupCustomSort($objects)
+    {
+        if ($this->hasClassGroups()) {
             //retrieve objects
             $keys = array_keys($finalArray);
-
         }
         return $objects;
     }
 
     /**
-     *
-     * @param  [type] $array an array if IDs,
+     * @param  [type] $objects an array if IDs,
      * @return [type]        [description]
      */
     protected function makeClassGroups($objects)
     {
-        if($this->hasClassGroups()) {
+        if ($this->hasClassGroups()) {
             if ($objects->count() > 1) {
                 $classGroupCounts = [];
-                $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups");
-                $classGroupLimits = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_group_limits");
+                $classGroups = Config::inst()->get(self::class, 'class_groups');
+                $classGroupLimits = Config::inst()->get(self::class, 'class_group_limits');
                 $newArray = [];
-                $array = $objects->Map("ID", "DataObjectClassName")->toArray();
+                $array = $objects->Map('ID', 'DataObjectClassName')->toArray();
                 foreach ($classGroups as $key => $classGroupGroup) {
-                    if (!isset($classGroupCounts[$key])) {
+                    if (! isset($classGroupCounts[$key])) {
                         $classGroupCounts[$key] = 0;
                     }
                     foreach ($array as $id => $className) {
-                        if (in_array($className, $classGroupGroup)) {
-                            if ((!isset($classGroupLimits[$key]))  || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
+                        if (in_array($className, $classGroupGroup, true)) {
+                            if (! isset($classGroupLimits[$key]) || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
                                 $classGroupCounts[$key]++;
                                 $newArray[$id] = $className;
                             }
@@ -138,8 +147,8 @@ abstract class SearchEngineSortByDescriptor
                 $keys = array_keys($newArray);
                 //retrieve objects
                 $objects = SearchEngineDataObject::get()
-                    ->filter(array("ID" => $keys))
-                    ->sort("FIELD(\"ID\", ".implode(",", $keys).")");
+                    ->filter(['ID' => $keys])
+                    ->sort('FIELD("ID", ' . implode(',', $keys) . ')');
             }
         }
         return $objects;
@@ -147,7 +156,7 @@ abstract class SearchEngineSortByDescriptor
 
     protected function hasClassGroups()
     {
-        $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, "class_groups");
+        $classGroups = Config::inst()->get(self::class, 'class_groups');
 
         return is_array($classGroups) && count($classGroups) ? true : false;
     }
@@ -155,19 +164,5 @@ abstract class SearchEngineSortByDescriptor
     protected function hasNoClassGroups()
     {
         return $this->hasClassGroups() ? false : true;
-    }
-
-    /**
-     * retains debug information if turned on.
-     * @var array
-     */
-    protected $debugArray = [];
-
-    /**
-     * @return string (html)
-     */
-    public function getDebugArray()
-    {
-        return "<ul><li>".implode("</li>li><li>", $this->debugArray)."</li></ul>";
     }
 }

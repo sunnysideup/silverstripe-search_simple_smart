@@ -4,42 +4,14 @@ namespace Sunnysideup\SearchSimpleSmart\Api;
 
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
 
 class SearchEngineStopWords
 {
-
-   use Extensible;
-   use Injectable;
-   use Configurable;
-
-    public static function get_list($size)
-    {
-        $listNames = [
-            'short',
-            'medium',
-            'long',
-            'extra_long'
-        ];
-        if(!in_array($size, $listNames)) {
-            user_error('Name should be in '.print_r($listNames, 1));
-        }
-        $covered = [];
-        foreach($listNames as $name) {
-            $listWords = Config::inst()->get(self::class, 'list_'.$name);
-            foreach($listWords as $word) {
-                $covered[$word] = $word;
-            }
-            if($name === $size) {
-                sort($covered);
-
-                return $covered;
-            }
-        }
-
-    }
-
+    use Extensible;
+    use Injectable;
+    use Configurable;
 
     private static $list_short = [
         'I',
@@ -74,14 +46,6 @@ class SearchEngineStopWords
 
 
     ];
-
-
-
-
-
-
-
-
 
     private static $list_medium = [
         'above',
@@ -234,14 +198,6 @@ class SearchEngineStopWords
 
 
     ];
-
-
-
-
-
-
-
-
 
     private static $list_long = [
         'across',
@@ -447,14 +403,6 @@ class SearchEngineStopWords
 
 
     ];
-
-
-
-
-
-
-
-
 
     private static $list_extra_long = [
         'able',
@@ -827,6 +775,28 @@ class SearchEngineStopWords
 
     ];
 
+    public static function get_list($size)
+    {
+        $listNames = [
+            'short',
+            'medium',
+            'long',
+            'extra_long',
+        ];
+        if (! in_array($size, $listNames, true)) {
+            user_error('Name should be in ' . print_r($listNames, 1));
+        }
+        $covered = [];
+        foreach ($listNames as $name) {
+            $listWords = Config::inst()->get(self::class, 'list_' . $name);
+            foreach ($listWords as $word) {
+                $covered[$word] = $word;
+            }
+            if ($name === $size) {
+                sort($covered);
 
-
+                return $covered;
+            }
+        }
+    }
 }

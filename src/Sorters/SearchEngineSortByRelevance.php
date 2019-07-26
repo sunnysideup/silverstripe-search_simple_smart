@@ -4,30 +4,26 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DB;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 /**
  * default sort option
- *
- *
  */
 
 class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
 {
-
-
     /**
      * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineSortByRelevance.TITLE", "Relevance");
+        return _t('SearchEngineSortByRelevance.TITLE', 'Relevance');
     }
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     public function getDescription()
     {
@@ -52,7 +48,6 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     }
 
     /**
-     *
      * @return boolean
      */
     public function hasCustomSort($sortProviderValues = null)
@@ -73,7 +68,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
         if ($objects->count() < 2) {
             //do nothing
         } else {
-            $array = array(0 => -1);
+            $array = [0 => -1];
             $fromSQL = '
                 FROM "SearchEngineFullContent"
                     INNER JOIN "SearchEngineDataObject"
@@ -88,22 +83,22 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //look for complete phrase if there is more than one word.
             //exact full match of search phrase using relevance, level 1 first
             //and further upfront in text as second sort by.
-            if(strpos(trim($searchRecord->Phrase), ' ')) {
+            if (strpos(trim($searchRecord->Phrase), ' ')) {
                 $sql = '
                     SELECT
                         "SearchEngineDataObject"."ID" AS MyID,
-                        (999999 - LOCATE(\''.Convert::raw2sql($searchRecord->Phrase).'\',"Content")) AS RELEVANCE
-                    '.$fromSQL.'
+                        (999999 - LOCATE(\'' . Convert::raw2sql($searchRecord->Phrase) . '\',"Content")) AS RELEVANCE
+                    ' . $fromSQL . '
                     WHERE
-                        "Content" LIKE \'%'.Convert::raw2sql($searchRecord->Phrase).'%\'
-                        AND "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                    '.$sortSQL.'
+                        "Content" LIKE \'%' . Convert::raw2sql($searchRecord->Phrase) . '%\'
+                        AND "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+                    ' . $sortSQL . '
                 ;';
                 $rows = DB::query($sql);
                 foreach ($rows as $row) {
-                    $id = $row["MyID"];
-                    if(! isset($array[$id])) {
-                        $array[$id] = $row["RELEVANCE"];
+                    $id = $row['MyID'];
+                    if (! isset($array[$id])) {
+                        $array[$id] = $row['RELEVANCE'];
                     }
                 }
             }
@@ -111,26 +106,26 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             $sql = '
                 SELECT
                     "SearchEngineDataObject"."ID" AS MyID,
-                    MATCH ("Content") AGAINST (\''.$searchRecord->FinalPhrase.'\') AS RELEVANCE
-                '.$fromSQL.'
+                    MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\') AS RELEVANCE
+                ' . $fromSQL . '
                 WHERE
-                    "SearchEngineDataObjectID" IN ('.$searchRecord->ListOfIDsCUSTOM.')
-                    AND "SearchEngineDataObjectID" NOT IN ('.implode(",", array_keys($array)).')
-                    '.$sortSQL.'
+                    "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+                    AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
+                    ' . $sortSQL . '
                 ;';
             $rows = DB::query($sql);
             foreach ($rows as $row) {
-                $id = $row["MyID"];
-                if(! isset($array[$id])) {
-                    $array[$id] = $row["RELEVANCE"];
+                $id = $row['MyID'];
+                if (! isset($array[$id])) {
+                    $array[$id] = $row['RELEVANCE'];
                 }
             }
             $ids = array_keys($array);
 
             //retrieve objects
             $objects = SearchEngineDataObject::get()
-                ->filter(array("ID" => $ids))
-                ->sort("FIELD(\"ID\", ".implode(",", $ids).")");
+                ->filter(['ID' => $ids])
+                ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 
             //group results!
             $objects = $this->makeClassGroups($objects);

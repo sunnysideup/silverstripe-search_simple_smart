@@ -2,8 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use SilverStripe\Security\Permission;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Permission;
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
@@ -11,7 +11,6 @@ use SilverStripe\ORM\DataObject;
 
 class SearchEngineAdvancedSettings extends DataObject
 {
-
     /**
      * Defines the database table name
      * @var string
@@ -21,16 +20,18 @@ class SearchEngineAdvancedSettings extends DataObject
     /**
      * @var string
      */
-    private static $singular_name = "Advanced";
+    private static $singular_name = 'Advanced';
+
+    /**
+     * @var string
+     */
+    private static $plural_name = 'Advanced Settings';
+
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
-    /**
-     * @var string
-     */
-    private static $plural_name = "Advanced Settings";
     public function i18n_plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -77,7 +78,6 @@ class SearchEngineAdvancedSettings extends DataObject
      */
     public function canView($member = null, $context = [])
     {
-        return parent::canView() && Permission::check("SEARCH_ENGINE_ADMIN");
+        return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
-
 }

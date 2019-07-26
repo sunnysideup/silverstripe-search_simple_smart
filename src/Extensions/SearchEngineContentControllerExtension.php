@@ -2,15 +2,14 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
-use Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm;
-use SilverStripe\Control\Director;
-use SilverStripe\Control\Controller;
-use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\CMS\Model\SiteTreeExtension;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
+use SilverStripe\ORM\FieldType\DBField;
+use Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm;
 
 class SearchEngineContentControllerExtension extends SiteTreeExtension
 {
-
     /**
      * An array of actions that can be accessed via a request. Each array element should be an action name, and the
      * permissions or conditions required to allow the user to access it.
@@ -24,15 +23,19 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
      * );
      * </code>
      *
-     * @var array $allowed_actions
+     * @var array
      */
-    private static $allowed_actions = array(
-        "SearchEngineBasicForm",
-        "SearchEngineSuperBasicForm",
-        "SearchEngineCustomForm"
-    );
+    private static $allowed_actions = [
+        'SearchEngineBasicForm',
+        'SearchEngineSuperBasicForm',
+        'SearchEngineCustomForm',
+    ];
 
     private $_mySearchEngineBasicForm = null;
+
+    private $_mySearchEngineSuperBasicForm = null;
+
+    private $_mySearchEngineCustomForm = null;
 
     /**
      * this function returns a new Search Engine Form
@@ -41,7 +44,7 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
     public function SearchEngineBasicForm()
     {
         $this->SearchEngineClearHistoryID();
-        if (!$this->_mySearchEngineBasicForm) {
+        if (! $this->_mySearchEngineBasicForm) {
             $this->_mySearchEngineBasicForm = SearchEngineBasicForm::create($this->owner, SearchEngineBasicForm::class)
                 ->setIsMoreDetailsResult(true)
                 ->setNumberOfResultsPerPage(20)
@@ -54,8 +57,6 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
         return $this->_mySearchEngineBasicForm;
     }
 
-    private $_mySearchEngineSuperBasicForm = null;
-
     /**
      * this function returns a new Search Engine Form
      * @return SearchEngineBasicForm
@@ -63,13 +64,11 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
     public function SearchEngineSuperBasicForm()
     {
         $this->SearchEngineClearHistoryID();
-        if (!$this->_mySearchEngineSuperBasicForm) {
-            $this->_mySearchEngineSuperBasicForm = SearchEngineBasicForm::create($this->owner, "SearchEngineSuperBasicForm");
+        if (! $this->_mySearchEngineSuperBasicForm) {
+            $this->_mySearchEngineSuperBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineSuperBasicForm');
         }
         return $this->_mySearchEngineSuperBasicForm;
     }
-
-    private $_mySearchEngineCustomForm = null;
 
     /**
      * this function returns a new Search Engine Form
@@ -78,11 +77,18 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
     public function SearchEngineCustomForm()
     {
         $this->SearchEngineClearHistoryID();
-        if (!$this->_mySearchEngineCustomForm) {
-            $this->_mySearchEngineCustomForm = SearchEngineBasicForm::create($this->owner, "SearchEngineCustomForm")
+        if (! $this->_mySearchEngineCustomForm) {
+            $this->_mySearchEngineCustomForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineCustomForm')
                 ->setOutputAsJSON(true);
         }
         return $this->_mySearchEngineCustomForm;
+    }
+
+    public function SearchEngineKeywordsPhrase()
+    {
+        $val = isset($_GET['SearchEngineKeywords']) ? $_GET['SearchEngineKeywords'] : '';
+
+        return DBField::create_field('Varchar', $val);
     }
 
     protected function SearchEngineClearHistoryID()
@@ -91,20 +97,11 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
         if (Director::is_ajax()) {
             //do nothing
         } else {
+            Controller::curr()->getRequest()->getSession()->clear('SearchEngineSearchRecordHistoryID');
 
-
-            Controller::curr()->getRequest()->getSession()->clear("SearchEngineSearchRecordHistoryID");
-
-            Controller::curr()->getRequest()->getSession()->set("SearchEngineSearchRecordHistoryID", 0);
+            Controller::curr()->getRequest()->getSession()->set('SearchEngineSearchRecordHistoryID', 0);
 
             Controller::curr()->getRequest()->getSession()->save();
         }
-    }
-
-    public function SearchEngineKeywordsPhrase()
-    {
-        $val = isset($_GET["SearchEngineKeywords"]) ? $_GET["SearchEngineKeywords"] : "";
-
-        return DBField::create_field("Varchar", $val);
     }
 }

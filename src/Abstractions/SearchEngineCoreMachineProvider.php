@@ -10,7 +10,6 @@ namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 interface SearchEngineCoreMachineProvider
 {
-
     /**
      * class used to provide the raw results
      * raw results are the SearchEngineDataObject matches for a particular keyword
@@ -21,7 +20,6 @@ interface SearchEngineCoreMachineProvider
      */
     // private static $class_name_for_search_provision;
 
-
     /**
      * this function runs the Core Search Machine
      * @param string $searchPhrase
@@ -30,7 +28,7 @@ interface SearchEngineCoreMachineProvider
      *
      * @return DataList
      */
-    public function run($searchPhrase, $filterProviders = array(), $sortProvider = "");
+    public function run($searchPhrase, $filterProviders = [], $sortProvider = '');
 
     /**
      * returns HTML for Debug

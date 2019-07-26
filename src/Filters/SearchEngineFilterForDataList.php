@@ -2,23 +2,17 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\SS_List;
-use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
 {
-
     /**
-     * @return String
+     * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineFilterForDataList.TITLE", "Custom Selection");
+        return _t('SearchEngineFilterForDataList.TITLE', 'Custom Selection');
     }
-
 
     /**
      * list of
@@ -26,11 +20,11 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      *    LARGE => Large Pages
      *    SMALL => Small Pages
      *    RED => Red Pages
-     * @return Array
+     * @return array
      */
     public function getFilterList()
     {
-        return array("CUSTOM" => "Custom selection of items");
+        return ['CUSTOM' => 'Custom selection of items'];
     }
 
     /**
@@ -47,16 +41,16 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      */
     public function getSqlFilterArray($list)
     {
-        if($filterArray instanceof SS_List) {
-            if($filterArray->count() === 0){
+        if ($filterArray instanceof SS_List) {
+            if ($filterArray->count() === 0) {
                 return ['ID' => -1];
             }
             $ids = $list->column('ID');
             $classNames = $list->column('ClassName');
             $preFilter = [];
-            foreach($ids as $position => $id) {
+            foreach ($ids as $position => $id) {
                 $className = $classNames[$position];
-                if(! isset($preFilter[$className])) {
+                if (! isset($preFilter[$className])) {
                     $preFilter[$className] = [];
                 }
                 $preFilter[$className][$id] = $id;
@@ -79,5 +73,4 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
     {
         return false;
     }
-
 }

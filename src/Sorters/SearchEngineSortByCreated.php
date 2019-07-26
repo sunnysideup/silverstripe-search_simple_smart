@@ -3,24 +3,21 @@
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\ORM\FieldType\DBDate;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use SilverStripe\CMS\Model\VirtualPage;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 
 class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
 {
-
     /**
      * @return string
      */
     public function getShortTitle()
     {
-        return _t("SearchEngineSortByCreated.TITLE", DBDate::class);
+        return _t('SearchEngineSortByCreated.TITLE', DBDate::class);
     }
 
     /**
      * returns the description - e.g. "sort by the last Edited date"
-     * @return String
+     * @return string
      */
     public function getDescription()
     {
@@ -41,12 +38,10 @@ class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
      */
     public function getSqlSortArray($sortProviderValues = null)
     {
-        return ["Created" => "DESC"];
+        return ['Created' => 'DESC'];
     }
 
-
     /**
-     *
      * @return boolean
      */
     public function hasCustomSort($sortProviderValues = null)
@@ -55,7 +50,6 @@ class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
     }
 
     /**
-     *
      * Does any custom filtering
      * @param SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
