@@ -148,7 +148,7 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @param bool $moreDetails
      *
-     * @return null|array
+     * @return array|null
      */
     public function SearchEngineResultsTemplates($moreDetails = false)
     {

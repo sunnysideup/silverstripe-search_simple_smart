@@ -334,7 +334,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      *
      * @return array
      */
-    public function setListOfIDs($list, $filterStep) :string
+    public function setListOfIDs($list, $filterStep): string
     {
         $field = $this->getListIDField($filterStep);
         if ($list && $list instanceof SS_List && $list->count()) {
@@ -355,9 +355,9 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * saves the IDs of the DataList
      * @param string $filterStep
      *
-     * @return null|array
+     * @return array|null
      */
-    public function getListOfIDs(string $filterStep) : ?array
+    public function getListOfIDs(string $filterStep): ?array
     {
         $field = $this->getListIDField($filterStep);
         if ($this->{$field}) {
@@ -371,7 +371,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      *
      * @return string
      */
-    protected function getListIDField(string $filterStep) : string
+    protected function getListIDField(string $filterStep): string
     {
         if (! in_array($filterStep, ['RAW', 'SQL', 'CUSTOM'], true)) {
             user_error("${filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
