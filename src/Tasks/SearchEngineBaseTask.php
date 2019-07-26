@@ -119,12 +119,12 @@ class SearchEngineBaseTask extends BuildTask
         $this->verbose = $request->getVar('verbose') ? true : false;
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
 
-        if($request->getVar('limit')) {
+        if ($request->getVar('limit')) {
             $this->limit = intval($request->getVar('limit'));
         }
         $this->flushNow('<strong>limit</strong>: ' . $this->limit);
 
-        if($request->getVar('step')) {
+        if ($request->getVar('step')) {
             $this->step = intval($request->getVar('step'));
         }
         $this->flushNow('<strong>step</strong>: ' . $this->step);
@@ -138,7 +138,7 @@ class SearchEngineBaseTask extends BuildTask
         $this->unindexedOnly = $request->getVar('unindexedonly') ? true : false;
         $this->flushNow('<strong>unindexed only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
 
-        $this->task = $request->getVar('task') ? : self::$segment;
+        $this->task = $request->getVar('task') ?: self::$segment;
         $this->flushNow('<strong>task</strong>: ' . $this->task);
 
         $this->flushNow('==========================', false);

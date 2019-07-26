@@ -7,7 +7,6 @@ use Psr\SimpleCache\CacheInterface;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\VirtualPage;
-use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ErrorPage\ErrorPage;
@@ -16,10 +15,8 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Security\Permission;
-use SilverStripe\Versioned\Versioned;
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
-use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 
 /**
  * List of dataobjects that are indexed.
@@ -228,8 +225,6 @@ class SearchEngineDataObject extends DataObject
 
     private $timeMeasure = [];
 
-
-
     #############################################
     # CRUD
     #############################################
@@ -277,8 +272,6 @@ class SearchEngineDataObject extends DataObject
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
-
-
 
     /**
      * make sure all the references are deleted as well
