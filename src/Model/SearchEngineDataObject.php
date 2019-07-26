@@ -221,7 +221,7 @@ class SearchEngineDataObject extends DataObject
      * used for caching...
      * @var array
      */
-    private static $_searchable_class_names = null;
+    private static $_searchable_class_names = [];
 
     private static $_source_objects = [];
 
@@ -427,7 +427,7 @@ class SearchEngineDataObject extends DataObject
     public function SearchEngineFieldsForIndexing($sourceObject = null)
     {
         $className = $this->getKey(true);
-        if (! isset($_search_engine_fields_for_indexing[$className])) {
+        if (! isset(self::$_search_engine_fields_for_indexing[$className])) {
             $levelFields = [
                 1 => [],
                 2 => [],
@@ -479,7 +479,7 @@ class SearchEngineDataObject extends DataObject
      */
     public static function searchable_class_names()
     {
-        if (self::$_searchable_class_names === null) {
+        if (count(self::$_searchable_class_names) === 0) {
             $allClasses = ClassInfo::subclassesFor(DataObject::class);
             //specifically include
             $includeClassNames = [];
