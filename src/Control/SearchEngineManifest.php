@@ -32,7 +32,7 @@ class SearchEngineManifest extends Controller
      */
     public function getContent()
     {
-        $classNames = SearchEngineDataObject::searchable_class_names();
+        $classNames = SearchEngineDataObjectApi::searchable_class_names();
         asort($classNames);
         $manifest = '';
         if (is_array($classNames) && count($classNames)) {

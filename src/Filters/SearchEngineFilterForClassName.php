@@ -42,7 +42,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     public function getFilterList()
     {
         $array = [];
-        $filterArray = SearchEngineDataObject::searchable_class_names();
+        $filterArray = SearchEngineDataObjectApi::searchable_class_names();
         $checkInclusion = false;
         $myInclusions = $this->Config()->get('classes_to_include');
         if (is_array($myInclusions) && count($myInclusions)) {
