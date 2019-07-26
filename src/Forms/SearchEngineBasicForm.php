@@ -172,79 +172,12 @@ class SearchEngineBasicForm extends Form
     public function forTemplate()
     {
         if (! self::$_for_template_completed) {
-            $sortBy = $this->SortByProvider();
-            if ($sortBy && count($sortBy) > 1) {
-                $default = isset($_GET['SortBy']) ? $_GET['SortBy'] : key($sortBy);
-                if ($this->includeSort) {
-                    $this->Fields()->insertAfter(
-                        //TextField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
-                        OptionsetField::create('SortBy', _t('SearchEngineBasicForm.SORT_BY', 'Sort by ...'), $sortBy, $default),
-                        'SearchEngineKeywords'
-                    );
-                } else {
-                    $this->Fields()->insertAfter(
-                        HiddenField::create('SortBy', '', $default),
-                        'SearchEngineKeywords'
-                    );
-                }
-            }
+            $this->addFields();
 
-            $filterFor = $this->FilterForProvider();
-            if ($filterFor && count($filterFor) > 1) {
-                if ($this->includeFilter) {
-                    $defaults = isset($_GET['FilterFor']) ? $_GET['FilterFor'] : [];
-                    $this->Fields()->insertAfter(
-                        CheckboxSetField::create('FilterFor', _t('SearchEngineBasicForm.FILTER_FOR', 'Filter for ...'), $filterFor)->setDefaultItems($defaults),
-                        'SortBy'
-                    );
-                }
-            }
+            //requirements
+            $this->workOutRequirements();
 
-            $results = '';
-            if ($this->keywords) {
-                if (Director::is_ajax()) {
-                    //do nothing
-                } else {
-                    $this->resultsCompleted = true;
-                    $results = $this->workOutResults($_GET);
-                }
-            }
-            $this->Fields()->push(LiteralField::create(
-                'SearchEngineResultsHolderOuter',
-                '<div id="SearchEngineResultsHolderOuter">' . $results . '</div>'
-            ));
-            if ($this->Config()->jquery_source) {
-                Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
-                Requirements::javascript($this->Config()->jquery_source);
-            } else {
-                Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
-            }
-            Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/SearchEngineInitFunctions.js');
-
-            if ($this->useInfiniteScroll) {
-                Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/jquery.infinitescroll.min.js');
-                $this->customScript[] = 'SearchEngineInitFunctions.useInfiniteScroll = true;';
-            }
-            if ($this->displayedFormInputSelector) {
-                $this->customScript[] = 'SearchEngineInitFunctions.displayedFormInputSelector = "' . $this->displayedFormInputSelector . '";';
-            }
-            if ($this->useAutoComplete) {
-                Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/awesomplete.min.js');
-                $this->customScript[] = 'SearchEngineInitFunctions.useAutoComplete = true;';
-                $keywordFile = ExportKeywordList::get_js_keyword_file_name($includeBase = false);
-                if ($keywordFile) {
-                    Requirements::javascript(ExportKeywordList::get_js_keyword_file_name($includeBase = false));
-                }
-            }
-            if ($this->updateBrowserHistory) {
-                $this->customScript[] = 'SearchEngineInitFunctions.updateBrowserHistory = true;';
-            }
-
-            Requirements::customScript(implode("\n", $this->customScript), 'SearchEngineInitFunctions');
-
-            //css settings
-            Requirements::themedCSS('sunnysideup/search_simple_smart: awesomplete', 'searchengine');
-            Requirements::themedCSS('sunnysideup/search_simple_smart: SearchEngine', 'searchengine');
+            //extra classes
             $this->addExtraClass('searchEngineFormForm');
             if ($this->includeFilter || $this->includeSort) {
                 $this->addExtraClass('searchEngineFormWithSideBar');
@@ -400,6 +333,87 @@ class SearchEngineBasicForm extends Form
     {
         $this->updateBrowserHistory = $b;
         return $this;
+    }
+
+    protected function addFields()
+    {
+        $sortBy = $this->SortByProvider();
+        if ($sortBy && count($sortBy) > 1) {
+            $default = isset($_GET['SortBy']) ? $_GET['SortBy'] : key($sortBy);
+            if ($this->includeSort) {
+                $this->Fields()->insertAfter(
+                    //TextField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
+                    OptionsetField::create('SortBy', _t('SearchEngineBasicForm.SORT_BY', 'Sort by ...'), $sortBy, $default),
+                    'SearchEngineKeywords'
+                );
+            } else {
+                $this->Fields()->insertAfter(
+                    HiddenField::create('SortBy', '', $default),
+                    'SearchEngineKeywords'
+                );
+            }
+        }
+
+        $filterFor = $this->FilterForProvider();
+        if ($filterFor && count($filterFor) > 1) {
+            if ($this->includeFilter) {
+                $defaults = isset($_GET['FilterFor']) ? $_GET['FilterFor'] : [];
+                $this->Fields()->insertAfter(
+                    CheckboxSetField::create('FilterFor', _t('SearchEngineBasicForm.FILTER_FOR', 'Filter for ...'), $filterFor)->setDefaultItems($defaults),
+                    'SortBy'
+                );
+            }
+        }
+
+        $results = '';
+        if ($this->keywords) {
+            if (Director::is_ajax()) {
+                //do nothing
+            } else {
+                $this->resultsCompleted = true;
+                $results = $this->workOutResults($_GET);
+            }
+        }
+        $this->Fields()->push(LiteralField::create(
+            'SearchEngineResultsHolderOuter',
+            '<div id="SearchEngineResultsHolderOuter">' . $results . '</div>'
+        ));
+    }
+
+    protected function workOutRequirements()
+    {
+        if ($this->Config()->jquery_source) {
+            Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
+            Requirements::javascript($this->Config()->jquery_source);
+        } else {
+            Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
+        }
+        Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/SearchEngineInitFunctions.js');
+
+        if ($this->useInfiniteScroll) {
+            Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/jquery.infinitescroll.min.js');
+            $this->customScript[] = 'SearchEngineInitFunctions.useInfiniteScroll = true;';
+        }
+        if ($this->displayedFormInputSelector) {
+            $this->customScript[] = 'SearchEngineInitFunctions.displayedFormInputSelector = "' . $this->displayedFormInputSelector . '";';
+        }
+        if ($this->useAutoComplete) {
+            Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/awesomplete.min.js');
+            $this->customScript[] = 'SearchEngineInitFunctions.useAutoComplete = true;';
+            $hasKeywordFile = ExportKeywordList::get_js_keyword_file_name($includeBase = false);
+            if ($hasKeywordFile) {
+                Requirements::javascript(ExportKeywordList::get_js_keyword_file_name($includeBase = false));
+            }
+        }
+        if ($this->updateBrowserHistory) {
+            $this->customScript[] = 'SearchEngineInitFunctions.updateBrowserHistory = true;';
+        }
+
+        Requirements::customScript(implode("\n", $this->customScript), 'SearchEngineInitFunctions');
+
+        //css settings
+        Requirements::themedCSS('sunnysideup/search_simple_smart: awesomplete', 'searchengine');
+        Requirements::themedCSS('sunnysideup/search_simple_smart: SearchEngine', 'searchengine');
     }
 
     /**
