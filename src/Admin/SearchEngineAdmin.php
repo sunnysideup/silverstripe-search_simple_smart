@@ -103,7 +103,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         HTMLReadonlyField::create(
                             'searchable_class_names',
                             'Searchable Class Names',
-                            self::print_nice(SearchEngineDataObject::searchable_class_names())
+                            self::print_nice(SearchEngineDataObjectApi::searchable_class_names())
                         ),
                         HTMLReadonlyField::create(
                             'classes_to_exclude',

@@ -37,7 +37,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
     {
         $this->runStart($request);
 
-        $classNames = SearchEngineDataObject::searchable_class_names();
+        $classNames = SearchEngineDataObjectApi::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
             $filter = ['ClassName' => $className];
             $count = $className::get()
