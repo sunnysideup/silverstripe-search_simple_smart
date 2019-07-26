@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "silverstripe/recipe-cms": "^4.3"
+        "silverstripe/cms": "~4@stable"
     },
     "autoload": {
         "psr-4": {
