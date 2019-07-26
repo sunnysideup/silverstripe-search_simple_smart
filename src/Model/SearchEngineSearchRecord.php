@@ -161,7 +161,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * affect whether (or where) this object could be created.
      * @return boolean
      */
-    public function canEdit($member = null, $context = [])
+    public function canEdit($member = null)
     {
         return false;
     }
@@ -172,7 +172,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * affect whether (or where) this object could be created.
      * @return boolean
      */
-    public function canDelete($member = null, $context = [])
+    public function canDelete($member = null)
     {
         return false;
     }
@@ -183,7 +183,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * affect whether (or where) this object could be created.
      * @return boolean
      */
-    public function canView($member = null, $context = [])
+    public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
@@ -191,7 +191,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     /**
      * @param string $searchPhrase
      * @param array $filterProviders
-     * @param boolean $clear
+     * @param bool $clear
      *
      * @return SearchEngineSearchRecord
      */
@@ -330,11 +330,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * to match getListOfIDs
      *
      * @param SS_List $list
-     * @param $filterStep ("RAW", "SQL", "CUSTOM")
+     * @param string $filterStep ("RAW", "SQL", "CUSTOM")
      *
      * @return array
      */
-    public function setListOfIDs($list, $filterStep)
+    public function setListOfIDs($list, $filterStep) :string
     {
         $field = $this->getListIDField($filterStep);
         if ($list && $list instanceof SS_List && $list->count()) {
@@ -353,12 +353,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     /**
      * saves the IDs of the DataList
-     * @param SS_List
-     * @param $filterStep ("RAW", "SQL", "CUSTOM")
+     * @param string $filterStep
      *
-     * @return array
+     * @return null|array
      */
-    public function getListOfIDs($filterStep)
+    public function getListOfIDs(string $filterStep) : ?array
     {
         $field = $this->getListIDField($filterStep);
         if ($this->{$field}) {
@@ -368,11 +367,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     }
 
     /**
-     * @param $filterStep ("RAW", "SQL", "CUSTOM")
+     * @param string $filterStep
      *
      * @return string
      */
-    protected function getListIDField($filterStep)
+    protected function getListIDField(string $filterStep) : string
     {
         if (! in_array($filterStep, ['RAW', 'SQL', 'CUSTOM'], true)) {
             user_error("${filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
