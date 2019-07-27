@@ -1,6 +1,7 @@
 <?php
 
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
+use SilverStripe\ORM\DataList;
 
 /***
  * Interface for the class that returns
