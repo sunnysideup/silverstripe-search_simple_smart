@@ -525,7 +525,9 @@ class SearchEngineDataObject extends DataObject
 
     public function CMSEditLink()
     {
-        return '/admin/searchengine/Sunnysideup-SearchSimpleSmart-Model-SearchEngineDataObject/EditForm/field/Sunnysideup-SearchSimpleSmart-Model-SearchEngineDataObject/item/' . $this->ID . '/edit';
+        $className = str_replace('\\', '-', self::class);
+
+        return '/admin/searchengine/'.$className.'/EditForm/field/'.$className.'/item/' . $this->ID . '/edit';
     }
 
     #####################
@@ -658,14 +660,15 @@ class SearchEngineDataObject extends DataObject
         return $str;
     }
 
+
     /**
      * deletes cached search results
      * sets stage to LIVE
      * indexes the current object.
      * @param SearchEngineDataObject $sourceObject
-     * @param do $withModeChange everything necessary for indexings.
-     *                        Setting this to false means the stage will not be set
-     *                        and the cache will not be cleared.
+     * @param DataObject $sourceObject
+     * @param bool $withModeChange  - Setting this to false means the stage
+     * @param bool $timeMeasure  - do time measure?
      */
     public function doSearchEngineIndex($sourceObject = null, $withModeChange = true, $timeMeasure = false)
     {
