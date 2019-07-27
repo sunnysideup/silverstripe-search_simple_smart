@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use SilverStripe\ORM\DataList;
 
 /***
  * Interface for the class that returns the matching
@@ -19,7 +20,7 @@ interface SearchEngineSearchEngineProvider
     public function setSearchRecord(SearchEngineSearchRecord $searchRecord);
 
     /**
-     * @return return DataList
+     * @return DataList
      */
     public function getRawResults();
 }

@@ -5,6 +5,7 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
 {

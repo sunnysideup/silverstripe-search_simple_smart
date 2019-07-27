@@ -8,6 +8,8 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataList;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 abstract class SearchEngineSortByDescriptor
 {
@@ -115,8 +117,8 @@ abstract class SearchEngineSortByDescriptor
     // }
 
     /**
-     * @param  [type] $objects an array if IDs,
-     * @return [type]        [description]
+     * @param DataList $objects
+     * @return DataList
      */
     protected function makeClassGroups($objects)
     {

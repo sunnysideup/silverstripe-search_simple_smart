@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use SilverStripe\ORM\SS_List;
 
 /**
