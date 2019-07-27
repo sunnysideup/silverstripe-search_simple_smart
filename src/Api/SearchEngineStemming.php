@@ -26,6 +26,18 @@ use SilverStripe\Core\Injector\Injectable;
 
 class SearchEngineStemming
 {
+
+    private const END_REPLACERS = [
+        'a' => 'al',
+        'a' => 'er',
+        'i' => 'ic',
+        's' => 'ism',
+        'u' => 'ous',
+        'v' => 'ive',
+        'z' => 'ize',
+        'a' => 'er',
+    ];
+
     use Extensible;
     use Injectable;
     use Configurable;
@@ -232,17 +244,7 @@ class SearchEngineStemming
             case 'u':
             case 'v':
             case 'z':
-                $a = [
-                    'a' => 'al',
-                    'a' => 'er',
-                    'i' => 'ic',
-                    's' => 'ism',
-                    'u' => 'ous',
-                    'v' => 'ive',
-                    'z' => 'ize',
-                    'a' => 'er',
-                ];
-                self::replace($word, $a[$sub], '', 1);
+                self::replace($word, self::END_REPLACERS[$sub], '', 1);
                 break;
 
             case 'c':
@@ -278,6 +280,7 @@ class SearchEngineStemming
 
         return $word;
     }
+
 
     /**
      * Step 5
