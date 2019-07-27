@@ -28,7 +28,7 @@ class SearchEngineManifest extends Controller
 
     /**
      * record the click that the user chooses from the search results.
-     * @param SS_HTTPRequest
+     * @param HTTPRequest
      * @return string
      */
     public function getContent()

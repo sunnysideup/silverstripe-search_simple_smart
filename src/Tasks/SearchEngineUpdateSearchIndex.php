@@ -29,7 +29,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
 
     /**
      * this function runs the SearchEngineUpdateSearchIndex task
-     * @param SS_HTTPRequest | null $request
+     * @param HTTPRequest | null $request
      */
     public function run($request)
     {

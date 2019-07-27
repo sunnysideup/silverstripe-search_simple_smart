@@ -332,7 +332,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * @param SS_List $list
      * @param string $filterStep ("RAW", "SQL", "CUSTOM")
      *
-     * @return array
+     * @return string
      */
     public function setListOfIDs($list, $filterStep): string
     {

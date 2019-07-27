@@ -7,6 +7,7 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
@@ -185,8 +186,8 @@ class SearchEngineCoreSearchMachine
     private static $class_name_for_search_provision = SearchEngineProviderMYSQLFullText::class;
 
     /**
-     * @param [type] $filterClassName [description]
-     * @param [type] $filterValues    [description]
+     * @param string $filterClassName
+     * @param array $filterValues
      *
      * @return $this
      */

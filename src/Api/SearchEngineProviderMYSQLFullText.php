@@ -47,7 +47,7 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
      use Configurable;
 
      /*
-      * @var array
+      * @var ?SearchEngineSearchRecord
       */
      protected $searchRecord = null;
 
@@ -60,7 +60,7 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
      }
 
      /**
-      * @return DataList of SearchEngineDataObjects
+      * @return DataList|array of SearchEngineDataObjects
       */
      public function getRawResults($returnFilter = false)
      {

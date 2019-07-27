@@ -14,7 +14,7 @@ class SearchEngineRecordClick extends Controller
 
     /**
      * record the click that the user chooses from the search results.
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
      * @return string
      */
     public function add(HTTPRequest $request)
