@@ -397,7 +397,10 @@ class SearchEngineCoreSearchMachine
     protected function runFilterAndSortUsingCustom()
     {
         $this->listOfIDsCustomAsArray = $this->searchRecord->getListOfIDs('CUSTOM');
-        if ($this->listOfIDsCustomAsArray === null) {
+        if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
+            $this->listOfIDsCustomAsString = implode(',', $this->listOfIDsCustomAsArray);
+            $this->dataList = SearchEngineDataObject::get()->filter(['ID' => $this->listOfIDsCustomAsArray])->sort($this->nonCustomSort);
+        } else {
             if ($this->debug) {
                 $this->filterExecutedCustom = true;
             }
@@ -413,9 +416,6 @@ class SearchEngineCoreSearchMachine
                 }
             }
             $this->listOfIDsCustomAsString = $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM');
-        } else {
-            $this->listOfIDsCustomAsString = implode(',', $this->listOfIDsCustomAsArray);
-            $this->dataList = SearchEngineDataObject::get()->filter(['ID' => $this->listOfIDsCustomAsArray])->sort($this->nonCustomSort);
         }
         if ($this->hasCustomSort) {
             if ($this->debug) {
@@ -456,15 +456,15 @@ class SearchEngineCoreSearchMachine
         $this->filter1 = ' (' . ($this->filterExecutedRAW ? 'executed ' : 'from cache') . '): carried out by: ' . $this->searchProviderName . '';
         $this->filter2 = ' (' . ($this->filterExecutedSQL ? 'executed' : 'from cache') . '): <pre>' . print_r($this->filterStringForDebug, 1) . '</pre>';
         $this->filter3 = ' (' . ($this->filterExecutedCustom ? 'executed' : 'from cache') . '): ' . $this->customFilterTime;
-        $this->listOfIDsAsString = explode(',', $this->listOfIDsAsString);
-        $this->listOfIDsSQLString = explode(',', $this->listOfIDsSQLString);
-        $this->listOfIDsCustomAsString = explode(',', $this->listOfIDsCustomAsString);
+        $this->listOfIDsAsArray = explode(',', $this->listOfIDsAsString);
+        $this->listOfIDsSQLAsArray = explode(',', $this->listOfIDsSQLString);
+        $this->listOfIDsCustomAsArray = explode(',', $this->listOfIDsCustomAsString);
         $this->matches1 = (is_array($this->listOfIDsAsString) ?
-            count($this->listOfIDsAsString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsAsString) . '</pre>' : 0);
+            count($this->listOfIDsAsString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsAsArray) . '</pre>' : 0);
         $this->matches2 = (is_array($this->listOfIDsSQLString) ?
-            count($this->listOfIDsSQLString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsSQLString) . '</pre>' : 0);
+            count($this->listOfIDsSQLString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsSQLAsArray) . '</pre>' : 0);
         $this->matches3 = (is_array($this->listOfIDsCustomAsString) ?
-            count($this->listOfIDsCustomAsString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsCustomAsString) . '</pre>' : 0);
+            count($this->listOfIDsCustomAsString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsCustomAsArray) . '</pre>' : 0);
     }
 
     protected function runDebugOutput()

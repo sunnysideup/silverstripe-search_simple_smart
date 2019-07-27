@@ -2,13 +2,13 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
-use SilverStripe\CMS\Model\SiteTreeExtension;
+use SilverStripe\Core;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\FieldType\DBField;
 use Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm;
 
-class SearchEngineContentControllerExtension extends SiteTreeExtension
+class SearchEngineContentControllerExtension extends Extension
 {
     /**
      * An array of actions that can be accessed via a request. Each array element should be an action name, and the
@@ -97,11 +97,10 @@ class SearchEngineContentControllerExtension extends SiteTreeExtension
         if (Director::is_ajax()) {
             //do nothing
         } else {
-            Controller::curr()->getRequest()->getSession()->clear('SearchEngineSearchRecordHistoryID');
-
-            Controller::curr()->getRequest()->getSession()->set('SearchEngineSearchRecordHistoryID', 0);
-
-            Controller::curr()->getRequest()->getSession()->save();
+            $request = $this->owner->getRequest();
+            $request->getSession()->clear('SearchEngineSearchRecordHistoryID');
+            $request->getSession()->set('SearchEngineSearchRecordHistoryID', 0);
+            $request->getSession()->save($request);
         }
     }
 }

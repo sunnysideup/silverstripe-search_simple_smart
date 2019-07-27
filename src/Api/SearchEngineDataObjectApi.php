@@ -3,13 +3,16 @@
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
 
 class SearchEngineDataObjectApi
 {
@@ -138,4 +141,78 @@ class SearchEngineDataObjectApi
             $item->delete();
         }
     }
+
+    public static function fields_for_indexing($sourceObject)
+    {
+        $className = $sourceObject->getKey(true);
+        if (! isset(self::$_search_engine_fields_for_indexing[$className])) {
+            $levelFields = [
+                1 => [],
+                2 => [],
+            ];
+            if ($sourceObject) {
+                $levelFields = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
+                if (is_array($levelFields) && count($levelFields)) {
+                    //do nothing
+                } else {
+                    $levelOneFieldArray = Config::inst()->get(self::class, 'search_engine_default_level_one_fields');
+                    $excludedFieldArray = Config::inst()->get(self::class, 'search_engine_default_excluded_db_fields');
+                    $dbArray = SearchEngineMakeSearchableApi::search_engine_rel_fields($sourceObject, 'db');
+                    $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
+                    foreach ($dbArray as $field => $type) {
+                        //get without brackets ...
+                        if (preg_match('/^(\w+)\(/', $type, $match)) {
+                            $type = $match[1];
+                        }
+                        if (is_subclass_of($type, DBString::class)) {
+                            if (in_array($field, $excludedFieldArray, true)) {
+                                //do nothing
+                            } else {
+                                $level = 2;
+                                if (in_array($field, $levelOneFieldArray, true)) {
+                                    $level = 1;
+                                }
+                                $levelFields[$level][] = $field;
+                            }
+                        }
+                    }
+                }
+            }
+            self::$_search_engine_fields_for_indexing[$className] = $levelFields;
+        }
+
+        return self::$_search_engine_fields_for_indexing[$className];
+    }
+
+    public static function content_for_index_building(DataObject $sourceObject) : array
+    {
+        $finalArray = [];
+        if ($sourceObject) {
+            if ($sourceObject->hasMethod('SearchEngineFullContentForIndexingProvider')) {
+                $finalArray = $sourceObject->SearchEngineFullContentForIndexingProvider();
+            } else {
+                $levels = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
+                if (is_array($levels)) {
+                    //do nothing
+                } else {
+                    $levels = $sourceObject->SearchEngineFieldsForIndexing();
+                }
+                if (is_array($levels) && count($levels)) {
+                    foreach ($levels as $level => $fieldArray) {
+                        $level = SearchEngineKeyword::level_sanitizer($level);
+                        $finalArray[$level] = '';
+                        if (is_array($fieldArray) && count($fieldArray)) {
+                            foreach ($fieldArray as $field) {
+                                $fields = explode('.', $field);
+                                $finalArray[$level] .= ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $finalArray;
+    }
+
 }

@@ -9,7 +9,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\DataList;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
 
- /**
+/**
   * 1. finds DataObjects with the keywords listed.
   *
   * 2. mysql methods:
@@ -42,80 +42,83 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
 
  class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvider
  {
-     use Extensible;
-     use Injectable;
-     use Configurable;
+    use Extensible;
+    use Injectable;
+    use Configurable;
 
-     /*
-      * @var ?SearchEngineSearchRecord
-      */
-     protected $searchRecord = null;
+    /*
+     * @var ?SearchEngineSearchRecord
+     */
+    protected $searchRecord = null;
 
-     /**
-      * @param SearchEngineSearchRecord $searchRecord
-      */
-     public function setSearchRecord(SearchEngineSearchRecord $searchRecord)
-     {
-         $this->searchRecord = $searchRecord;
-     }
+    /**
+     * @param SearchEngineSearchRecord $searchRecord
+     */
+    public function setSearchRecord(SearchEngineSearchRecord $searchRecord)
+    {
+        $this->searchRecord = $searchRecord;
+    }
 
-     /**
-      * @return DataList|array of SearchEngineDataObjects
-      */
-     public function getRawResults($returnFilter = false)
-     {
 
-        //1. find keywords
-         // $filterArray = [];
-         // $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('" . $this->searchRecord->FinalPhrase . "')");
-         $dataObjectArray = [];
-         $max = substr_count($this->searchRecord->FinalPhrase, ' ') + 2;
-         for ($i = 1; $i < $max; $i++) {
-             $keywordIDArray = [0 => 0];
-             $rows = DB::query(
-                 "
-                SELECT \"SearchEngineKeywordID\"
-                FROM \"SearchEngineSearchRecord_SearchEngineKeywords\"
-                WHERE
-                    \"KeywordPosition\" = ${i}
-                    AND \"SearchEngineSearchRecordID\" = " . $this->searchRecord->ID
-             );
-             foreach ($rows as $row) {
-                 $keywordIDArray[$row['SearchEngineKeywordID']] = $row['SearchEngineKeywordID'];
-             }
-             $rowsLevel1 = DB::query('
-                SELECT "SearchEngineDataObjectID"
-                FROM SearchEngineKeyword_SearchEngineDataObjects_Level1
-                WHERE "SearchEngineKeywordID" IN (' . implode(',', $keywordIDArray) . ')
-                GROUP BY "SearchEngineDataObjectID"');
-             $rowsLevel1Array = [0 => 0];
-             foreach ($rowsLevel1 as $row) {
-                 $rowsLevel1Array[$row['SearchEngineDataObjectID']] = $row['SearchEngineDataObjectID'];
-             }
-             $rowsLevel2 = DB::query('
-                SELECT "SearchEngineDataObjectID"
-                FROM SearchEngineDataObject_SearchEngineKeywords_Level2
-                WHERE
-                    "SearchEngineKeywordID" IN (' . implode(',', $keywordIDArray) . ') AND
-                    "SearchEngineDataObjectID" NOT IN (' . implode(',', $rowsLevel1Array) . ')
-                GROUP BY "SearchEngineDataObjectID"
-            ');
-             $rowsLevel2Array = [0 => 0];
-             foreach ($rowsLevel2 as $row) {
-                 $rowsLevel2Array[$row['SearchEngineDataObjectID']] = $row['SearchEngineDataObjectID'];
-             }
-             $dataObjectArray[$i] = array_merge($rowsLevel1Array, $rowsLevel2Array);
-         }
-         if (count($dataObjectArray) > 1) {
-             $finalArray = call_user_func_array('array_intersect', $dataObjectArray);
-         } else {
-             $finalArray = $dataObjectArray[1];
-         }
-         $filter = ['ID' => $finalArray];
-         if ($returnFilter) {
-             return $filter;
-         }
+    /**
+     *
+     * @param  boolean $returnFilter
+     * @return mixed
+     */
+    public function getRawResults($returnFilter = false)
+    {
 
-         return SearchEngineDataObject::get()->filter($filter);
-     }
+       //1. find keywords
+        // $filterArray = [];
+        // $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('" . $this->searchRecord->FinalPhrase . "')");
+        $dataObjectArray = [];
+        $max = substr_count($this->searchRecord->FinalPhrase, ' ') + 2;
+        for ($i = 1; $i < $max; $i++) {
+           $keywordIDArray = [0 => 0];
+           $rows = DB::query(
+              "
+             SELECT \"SearchEngineKeywordID\"
+             FROM \"SearchEngineSearchRecord_SearchEngineKeywords\"
+             WHERE
+                \"KeywordPosition\" = ${i}
+                AND \"SearchEngineSearchRecordID\" = " . $this->searchRecord->ID
+           );
+           foreach ($rows as $row) {
+              $keywordIDArray[$row['SearchEngineKeywordID']] = $row['SearchEngineKeywordID'];
+           }
+           $rowsLevel1 = DB::query('
+             SELECT "SearchEngineDataObjectID"
+             FROM SearchEngineKeyword_SearchEngineDataObjects_Level1
+             WHERE "SearchEngineKeywordID" IN (' . implode(',', $keywordIDArray) . ')
+             GROUP BY "SearchEngineDataObjectID"');
+           $rowsLevel1Array = [0 => 0];
+           foreach ($rowsLevel1 as $row) {
+              $rowsLevel1Array[$row['SearchEngineDataObjectID']] = $row['SearchEngineDataObjectID'];
+           }
+           $rowsLevel2 = DB::query('
+             SELECT "SearchEngineDataObjectID"
+             FROM SearchEngineDataObject_SearchEngineKeywords_Level2
+             WHERE
+                "SearchEngineKeywordID" IN (' . implode(',', $keywordIDArray) . ') AND
+                "SearchEngineDataObjectID" NOT IN (' . implode(',', $rowsLevel1Array) . ')
+             GROUP BY "SearchEngineDataObjectID"
+          ');
+           $rowsLevel2Array = [0 => 0];
+           foreach ($rowsLevel2 as $row) {
+              $rowsLevel2Array[$row['SearchEngineDataObjectID']] = $row['SearchEngineDataObjectID'];
+           }
+           $dataObjectArray[$i] = array_merge($rowsLevel1Array, $rowsLevel2Array);
+        }
+        if (count($dataObjectArray) > 1) {
+           $finalArray = call_user_func_array('array_intersect', $dataObjectArray);
+        } else {
+           $finalArray = $dataObjectArray[1];
+        }
+        $filter = ['ID' => $finalArray];
+        if ($returnFilter) {
+           return $filter;
+        }
+
+        return SearchEngineDataObject::get()->filter($filter);
+    }
  }

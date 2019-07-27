@@ -37,10 +37,6 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private $_onAfterWriteCount = [];
 
-    /**
-     * @var array
-     */
-    private $_array_of_relations = [];
 
     /**
      * @var array
@@ -61,7 +57,7 @@ class SearchEngineMakeSearchable extends DataExtension
      * sets stage to LIVE
      * indexes the current object.
      * @param SearchEngineDataObject $searchEngineDataObject
-     * @param DataObject $withModeChange everything necessary for indexings.
+     * @param bool $withModeChange everything necessary for indexings.
      *                        Setting this to false means the stage will not be set
      *                        and the cache will not be cleared.
      */
@@ -170,7 +166,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 $fields->findOrMakeTab('Root.Main');
                 $fields->removeFieldFromTab('Root.Main', 'SearchEngineDataObjectID');
                 if (! $this->owner->hasMethod('getSettingsFields')) {
-                    return $this->updateSettingsFields($fields);
+                    $this->updateSettingsFields($fields);
                 } elseif ($this->owner instanceof SiteTree) {
                     $fields->addFieldToTab(
                         'Root.Main',
@@ -384,85 +380,6 @@ class SearchEngineMakeSearchable extends DataExtension
         return SearchEngineFullContent::get()->filter(['ID' => 0]);
     }
 
-    /**
-     * @param DataObject $object
-     * @param array $fields array of TWO items.  The first specifies the relation,
-     *                      the second one the method that should be run on the relation (if any)
-     *                      you can also specific more relations ...
-     *
-     * @return array
-     */
-    public function SearchEngineRelObject($object, $fields, $str = '')
-    {
-        if (count($fields) === 0 || ! is_array($fields)) {
-            $str .= ' ' . $object->getTitle() . ' ';
-        } else {
-            $fieldCount = count($fields);
-            $possibleMethod = $fields[0];
-            if (substr($possibleMethod, 0, 3) === 'get' && $object->hasMethod($possibleMethod) && $fieldCount === 1) {
-                $str .= ' ' . $object->{$possibleMethod}() . ' ';
-            } else {
-                $dbArray = $this->SearchEngineRelFields($object, 'db');
-                //db field
-                if (isset($dbArray[$fields[0]])) {
-                    $dbField = $fields[0];
-                    if ($fieldCount === 1) {
-                        $str .= ' ' . $object->{$dbField} . ' ';
-                    } elseif ($fieldCount === 2) {
-                        $method = $fields[1];
-                        $str .= ' ' . $object->dbObject($dbField)->{$method}() . ' ';
-                    }
-                } else {
-                    //has one relation
-                    $method = array_shift($fields);
-                    $hasOneArray = array_merge(
-                        $this->SearchEngineRelFields($object, 'has_one'),
-                        $this->SearchEngineRelFields($object, 'belongs_to')
-                    );
-                    //has_one relation
-                    if (isset($hasOneArray[$method])) {
-                        $foreignObject = $object->{$method}();
-                        $str .= ' ' . $this->searchEngineRelObject($foreignObject, $fields) . ' ';
-                    } else {
-                        //many relation
-                        $manyArray = array_merge(
-                            $this->SearchEngineRelFields($object, 'has_many'),
-                            $this->SearchEngineRelFields($object, 'many_many'),
-                            $this->SearchEngineRelFields($object, 'belongs_many_many')
-                        );
-                        if (isset($manyArray[$method])) {
-                            $foreignObjects = $object->{$method}()->limit(100);
-                            foreach ($foreignObjects as $foreignObject) {
-                                $str .= ' ' . $this->searchEngineRelObject($foreignObject, $fields) . ' ';
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $str;
-    }
-
-    /**
-     * returns db, has_one, has_many, many_many, or belongs_many_many fields
-     * for object
-     *
-     * @param DataObject $object
-     * @param string $relType (db, has_one, has_many, many_many, or belongs_many_many)
-     *
-     * @return string
-     */
-    public function SearchEngineRelFields($object, $relType)
-    {
-        if (! isset($this->_array_of_relations[$object->ClassName])) {
-            $this->_array_of_relations[$object->ClassName] = [];
-        }
-        if (! isset($this->_array_of_relations[$object->ClassName][$relType])) {
-            $this->_array_of_relations[$object->ClassName][$relType] = Config::inst()->get($object->ClassName, $relType);
-        }
-        return $this->_array_of_relations[$object->ClassName][$relType];
-    }
 
     ######################################
     # Status
