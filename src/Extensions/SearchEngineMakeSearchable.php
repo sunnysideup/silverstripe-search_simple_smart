@@ -87,14 +87,16 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @return array
      */
-    public function SearchEngineFullContentForIndexingBuild($searchEngineDataObject = null)
+    public function SearchEngineFullContentForIndexingBuild($item = null)
     {
-        if (! $searchEngineDataObject) {
-            $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($this->owner);
+        if (! $item) {
+            $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         }
-        if ($searchEngineDataObject) {
-            return $searchEngineDataObject->SearchEngineFullContentForIndexingBuild($this->owner);
+        if ($item) {
+            return $item->SearchEngineFullContentForIndexingBuild($this->owner);
         }
+
+        return [];
     }
 
     /**
@@ -153,6 +155,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($item) {
             $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
         }
+        return [];
     }
 
     ############################
