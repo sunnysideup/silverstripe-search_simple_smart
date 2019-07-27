@@ -18,6 +18,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineSourceObjectApi;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
 
 /**
@@ -203,11 +204,6 @@ class SearchEngineDataObject extends DataObject
 
     private $recalculateCount = 0;
 
-    /**
-     * used for caching...
-     * @var array
-     */
-    private static $_search_engine_fields_for_indexing = [];
 
     /**
      * used for caching...
@@ -332,17 +328,8 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
-        if ($sourceObject) {
-            if ($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
-                return $sourceObject->SearchEngineSourceObjectSortDate();
-            }
-            $fieldsToCheck = Config::inst()->get(self::class, 'search_engine_date_fields_for_sorting');
-            foreach ($fieldsToCheck as $field) {
-                if (! empty($sourceObject->{$field})) {
-                    return $sourceObject->{$field};
-                }
-            }
-        }
+        return Injector::inst()->get(SearchEngineSourceObjectApi::class)
+            ->SearchEngineSourceObjectSortDate($sourceObject);
     }
 
     /**
@@ -356,15 +343,11 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
-
-        return SearchEngineDataObjectApi::fields_for_indexing($sourceObject);
+        return Injector::inst()->get(SearchEngineSourceObjectApi::class)
+            ->SearchEngineFieldsForIndexing($sourceObject);
     }
 
-    /**
-     * @casted variable
-     * @return string
-     */
-    public function getTitle()
+    public function getObjectClassName() : string
     {
         $className = $this->DataObjectClassName;
         if (! class_exists($className)) {
@@ -376,6 +359,17 @@ class SearchEngineDataObject extends DataObject
             $objectClassName = Injector::inst()->get($className)->singular_name();
             self::$_object_class_name[$className] = $objectClassName;
         }
+        return self::$_object_class_name[$className];
+
+    }
+
+    /**
+     * @casted variable
+     * @return string
+     */
+    public function getTitle() : string
+    {
+        $objectClassName = $this->getObjectClassName();
         $object = $this->SourceObject();
         if ($object) {
             $objectName = $object->getTitle();
@@ -582,82 +576,23 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
-        if ($sourceObject) {
-            if ($sourceObject->hasMethod('SearchEngineResultsTemplatesProvider')) {
-                return $sourceObject->SearchEngineResultsTemplatesProvider($moreDetails);
-            }
-            $template = Config::inst()->get($sourceObject->ClassName, 'search_engine_results_templates');
-            if ($template) {
-                if ($moreDetails) {
-                    return [$template . '_MoreDetails', $template];
-                }
-                return [$template];
-            }
-            $arrayOfTemplates = [];
-            $parentClasses = class_parents($sourceObject);
-            $firstTemplate = 'SearchEngineResultItem_' . $sourceObject->ClassName;
-            if ($moreDetails) {
-                $arrayOfTemplates = [$firstTemplate . '_MoreDetails', $firstTemplate];
-            } else {
-                $arrayOfTemplates = [$firstTemplate];
-            }
-            foreach ($parentClasses as $parent) {
-                if ($parent === DataObject::class) {
-                    break;
-                }
-                if ($moreDetails) {
-                    $arrayOfTemplates[] = 'SearchEngineResultItem_' . $parent . '_MoreDetails';
-                }
-                $arrayOfTemplates[] = 'SearchEngineResultItem_' . $parent;
-            }
-            if ($moreDetails) {
-                $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject_MoreDetails';
-            }
-            $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject';
-
-            return $arrayOfTemplates;
-        }
-        return [];
+        return Injector::inst()->get(SearchEngineSourceObjectApi::class)
+            ->SearchEngineResultsTemplates(
+                $sourceObject,
+                $moreDetails
+            );
     }
 
     public function SearchEngineFieldsToBeIndexedHumanReadable($sourceObject = null, $includeExample = false)
     {
-        $str = 'ERROR';
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
-        if ($sourceObject) {
-            $levels = $sourceObject->SearchEngineFieldsForIndexing();
-            if (is_array($levels)) {
-                ksort($levels);
-                $fieldLabels = $sourceObject->fieldLabels();
-                $str = '<ul>';
-                foreach ($levels as $level => $fieldArray) {
-                    $str .= '<li><strong>' . $level . '</strong><ul>';
-                    foreach ($fieldArray as $field) {
-                        if (isset($fieldLabels[$field])) {
-                            $title = $fieldLabels[$field] . ' [' . $field . ']';
-                        } else {
-                            $title = $field;
-                        }
-                        if ($includeExample) {
-                            $fields = explode('.', $field);
-                            $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
-                            $str .= '<li> - <strong>' . $title . '</strong> <em>' . $data . '</em></li>';
-                        } else {
-                            $str .= '<li> - ' . $title . '</li>';
-                        }
-                    }
-                    $str .= '</ul></li>';
-                    //$str .= '<li>results in: <em>'.$this->SearchEngineFullContentForIndexing()[$level].'</em></li></ol>';
-                }
-                $str .= '</ul>';
-            } else {
-                $str = _t('SearchEngineDataObject.NO_FIELDS', '<p>No fields are listed for indexing.</p>');
-            }
-        }
-
-        return $str;
+        return Injector::inst()->get(SearchEngineSourceObjectApi::class)
+            ->SearchEngineFieldsToBeIndexedHumanReadable(
+                $sourceObject,
+                $includeExample
+            );
     }
 
 
@@ -732,8 +667,8 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
-
-        return SearchEngineDataObjectApi::content_for_index_building($sourceObject);
+        return Injector::inst()->get(SearchEngineSourceObjectApi::class)
+            ->SearchEngineFullContentForIndexingBuild($sourceObject);
     }
 
     #############################################
