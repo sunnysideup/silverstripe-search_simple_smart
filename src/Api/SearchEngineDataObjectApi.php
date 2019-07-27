@@ -4,6 +4,9 @@ namespace Sunnysideup\SearchSimpleSmart\Api;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
@@ -43,7 +46,7 @@ class SearchEngineDataObjectApi
 
             return $item;
         }
-        user_error('DataObject expected, instead, the following was provided: ' . var_dump($obj));
+        user_error('Object does not have expected extension: '.SearchEngineMakeSearchable::class.'.');
     }
 
     public static function start_indexing_mode()
