@@ -6,6 +6,7 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\SS_List;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 abstract class SearchEngineFilterForDescriptor
 {

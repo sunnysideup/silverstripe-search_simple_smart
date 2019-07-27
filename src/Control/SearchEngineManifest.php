@@ -9,6 +9,7 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\View\Requirements;
 use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 
 class SearchEngineManifest extends Controller
 {

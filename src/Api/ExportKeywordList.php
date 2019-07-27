@@ -39,12 +39,12 @@ class ExportKeywordList
                 foreach ($rows as $row) {
                     $array[] = str_replace('\'', '', Convert::raw2js($row['Keyword']));
                 }
-                $written = null;
+                $written = 0;
                 if ($fh = fopen($fileName, 'w')) {
                     $written = fwrite($fh, 'SearchEngineInitFunctions.keywordList = [\'' . implode('\',\'', $array) . '\'];');
                     fclose($fh);
                 }
-                if (! $written) {
+                if (intval($written) === 0) {
                     user_error('Could not write keyword list to $fileName', E_USER_NOTICE);
                 }
                 return 'Writing: <br />' . implode('<br />', $array);
