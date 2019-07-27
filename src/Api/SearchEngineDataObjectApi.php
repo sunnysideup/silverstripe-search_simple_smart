@@ -5,6 +5,7 @@ namespace Sunnysideup\SearchSimpleSmart\Api;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 class SearchEngineDataObjectApi
@@ -32,11 +33,11 @@ class SearchEngineDataObjectApi
                 'DataObjectClassName' => $obj->ClassName,
                 'DataObjectID' => $obj->ID,
             ];
-            $item = DataObject::get_one(self::class, $fieldArray);
+            $item = DataObject::get_one(SearchEngineDataObject::class, $fieldArray);
             if ($item || $doNotMake) {
                 //do nothing;
             } else {
-                $item = self::create($fieldArray);
+                $item = SearchEngineDataObject::create($fieldArray);
                 $item->write();
             }
 
@@ -79,7 +80,7 @@ class SearchEngineDataObjectApi
             $finalClasses = [];
 
             //check for inclusions
-            $include = Config::inst()->get(self::class, 'classes_to_include');
+            $include = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include');
             if (is_array($include) && count($include)) {
                 foreach ($include as $includeOne) {
                     $includeClassNames = array_merge($includeClassNames, ClassInfo::subclassesFor($includeOne));
@@ -93,7 +94,7 @@ class SearchEngineDataObjectApi
             } else {
                 //lets see which ones are excluded from full list.
                 $testArray = $allClasses;
-                $exclude = Config::inst()->get(self::class, 'classes_to_exclude');
+                $exclude = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
                 if (is_array($exclude) && count($exclude)) {
                     foreach ($exclude as $excludeOne) {
                         $excludeClassNames = array_merge($excludeClassNames, ClassInfo::subclassesFor($excludeOne));
