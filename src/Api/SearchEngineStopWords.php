@@ -775,7 +775,7 @@ class SearchEngineStopWords
 
     ];
 
-    public static function get_list($size)
+    public static function get_list($size) : array
     {
         $listNames = [
             'short',
@@ -794,9 +794,9 @@ class SearchEngineStopWords
             }
             if ($name === $size) {
                 sort($covered);
-
-                return $covered;
+                break;
             }
         }
+        return $covered;
     }
 }

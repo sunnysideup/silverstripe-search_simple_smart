@@ -8,6 +8,8 @@ use SilverStripe\ORM\Connect\MySQLSchemaManager;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
 
 /**
  * Full Content for each dataobject, separated by level of importance.

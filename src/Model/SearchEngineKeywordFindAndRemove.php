@@ -7,6 +7,9 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStopWords;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
+
 
 class SearchEngineKeywordFindAndRemove extends DataObject
 {

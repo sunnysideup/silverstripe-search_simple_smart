@@ -10,6 +10,7 @@ use SilverStripe\CMS\Model\VirtualPage;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ErrorPage\ErrorPage;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
@@ -529,36 +530,23 @@ class SearchEngineDataObject extends DataObject
     #####################
 
     /**
-     * @param boolean $moreDetails
-     * @return html
+     * @param bool $moreDetails
+     * @return string
      */
-    public function getHTMLOutput($moreDetails = false)
+    public function getHTMLOutput($moreDetails = false) : DBField
     {
-        $obj = $this->SourceObject();
-        if ($obj) {
-            $arrayOfTemplates = $obj->SearchEngineResultsTemplates($moreDetails);
-            $cacheKey = 'SearchEngine_' . $obj->ClassName . '_' . abs($obj->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
-
-            $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
-
-            $templateRender = null;
-            if ($cache->has($cacheKey)) {
-                $templateRender = $cache->get($cacheKey);
-            }
-            if ($templateRender) {
-                $templateRender = unserialize($templateRender);
-            } else {
-                $templateRender = $obj->renderWith($arrayOfTemplates);
-                $cache->set($cacheKey, serialize($templateRender));
-            }
-            return $templateRender;
-        }
+        $sourceObject = $this->SourceObject();
+        return Injector::inst()->get(SearchEngineSourceObjectApi::class)
+            ->getHTMLOutput(
+                $sourceObject,
+                $moreDetails
+            );
     }
 
     /**
-     * @return html
+     * @return string
      */
-    public function getHTMLOutputMoreDetails()
+    public function getHTMLOutputMoreDetails() : DBField
     {
         return $this->getHTMLOutput(true);
     }
@@ -683,7 +671,7 @@ class SearchEngineDataObject extends DataObject
     public function getKey($classNameOnly = false) : string
     {
         if ($classNameOnly) {
-            return $this->DataObjectClassName;
+            return $this->DataObjectClassName . '';
         }
         return $this->DataObjectID . '_' . $this->DataObjectClassName;
     }

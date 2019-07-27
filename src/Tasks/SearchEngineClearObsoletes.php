@@ -29,7 +29,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
 
     /**
      * this function runs the SearchEngineRemoveAll task
-     * @param var $request
+     * @param HTTPRequest $request
      */
     public function run($request)
     {

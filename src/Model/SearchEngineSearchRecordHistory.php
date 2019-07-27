@@ -6,6 +6,8 @@ use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\Forms\FieldList;
+
 
 /**
  * the DataObject ClassName + ID is recorded separately

@@ -6,6 +6,8 @@ use SilverStripe\Core;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\FieldType\DBVarchar;
+use SilverStripe\Core\Extension;
 use Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm;
 
 class SearchEngineContentControllerExtension extends Extension
@@ -41,7 +43,7 @@ class SearchEngineContentControllerExtension extends Extension
      * this function returns a new Search Engine Form
      * @return SearchEngineBasicForm
      */
-    public function SearchEngineBasicForm()
+    public function SearchEngineBasicForm() : SearchEngineBasicForm
     {
         $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineBasicForm) {
@@ -61,7 +63,7 @@ class SearchEngineContentControllerExtension extends Extension
      * this function returns a new Search Engine Form
      * @return SearchEngineBasicForm
      */
-    public function SearchEngineSuperBasicForm()
+    public function SearchEngineSuperBasicForm() : SearchEngineBasicForm
     {
         $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineSuperBasicForm) {
@@ -74,7 +76,7 @@ class SearchEngineContentControllerExtension extends Extension
      * this function returns a new Search Engine Form
      * @return SearchEngineBasicForm
      */
-    public function SearchEngineCustomForm()
+    public function SearchEngineCustomForm() : SearchEngineBasicForm
     {
         $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineCustomForm) {
@@ -84,7 +86,7 @@ class SearchEngineContentControllerExtension extends Extension
         return $this->_mySearchEngineCustomForm;
     }
 
-    public function SearchEngineKeywordsPhrase()
+    public function SearchEngineKeywordsPhrase() : DBVarchar
     {
         $val = isset($_GET['SearchEngineKeywords']) ? $_GET['SearchEngineKeywords'] : '';
 

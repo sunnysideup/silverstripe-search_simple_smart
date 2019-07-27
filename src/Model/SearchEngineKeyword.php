@@ -8,6 +8,9 @@ use SilverStripe\ORM\Connect\MySQLSchemaManager;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
+
 
 /**
  * getExtraData($componentName, $itemID) method on the ManyManyList to retrieve those extra fields values:

@@ -14,6 +14,9 @@ use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStemming;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
+
 
 class SearchEngineSearchRecord extends DataObject implements Flushable
 {
@@ -329,7 +332,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * note that it returns the list as an array
      * to match getListOfIDs
      *
-     * @param SS_List $list
+     * @param $list
      * @param string $filterStep ("RAW", "SQL", "CUSTOM")
      *
      * @return string

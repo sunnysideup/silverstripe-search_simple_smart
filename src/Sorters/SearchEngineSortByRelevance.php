@@ -4,6 +4,8 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DB;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataList;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
@@ -62,7 +64,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      * @param SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
-     * @return SS_List
+     * @return DataList
      */
     public function doCustomSort($objects, $searchRecord)
     {
