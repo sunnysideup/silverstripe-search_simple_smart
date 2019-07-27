@@ -4,6 +4,9 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
+
 
 /**
  * keyword replace engine

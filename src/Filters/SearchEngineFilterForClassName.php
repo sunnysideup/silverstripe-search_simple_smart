@@ -73,11 +73,11 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      *
      * @param array $filterArray
      *
-     * @return array| null
+     * @return array
      */
     public function getSqlFilterArray($filterArray)
     {
-        if (! $filterArray) {
+        if (empty($filterArray)) {
             $filterArray = array_keys($this->getFilterList());
         }
         $array = [];

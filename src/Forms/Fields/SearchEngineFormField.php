@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
+use Silvetripe\Forms\Field;
 
 class SearchEngineFormField extends LiteralField
 {
@@ -27,7 +28,7 @@ class SearchEngineFormField extends LiteralField
 
     public function __construct($name, $title = '')
     {
-        return parent::__construct($name, $title);
+        parent::__construct($name, $title);
     }
 
     public function FieldHolder($properties = [])
@@ -43,25 +44,25 @@ class SearchEngineFormField extends LiteralField
          */
         if (! $this->minimumCount < 2) {
             $sql = '
-				SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount
-				FROM "SearchEngineSearchRecordHistory"
-				WHERE  SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
-					AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )
-					AND MemberID = 0
-			';
+                SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount
+                FROM "SearchEngineSearchRecordHistory"
+                WHERE  SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
+                    AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )
+                    AND MemberID = 0
+            ';
             $totalCount = DB::query($sql)->value();
             $this->minimumCount = round($totalCount / 1000);
         }
         $sql = '
-			SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
-				FROM "SearchEngineSearchRecordHistory"
-			WHERE SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
-				AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )
-				AND MemberID = 0
-			GROUP BY "Phrase"
-			HAVING myCount >= ' . $this->minimumCount . '
-			ORDER BY myCount DESC
-		';
+            SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
+                FROM "SearchEngineSearchRecordHistory"
+            WHERE SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
+                AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )
+                AND MemberID = 0
+            GROUP BY "Phrase"
+            HAVING myCount >= ' . $this->minimumCount . '
+            ORDER BY myCount DESC
+        ';
         $data = DB::query($sql);
         if (! $this->minimumCount) {
             $this->minimumCount++;
@@ -71,9 +72,9 @@ class SearchEngineFormField extends LiteralField
             $content .= '<h2>' . $this->title . '</h2>';
         }
         $content .= '
-		<div id="SearchHistoryTableForCMS">
-			<h3>Search Phrases entered at least ' . $this->minimumCount . ' times between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) . ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) . '</h3>
-			<table id="HighToLow" style="width: 100%">';
+        <div id="SearchHistoryTableForCMS">
+            <h3>Search Phrases entered at least ' . $this->minimumCount . ' times between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) . ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) . '</h3>
+            <table id="HighToLow" style="width: 100%">';
         $list = [];
         foreach ($data as $key => $row) {
             //for the highest count, we work out a max-width
@@ -83,42 +84,42 @@ class SearchEngineFormField extends LiteralField
             $multipliedWidthInPercentage = floor(($row['myCount'] / $maxwidth) * 100);
             $list[$row['myCount'] . '-' . $key] = $row['Title'];
             $content .= '
-				<tr>
-					<td style="text-align: right; width: 30%; padding: 5px;">' . $row['Title'] . '</td>
-					<td style="background-color: silver;  padding: 5px; width: 70%;">
-						<div style="width: ' . $multipliedWidthInPercentage . '%; background-color: #0066CC; color: #fff;">' . $row['myCount'] . '</div>
-					</td>
-				</tr>';
+                <tr>
+                    <td style="text-align: right; width: 30%; padding: 5px;">' . $row['Title'] . '</td>
+                    <td style="background-color: silver;  padding: 5px; width: 70%;">
+                        <div style="width: ' . $multipliedWidthInPercentage . '%; background-color: #0066CC; color: #fff;">' . $row['myCount'] . '</div>
+                    </td>
+                </tr>';
         }
         $content .= '
-			</table>';
+            </table>';
         asort($list);
         $content .= '
-			<h3>A - Z</h3>
-			<table id="AToz" style="width: 100%">';
+            <h3>A - Z</h3>
+            <table id="AToz" style="width: 100%">';
         foreach ($list as $key => $title) {
             $array = explode('-', $key);
             $multipliedWidthInPercentage = floor(($array[0] / $maxwidth) * 100);
             $content .= '
-				<tr>
-					<td style="text-align: right; width: 30%; padding: 5px;">' . $title . '</td>
-					<td style="background-color: silver;  padding: 5px; width: 70%">
-						<div style="width: ' . $multipliedWidthInPercentage . '%; background-color: #0066CC; color: #fff;">' . trim($array[0]) . '</div>
-					</td>
-				</tr>';
+                <tr>
+                    <td style="text-align: right; width: 30%; padding: 5px;">' . $title . '</td>
+                    <td style="background-color: silver;  padding: 5px; width: 70%">
+                        <div style="width: ' . $multipliedWidthInPercentage . '%; background-color: #0066CC; color: #fff;">' . trim($array[0]) . '</div>
+                    </td>
+                </tr>';
         }
         $content .= '
-			</table>
-		</div>';
+            </table>
+        </div>';
 
         return $content;
     }
 
     /**
      * @param int $days
-     * @return Field
+     * @return self
      */
-    public function setNumberOfDays($days)
+    public function setNumberOfDays($days) : self
     {
         $this->numberOfDays = intval($days);
         return $this;
@@ -126,9 +127,9 @@ class SearchEngineFormField extends LiteralField
 
     /**
      * @param int $count
-     * @return Field
+     * @return self
      */
-    public function setMinimumCount($count)
+    public function setMinimumCount($count) : self
     {
         $this->minimumCount = intval($count);
         return $this;
@@ -136,9 +137,9 @@ class SearchEngineFormField extends LiteralField
 
     /**
      * @param int $count
-     * @return Field
+     * @return self
      */
-    public function setEndingDaysBack($count)
+    public function setEndingDaysBack($count) : self
     {
         $this->endingDaysBack = intval($count);
         return $this;

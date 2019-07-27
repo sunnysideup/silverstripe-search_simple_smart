@@ -26,6 +26,10 @@ use SilverStripe\Core\Injector\Injectable;
 
 class SearchEngineStemming
 {
+    use Extensible;
+    use Injectable;
+    use Configurable;
+    use SearchEngineStemmingHelperTrait;
 
     private const END_REPLACERS = [
         'a' => 'al',
@@ -38,10 +42,6 @@ class SearchEngineStemming
         'a' => 'er',
     ];
 
-    use Extensible;
-    use Injectable;
-    use Configurable;
-    use SearchEngineStemmingHelperTrait;
 
     /**
      * Regex for matching a consonant

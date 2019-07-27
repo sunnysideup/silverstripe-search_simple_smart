@@ -6,6 +6,9 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
+
 
 class SearchEnginePunctuationFindAndRemove extends DataObject
 {
@@ -123,13 +126,13 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     }
 
     /**
-     * @param strig $character
+     * @param string $character
      * @return int
      */
-    public static function is_listed($character)
+    public static function is_listed($character) : bool
     {
         return self::get()
-            ->filter(['Character' => $character])->count();
+            ->filter(['Character' => $character])->count() ? true : false;
     }
 
     public function requireDefaultRecords()

@@ -16,6 +16,7 @@ use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\GroupedList;
 use SilverStripe\ORM\PaginatedList;
@@ -72,7 +73,7 @@ class SearchEngineBasicForm extends Form
 
     /**
      * alternative input field selector
-     * @var bool
+     * @var string
      */
     protected $displayedFormInputSelector = '';
 
@@ -193,7 +194,7 @@ class SearchEngineBasicForm extends Form
 
     /**
      * this method submits the Search Engine Form
-     * @param map $data
+     * @param array $data
      * @param SearchEngineBasicForm $form
      *
      * @return array
@@ -202,7 +203,9 @@ class SearchEngineBasicForm extends Form
     {
         if (Director::is_ajax()) {
             if ($this->outputAsJSON) {
-                $this->controller->response->addHeader('Content-Type', 'text/json');
+                if($this->controller->getResponse()) {
+                    $this->controller->getResponse()->addHeader('Content-Type', 'text/json');
+                }
             }
             Requirements::clear();
             return $this->workOutResults($data);
@@ -211,11 +214,11 @@ class SearchEngineBasicForm extends Form
     }
 
     /**
-     * @param int $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setIncludeSort($b)
+    public function setIncludeSort($b) : self
     {
         $this->includeSort = $b;
         $this->Fields()->removeByName('SortBy');
@@ -223,11 +226,11 @@ class SearchEngineBasicForm extends Form
     }
 
     /**
-     * @param int $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setIncludeFilter($b)
+    public function setIncludeFilter($b)  : self
     {
         $this->includeFilter = $b;
         $this->Fields()->removeByName('FilterFor');
@@ -328,11 +331,11 @@ class SearchEngineBasicForm extends Form
     }
 
     /**
-     * @param $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setUpdateBrowserHistory($b)
+    public function setUpdateBrowserHistory($b) : self
     {
         $this->updateBrowserHistory = $b;
         return $this;

@@ -3,6 +3,9 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
+
 use SilverStripe\Security\Permission;
 
 /**

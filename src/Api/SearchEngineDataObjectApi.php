@@ -14,8 +14,16 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
 
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
+
 class SearchEngineDataObjectApi
 {
+    use Extensible;
+    use Injectable;
+    use Configurable;
+
     /**
      * used for caching...
      * @var array

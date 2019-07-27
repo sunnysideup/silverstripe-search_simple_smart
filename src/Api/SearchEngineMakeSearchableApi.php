@@ -6,10 +6,16 @@ use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Config\Config;
 
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
 
 
 class SearchEngineMakeSearchableApi
 {
+    use Extensible;
+    use Injectable;
+    use Configurable;
 
     /**
      * @var array
@@ -24,7 +30,7 @@ class SearchEngineMakeSearchableApi
      *
      * @return string
      */
-    public static function make_searchable_rel_object($object, $fields, $str = '')
+    public static function make_searchable_rel_object($object, $fields, $str = '') : string
     {
         if (is_array($fields) && count($fields)) {
             $fieldCount = count($fields);
@@ -32,7 +38,7 @@ class SearchEngineMakeSearchableApi
             if (substr($possibleMethod, 0, 3) === 'get' && $object->hasMethod($possibleMethod) && $fieldCount === 1) {
                 $str .= ' ' . $object->{$possibleMethod}() . ' ';
             } else {
-                $dbArray = \search_engine_rel_fields($object, 'db');
+                $dbArray = self::search_engine_rel_fields($object, 'db');
                 //db field
                 if (isset($dbArray[$fields[0]])) {
                     $dbField = $fields[0];

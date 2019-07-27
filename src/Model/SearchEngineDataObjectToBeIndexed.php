@@ -9,6 +9,8 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\Member;
+use SilverStripe\Forms\FieldList;
 
 /**
  * presents a list of dataobjects

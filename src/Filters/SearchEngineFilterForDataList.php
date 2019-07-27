@@ -35,14 +35,14 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param SS_List|null $list
+     * @param SS_List $list
      *
      * @return array|null
      */
     public function getSqlFilterArray($list)
     {
-        if ($filterArray instanceof SS_List) {
-            if ($filterArray->count() === 0) {
+        if ($list instanceof SS_List) {
+            if ($list->count() === 0) {
                 return ['ID' => -1];
             }
             $ids = $list->column('ID');

@@ -4,6 +4,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Core\ClassInfo;
@@ -14,6 +15,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
+use Psr\SimpleCache\CacheInterface;
 
 class SearchEngineSourceObjectApi
 {
@@ -197,6 +199,35 @@ class SearchEngineSourceObjectApi
         }
 
         return $str;
+    }
+
+
+
+    /**
+     * @param bool $moreDetails
+     */
+    public function getHTMLOutput($sourceObject, $moreDetails = false) : DBField
+    {
+        if ($sourceObject) {
+            $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
+            $cacheKey = 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
+
+            $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
+
+            $templateRender = null;
+            if ($cache->has($cacheKey)) {
+                $templateRender = $cache->get($cacheKey);
+            }
+            if ($templateRender) {
+                $templateRender = unserialize($templateRender);
+            } else {
+                $templateRender = $sourceObject->renderWith($arrayOfTemplates);
+                $cache->set($cacheKey, serialize($templateRender));
+            }
+            return $templateRender;
+        }
+
+        return DBField::create_field('HTMLText', '');
     }
 
 }
