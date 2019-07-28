@@ -235,10 +235,17 @@ class SearchEngineCoreSearchMachine
      */
     public function run($searchPhrase, $filterProviders = [], $sortProvider = '', $sortProviderValues = null)
     {
+
         $this->searchPhrase = $searchPhrase;
-        $this->filterProviders = $filterProviders;
-        $this->sortProvider = $sortProvider;
-        $this->sortProviderValues = $sortProviderValues;
+        if(! empty($filterProviders)) {
+            $this->filterProviders += $filterProviders;
+        }
+        if(! empty($sortProvider)) {
+            $this->sortProvider = $sortProvider;
+        }
+        if(! empty($sortProviderValues)) {
+            $this->sortProviderValues = $sortProviderValues;
+        }
 
         $this->runGetGetVars();
 

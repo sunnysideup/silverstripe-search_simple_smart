@@ -147,45 +147,21 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return $this->Config()->get('plural_name');
     }
 
-    /**
-     * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
-     * @return boolean
-     */
     public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
-    /**
-     * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
-     * @return boolean
-     */
     public function canEdit($member = null)
     {
         return false;
     }
 
-    /**
-     * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
-     * @return boolean
-     */
     public function canDelete($member = null)
     {
         return false;
     }
 
-    /**
-     * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
-     * @return boolean
-     */
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
