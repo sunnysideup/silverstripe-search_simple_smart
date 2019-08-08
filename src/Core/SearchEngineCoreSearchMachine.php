@@ -48,7 +48,7 @@ class SearchEngineCoreSearchMachine
     /**
      * @var bool
      */
-    protected $debug = false;
+    protected $debug = true;
 
     /**
      * @var bool
@@ -298,7 +298,9 @@ class SearchEngineCoreSearchMachine
 
     protected function runGetGetVars()
     {
-        if ((! empty($_GET['searchenginedebug']) || SiteConfig::current_site_config()->SearchEngineDebug) && Permission::check('SEARCH_ENGINE_ADMIN')) {
+        $test1 = (! empty($_GET['searchenginedebug']) || SiteConfig::current_site_config()->SearchEngineDebug);
+        $test2 = Permission::check('SEARCH_ENGINE_ADMIN');
+        if ($test1 && $test2) {
             $this->debug = true;
         }
         if (isset($_GET['flush'])) {
@@ -488,14 +490,14 @@ class SearchEngineCoreSearchMachine
         $this->debugArray[] = 'Cleaned Searched: <pre>' . print_r($this->searchRecord->FinalPhrase, 1) . '</pre>';
         $this->debugArray[] = 'Keywords SQL (excludes keywords that are not in index): <pre> (' . implode(') AND (', $this->keywordArray) . ')</pre>';
         $this->debugArray[] = '---------------- Filters --------------';
-        $this->debugArray[] = "STEP 1: RAW Filter ${this}->{filter1}";
-        $this->debugArray[] = "... RAW matches ${this}->{matches1}";
+        $this->debugArray[] = "STEP 1: RAW Filter ".$this->filter1;
+        $this->debugArray[] = "... RAW matches $this->matches1";
         $this->debugArray[] = '<hr />';
-        $this->debugArray[] = "STEP 2: SQL Filter ${this}->{filter2}";
-        $this->debugArray[] = "... SQL matches ${this}->{matches2}";
+        $this->debugArray[] = "STEP 2: SQL Filter ".$this->filter2;
+        $this->debugArray[] = "... SQL matches ".$this->matches2;
         $this->debugArray[] = '<hr />';
-        $this->debugArray[] = "STEP 3: CUSTOM Filter ${this}->{filter3}";
-        $this->debugArray[] = "... CUSTOM matches ${this}->{matches3}";
+        $this->debugArray[] = "STEP 3: CUSTOM Filter ".$this->filter3;
+        $this->debugArray[] = "... CUSTOM matches ".$this->matches3;
         $this->debugArray[] = '<hr />';
         $this->debugArray[] = '---------------- Sorting --------------';
         $this->debugArray[] = '<hr />';
