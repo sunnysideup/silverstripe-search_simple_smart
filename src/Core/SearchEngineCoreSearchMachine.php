@@ -48,7 +48,7 @@ class SearchEngineCoreSearchMachine
     /**
      * @var bool
      */
-    protected $debug = true;
+    protected $debug = false;
 
     /**
      * @var bool
