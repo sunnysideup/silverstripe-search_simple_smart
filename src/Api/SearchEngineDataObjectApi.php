@@ -124,8 +124,7 @@ class SearchEngineDataObjectApi
             foreach ($testArray as $className) {
                 //does it have the extension?
                 if ($className::has_extension(SearchEngineMakeSearchable::class)) {
-                    $objectClassName = $sourceObject->getObjectClassName();
-                    $finalClasses[$className] = $objectClassName;
+                    $finalClasses[$className] = Injector::inst()->get($className)->i18n_singular_name();
                 }
             }
             self::$_searchable_class_names = $finalClasses;
