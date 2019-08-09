@@ -348,8 +348,13 @@ class SearchEngineBasicForm extends Form
             if ($this->includeSort) {
                 $this->Fields()->insertAfter(
                     //TextField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
-                    OptionsetField::create('SortBy', _t('SearchEngineBasicForm.SORT_BY', 'Sort by ...'), $sortBy, $default),
-                    'SearchEngineKeywords'
+                    'SearchEngineKeywords',
+                    OptionsetField::create(
+                        'SortBy',
+                        _t('SearchEngineBasicForm.SORT_BY', 'Sort by ...'),
+                        $sortBy,
+                        $default
+                    )
                 );
             } else {
                 $this->Fields()->insertAfter(
