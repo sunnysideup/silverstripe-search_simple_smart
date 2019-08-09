@@ -408,7 +408,7 @@ class SearchEngineDataObject extends DataObject
             self::$_source_objects_exists[$key] = false;
             $className = $this->DataObjectClassName;
             $id = $this->DataObjectID;
-            if($id && $className && class_exists($classname)) {
+            if($id && $className && class_exists($className)) {
                 self::$_source_objects_exists[$key] = $className::get()
                     ->filter(['ID' => $id])
                     ->count() === 1
