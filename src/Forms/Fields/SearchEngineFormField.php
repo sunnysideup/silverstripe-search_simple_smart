@@ -76,10 +76,10 @@ class SearchEngineFormField extends LiteralField
             <h3>Search Phrases entered at least ' . $this->minimumCount . ' times between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) . ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) . '</h3>
             <table id="HighToLow" style="width: 100%">';
         $list = [];
-        foreach ($data as $key => $row) {
+        $maxwidth = -1;
+        foreach ($data as $row) {
             //for the highest count, we work out a max-width
-            $maxwidth = 1000;
-            if (! $key) {
+            if ($maxwidth === -1) {
                 $maxwidth = $row['myCount'];
             }
             $multipliedWidthInPercentage = floor(($row['myCount'] / $maxwidth) * 100);
