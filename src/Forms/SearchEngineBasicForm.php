@@ -369,8 +369,8 @@ class SearchEngineBasicForm extends Form
             if ($this->includeFilter) {
                 $defaults = isset($_GET['FilterFor']) ? $_GET['FilterFor'] : [];
                 $this->Fields()->insertAfter(
-                    CheckboxSetField::create('FilterFor', _t('SearchEngineBasicForm.FILTER_FOR', 'Filter for ...'), $filterFor)->setDefaultItems($defaults),
-                    'SortBy'
+                    'SortBy',
+                    CheckboxSetField::create('FilterFor', _t('SearchEngineBasicForm.FILTER_FOR', 'Filter for ...'), $filterFor)->setDefaultItems($defaults)
                 );
             }
         }
