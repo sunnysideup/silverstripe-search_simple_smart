@@ -137,7 +137,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
         parent::requireDefaultRecords();
         if (Config::inst()->get(self::class, 'add_defaults') === true) {
             $defaults = Config::inst()->get(self::class, 'defaults');
-            foreach (self::$defaults as $default) {
+            foreach ($defaults as $default) {
                 if (! self::is_listed($default)) {
                     DB::alteration_message("Creating a punctuation: ".$default, 'created');
                     $obj = self::create();
