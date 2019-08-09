@@ -50,10 +50,6 @@ class SearchEngineSourceObjectApi
     {
         $className = $sourceObject->getKey(true);
         if (! isset(self::$_search_engine_fields_for_indexing[$className])) {
-            $levelFields = [
-                1 => [],
-                2 => [],
-            ];
             $levelFields = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
             if (is_array($levelFields) && count($levelFields)) {
                 //do nothing

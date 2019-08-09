@@ -48,7 +48,7 @@ class SearchEngineDataObjectApi
                 'DataObjectClassName' => $obj->ClassName,
                 'DataObjectID' => $obj->ID,
             ];
-            $item = DataObject::get_one(SearchEngineDataObject::class, $fieldArray);
+            $item = SearchEngineDataObject::get(SearchEngineDataObject::class, $fieldArray)->first();
             if ($item || $doNotMake) {
                 //do nothing;
             } else {
