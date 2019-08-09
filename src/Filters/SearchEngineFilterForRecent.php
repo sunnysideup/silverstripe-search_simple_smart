@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
+use SilverStripe\ORM\SS_List;
 
 class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
 {

@@ -469,13 +469,13 @@ class SearchEngineCoreSearchMachine
         $this->listOfIDsSQLAsArray = explode(',', $this->listOfIDsSQLString);
         $this->listOfIDsCustomAsArray = explode(',', $this->listOfIDsCustomAsString);
         $this->matches1 =
-            count($this->listOfIDsAsString) .
+            count($this->listOfIDsAsArray) .
             ': <pre>' . $this->fancyPrintIDList($this->listOfIDsAsArray) . '</pre>';
         $this->matches2 =
-            count($this->listOfIDsSQLString) .
+            count($this->listOfIDsSQLAsArray) .
             ': <pre>' . $this->fancyPrintIDList($this->listOfIDsSQLAsArray) . '</pre>';
         $this->matches3 =
-            count($this->listOfIDsCustomAsString) .
+            count($this->listOfIDsCustomAsArray) .
             ': <pre>' . $this->fancyPrintIDList($this->listOfIDsCustomAsArray) . '</pre>';
     }
 
