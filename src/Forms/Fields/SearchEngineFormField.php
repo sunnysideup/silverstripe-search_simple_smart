@@ -77,7 +77,7 @@ class SearchEngineFormField extends LiteralField
             <table id="HighToLow" style="width: 100%">';
         $list = [];
         $maxwidth = -1;
-        foreach ($data as $row) {
+        foreach ($data as $key => $row) {
             //for the highest count, we work out a max-width
             if ($maxwidth === -1) {
                 $maxwidth = $row['myCount'];
