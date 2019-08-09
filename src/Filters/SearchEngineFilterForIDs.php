@@ -43,11 +43,11 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
      *
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      *
      * @return array| null
      */
-    public function getSqlFilterArray($filterArray)
+    public function getSqlFilterArray($filterArray): ?array
     {
         return ['DataObjectID' => $filterArray];
     }
@@ -57,7 +57,7 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      * the filter array are the items selected by the
      * user, based on the filter options listed above
      * @see: getFilterList
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      * @return boolean
      */
     public function hasCustomFilter($filterArray)

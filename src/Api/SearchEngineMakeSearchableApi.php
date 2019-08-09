@@ -58,7 +58,7 @@ class SearchEngineMakeSearchableApi
                     //has_one relation
                     if (isset($hasOneArray[$method])) {
                         $foreignObject = $object->{$method}();
-                        $str .= ' ' . self::search_engine_rel_fields($foreignObject, $fields) . ' ';
+                        $str .= ' ' . self::make_searchable_rel_object($foreignObject, $fields) . ' ';
                     } else {
                         //many relation
                         $manyArray = array_merge(
@@ -90,14 +90,19 @@ class SearchEngineMakeSearchableApi
      *
      * @return array
      */
-    public static function search_engine_rel_fields($object, $relType)
+    public static function search_engine_rel_fields($object, $relType): array
     {
         if (! isset(self::$_array_of_relations[$object->ClassName])) {
             self::$_array_of_relations[$object->ClassName] = [];
         }
         if (! isset(self::$_array_of_relations[$object->ClassName][$relType])) {
-            self::$_array_of_relations[$object->ClassName][$relType] = Config::inst()->get($object->ClassName, $relType);
+            $value =  Config::inst()->get($object->ClassName, $relType);
+            if(! is_array($value)) {
+                $value = [];
+            }
+            self::$_array_of_relations[$object->ClassName][$relType] = $value;
         }
+
         return self::$_array_of_relations[$object->ClassName][$relType];
     }
 }

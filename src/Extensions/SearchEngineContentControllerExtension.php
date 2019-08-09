@@ -86,7 +86,10 @@ class SearchEngineContentControllerExtension extends Extension
         return $this->_mySearchEngineCustomForm;
     }
 
-    public function SearchEngineKeywordsPhrase() : DBVarchar
+    /**
+     * @return DBVarchar
+     */
+    public function SearchEngineKeywordsPhrase()
     {
         $val = isset($_GET['SearchEngineKeywords']) ? $_GET['SearchEngineKeywords'] : '';
 

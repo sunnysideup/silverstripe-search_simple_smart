@@ -35,18 +35,18 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param SS_List $list
+     * @param array|SS_List|null $filterArray
      *
      * @return array|null
      */
-    public function getSqlFilterArray($list)
+    public function getSqlFilterArray($filterArray): ?array
     {
-        if ($list instanceof SS_List) {
-            if ($list->count() === 0) {
+        if ($filterArray instanceof SS_List) {
+            if ($filterArray->count() === 0) {
                 return ['ID' => -1];
             }
-            $ids = $list->column('ID');
-            $classNames = $list->column('ClassName');
+            $ids = $filterArray->column('ID');
+            $classNames = $filterArray->column('ClassName');
             $preFilter = [];
             foreach ($ids as $position => $id) {
                 $className = $classNames[$position];
@@ -66,10 +66,10 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      * the filter array are the items selected by the
      * user, based on the filter options listed above
      * @see: getFilterList
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      * @return boolean
      */
-    public function hasCustomFilter($filterArray)
+    public function hasCustomFilter($filterArray): bool
     {
         return false;
     }

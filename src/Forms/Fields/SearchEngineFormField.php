@@ -4,7 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
-use Silvetripe\Forms\Field;
+use SilverStripe\Forms\FormField;
 
 class SearchEngineFormField extends LiteralField
 {
@@ -78,6 +78,7 @@ class SearchEngineFormField extends LiteralField
         $list = [];
         foreach ($data as $key => $row) {
             //for the highest count, we work out a max-width
+            $maxwidth = 1000;
             if (! $key) {
                 $maxwidth = $row['myCount'];
             }

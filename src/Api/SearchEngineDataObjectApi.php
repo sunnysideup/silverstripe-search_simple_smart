@@ -38,7 +38,7 @@ class SearchEngineDataObjectApi
      *
      * @return SearchEngineDataObject|null
      */
-    public static function find_or_make(DataObject $obj, $doNotMake = false)
+    public static function find_or_make(DataObject $obj, $doNotMake = false) : ?SearchEngineDataObject
     {
         if ($obj->hasExtension(SearchEngineMakeSearchable::class)) {
             if ($obj->SearchEngineExcludeFromIndex()) {
@@ -58,6 +58,7 @@ class SearchEngineDataObjectApi
 
             return $item;
         }
+        return null;
     }
 
     public static function start_indexing_mode()

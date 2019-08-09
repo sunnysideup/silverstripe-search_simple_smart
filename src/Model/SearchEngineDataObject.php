@@ -354,9 +354,7 @@ class SearchEngineDataObject extends DataObject
         if (! class_exists($className)) {
             return 'ERROR - class not found';
         }
-        if (isset(self::$_object_class_name[$className])) {
-            $objectClassName = self::$_object_class_name[$className];
-        } else {
+        if (! isset(self::$_object_class_name[$className])) {
             $objectClassName = Injector::inst()->get($className)->singular_name();
             self::$_object_class_name[$className] = $objectClassName;
         }
@@ -384,13 +382,17 @@ class SearchEngineDataObject extends DataObject
     /**
      * @return DataObject|null
      */
-    public function SourceObject()
+    public function SourceObject() : ?DataObject
     {
         $key = $this->getKey();
         if (! isset(self::$_source_objects[$key])) {
             $className = $this->DataObjectClassName;
-            $id = $this->DataObjectID;
-            self::$_source_objects[$key] = $className::get()->byID($id);
+            if($classname && class_exists($classname)) {
+                $id = $this->DataObjectID;
+                if($id) {
+                    self::$_source_objects[$key] = $className::get()->byID($id);
+                }
+            }
         }
 
         return self::$_source_objects[$key];

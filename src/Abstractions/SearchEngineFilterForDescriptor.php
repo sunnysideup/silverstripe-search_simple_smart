@@ -62,18 +62,18 @@ abstract class SearchEngineFilterForDescriptor
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      *
      * @return array| null
      */
-    abstract public function getSqlFilterArray($filterArray);
+    abstract public function getSqlFilterArray($filterArray): ?array;
 
     /**
      * do we need to do custom filtering
      * the filter array are the items selected by the
      * user, based on the filter options listed above
      * @see: getFilterList
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      * @return boolean
      */
     abstract public function hasCustomFilter($filterArray);
@@ -82,7 +82,7 @@ abstract class SearchEngineFilterForDescriptor
      * Does any custom filtering
      * @param SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      *
      * @return SS_List
      */

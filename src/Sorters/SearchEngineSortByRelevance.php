@@ -86,14 +86,15 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //look for complete phrase if there is more than one word.
             //exact full match of search phrase using relevance, level 1 first
             //and further upfront in text as second sort by.
-            if (strpos(trim($searchRecord->Phrase), ' ')) {
+            $phrase = (string) Convert::raw2sql($searchRecord->Phrase);
+            if (strpos(trim($phrase), ' ')) {
                 $sql = '
                     SELECT
                         "SearchEngineDataObject"."ID" AS MyID,
-                        (999999 - LOCATE(\'' . Convert::raw2sql($searchRecord->Phrase) . '\',"Content")) AS RELEVANCE
+                        (9999999 - LOCATE(\'' . $phrase . '\',"Content")) AS RELEVANCE
                     ' . $fromSQL . '
                     WHERE
-                        "Content" LIKE \'%' . Convert::raw2sql($searchRecord->Phrase) . '%\'
+                        "Content" LIKE \'%' . $phrase . '%\'
                         AND "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
                     ' . $sortSQL . '
                 ;';

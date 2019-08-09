@@ -5,6 +5,7 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 use SilverStripe\Security\Permission;
 use SilverStripe\Forms\FieldList;
 
@@ -134,9 +135,14 @@ class SearchEngineSearchRecordHistory extends DataObject
     public static function add_entry($searchEngineSearchRecord)
     {
         //a real request - lets start a new search record history ...
+        $currentUserID = 0;
+        $currentUser = Security::getCurrentUser();
+        if($currentUser) {
+            $currentUserID = $currentUser->ID;
+        }
         $fieldArray = [
             'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
-            'MemberID' => intval(Member::currentUserID()) - 0,
+            'MemberID' => $currentUserID - 0,
             'Session' => session_id(),
         ];
         //update latest search
