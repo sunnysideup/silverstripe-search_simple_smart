@@ -88,12 +88,17 @@ class SearchEngineBaseTask extends BuildTask
         if ($this->verbose) {
             echo '';
             // check that buffer is actually set before flushing
-            if (ob_get_length()) {
-                @ob_flush();
-                @flush();
-                @ob_end_flush();
+            try{
+                if (ob_get_length()) {
+                    ob_flush();
+                    flush();
+                    ob_end_flush();
+                }
+                ob_start();
+
+            } catch(\Exception $e) {
+                echo ' ';
             }
-            @ob_start();
             if ($bullet) {
                 DB::alteration_message($message, $type);
             } else {

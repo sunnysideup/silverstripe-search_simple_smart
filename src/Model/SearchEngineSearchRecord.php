@@ -316,17 +316,20 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     public function setListOfIDs($list, $filterStep): string
     {
         $field = $this->getListIDField($filterStep);
-        if ($list && $list instanceof SS_List && $list->count()) {
-            return $this->setListOfIDs($list->column('ID'), $filterStep);
-        } elseif (is_string($list) && $list) {
-            return $this->setListOfIDs(explode(',', $list), $filterStep);
-        } elseif (is_array($list) && $list) {
-            $this->{$field} = implode(',', array_unique($list));
-        } else {
-            $this->{$field} = '-1';
+        //default to nothing
+        $this->{$field} = -1;
+        if($list) {
+            if ($list instanceof SS_List && $list->count()) {
+                return $this->setListOfIDs($list->column('ID'), $filterStep);
+            } elseif (is_string($list)) {
+                return $this->setListOfIDs(explode(',', $list), $filterStep);
+            } elseif (is_array($list)) {
+                $this->{$field} = implode(',', array_unique($list));
+            }
         }
         $this->listOfIDsUpdateOnly = true;
         $this->write();
+
         return $this->{$field};
     }
 

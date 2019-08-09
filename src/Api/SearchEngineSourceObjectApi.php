@@ -26,7 +26,7 @@ class SearchEngineSourceObjectApi
      */
     private static $_search_engine_fields_for_indexing = [];
 
-    public function SearchEngineSourceObjectSortDate($sourceObject = null)
+    public function SearchEngineSourceObjectSortDate(?DataObject $sourceObject = null)
     {
         if ($sourceObject) {
             if ($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
@@ -54,30 +54,28 @@ class SearchEngineSourceObjectApi
                 1 => [],
                 2 => [],
             ];
-            if ($sourceObject) {
-                $levelFields = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
-                if (is_array($levelFields) && count($levelFields)) {
-                    //do nothing
-                } else {
-                    $levelOneFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields');
-                    $excludedFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields');
-                    $dbArray = SearchEngineMakeSearchableApi::search_engine_rel_fields($sourceObject, 'db');
-                    $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
-                    foreach ($dbArray as $field => $type) {
-                        //get without brackets ...
-                        if (preg_match('/^(\w+)\(/', $type, $match)) {
-                            $type = $match[1];
-                        }
-                        if (is_subclass_of($type, DBString::class)) {
-                            if (in_array($field, $excludedFieldArray, true)) {
-                                //do nothing
-                            } else {
-                                $level = 2;
-                                if (in_array($field, $levelOneFieldArray, true)) {
-                                    $level = 1;
-                                }
-                                $levelFields[$level][] = $field;
+            $levelFields = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
+            if (is_array($levelFields) && count($levelFields)) {
+                //do nothing
+            } else {
+                $levelOneFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields');
+                $excludedFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields');
+                $dbArray = SearchEngineMakeSearchableApi::search_engine_rel_fields($sourceObject, 'db');
+                $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
+                foreach ($dbArray as $field => $type) {
+                    //get without brackets ...
+                    if (preg_match('/^(\w+)\(/', $type, $match)) {
+                        $type = $match[1];
+                    }
+                    if (is_subclass_of($type, DBString::class)) {
+                        if (in_array($field, $excludedFieldArray, true)) {
+                            //do nothing
+                        } else {
+                            $level = 2;
+                            if (in_array($field, $levelOneFieldArray, true)) {
+                                $level = 1;
                             }
+                            $levelFields[$level][] = $field;
                         }
                     }
                 }
@@ -91,25 +89,23 @@ class SearchEngineSourceObjectApi
     public function ContentForIndexBuilding(DataObject $sourceObject) : array
     {
         $finalArray = [];
-        if ($sourceObject) {
-            if ($sourceObject->hasMethod('SearchEngineFullContentForIndexingProvider')) {
-                $finalArray = $sourceObject->SearchEngineFullContentForIndexingProvider();
+        if ($sourceObject->hasMethod('SearchEngineFullContentForIndexingProvider')) {
+            $finalArray = $sourceObject->SearchEngineFullContentForIndexingProvider();
+        } else {
+            $levels = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
+            if (is_array($levels)) {
+                //do nothing
             } else {
-                $levels = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
-                if (is_array($levels)) {
-                    //do nothing
-                } else {
-                    $levels = $sourceObject->SearchEngineFieldsForIndexing();
-                }
-                if (is_array($levels) && count($levels)) {
-                    foreach ($levels as $level => $fieldArray) {
-                        $level = SearchEngineKeyword::level_sanitizer($level);
-                        $finalArray[$level] = '';
-                        if (is_array($fieldArray) && count($fieldArray)) {
-                            foreach ($fieldArray as $field) {
-                                $fields = explode('.', $field);
-                                $finalArray[$level] .= ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
-                            }
+                $levels = $sourceObject->SearchEngineFieldsForIndexing();
+            }
+            if (is_array($levels) && count($levels)) {
+                foreach ($levels as $level => $fieldArray) {
+                    $level = SearchEngineKeyword::level_sanitizer($level);
+                    $finalArray[$level] = '';
+                    if (is_array($fieldArray) && count($fieldArray)) {
+                        foreach ($fieldArray as $field) {
+                            $fields = explode('.', $field);
+                            $finalArray[$level] .= ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
                         }
                     }
                 }

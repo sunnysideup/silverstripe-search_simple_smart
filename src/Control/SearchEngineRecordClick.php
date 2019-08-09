@@ -10,7 +10,9 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory;
 
 class SearchEngineRecordClick extends Controller
 {
-    private static $allowed_actions = ['add'];
+    private static $allowed_actions = [
+        'add' => true,
+    ];
 
     /**
      * record the click that the user chooses from the search results.
@@ -19,14 +21,16 @@ class SearchEngineRecordClick extends Controller
      */
     public function add(HTTPRequest $request)
     {
-        $itemID = $request->param('ID');
-        $item = SearchEngineDataObject::get()->byID(intval($itemID));
-        if ($item) {
-            SearchEngineSearchRecordHistory::register_click($item);
-            return $this->redirect($item->SourceObject()->Link());
+        $itemID = intval($request->param('ID'));
+        if($itemID) {
+            $item = SearchEngineDataObject::get()->byID(($itemID));
+            if ($item) {
+                SearchEngineSearchRecordHistory::register_click($item);
+                return $this->redirect($item->SourceObject()->Link());
+            }
         }
-        $url = isset($_GET['finaldestination']) ? $_GET['finaldestination'] : '404';
-        user_error('history could not be recorded', E_USER_NOTICE);
+        $url = empty($_GET['finaldestination']) ? '404' : $_GET['finaldestination'] ;
+
         return $this->redirect(Director::absoluteURL($url));
     }
 }

@@ -468,12 +468,15 @@ class SearchEngineCoreSearchMachine
         $this->listOfIDsAsArray = explode(',', $this->listOfIDsAsString);
         $this->listOfIDsSQLAsArray = explode(',', $this->listOfIDsSQLString);
         $this->listOfIDsCustomAsArray = explode(',', $this->listOfIDsCustomAsString);
-        $this->matches1 = (is_array($this->listOfIDsAsString) ?
-            count($this->listOfIDsAsString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsAsArray) . '</pre>' : 0);
-        $this->matches2 = (is_array($this->listOfIDsSQLString) ?
-            count($this->listOfIDsSQLString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsSQLAsArray) . '</pre>' : 0);
-        $this->matches3 = (is_array($this->listOfIDsCustomAsString) ?
-            count($this->listOfIDsCustomAsString) . ': <pre>' . $this->fancyPrintIDList($this->listOfIDsCustomAsArray) . '</pre>' : 0);
+        $this->matches1 =
+            count($this->listOfIDsAsString) .
+            ': <pre>' . $this->fancyPrintIDList($this->listOfIDsAsArray) . '</pre>';
+        $this->matches2 =
+            count($this->listOfIDsSQLString) .
+            ': <pre>' . $this->fancyPrintIDList($this->listOfIDsSQLAsArray) . '</pre>';
+        $this->matches3 =
+            count($this->listOfIDsCustomAsString) .
+            ': <pre>' . $this->fancyPrintIDList($this->listOfIDsCustomAsArray) . '</pre>';
     }
 
     protected function runDebugOutput()

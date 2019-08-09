@@ -197,7 +197,6 @@ class SearchEngineBasicForm extends Form
      * @param array $data
      * @param SearchEngineBasicForm $form
      *
-     * @return array
      */
     public function doSubmitForm($data, $form)
     {
@@ -425,7 +424,6 @@ class SearchEngineBasicForm extends Form
     /**
      * @param array $data
      *
-     * @return string (html)
      */
     protected function workOutResults($data)
     {

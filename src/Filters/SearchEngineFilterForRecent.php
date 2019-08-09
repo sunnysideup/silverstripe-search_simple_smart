@@ -45,11 +45,11 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      * return an array like
      *     Date => ASC
      *     Title => DESC
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      *
-     * @return Array| null
+     * @return array|null
      */
-    public function getSqlFilterArray($filterArray)
+    public function getSqlFilterArray($filterArray):?array
     {
         $recentTS = strtotime($this->Config()->get('recent_string'));
 
@@ -61,7 +61,7 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      * the filter array are the items selected by the
      * user, based on the filter options listed above
      * @see: getFilterList
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      * @return boolean
      */
     public function hasCustomFilter($filterArray)

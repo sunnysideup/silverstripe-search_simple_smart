@@ -39,10 +39,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     /**
      * @var array
      */
-    private static $defaults = [
-        '\'s',
-        'Custom' => 1,
-    ];
+    private static $defaults = [];
 
     /**
      * @var array
@@ -127,7 +124,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param string $character
-     * @return int
+     * @return bool
      */
     public static function is_listed($character) : bool
     {
@@ -139,9 +136,10 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     {
         parent::requireDefaultRecords();
         if (Config::inst()->get(self::class, 'add_defaults') === true) {
-            foreach ($defaults as $default) {
+            $defaults = Config::inst()->get(self::class, 'defaults');
+            foreach (self::$defaults as $default) {
                 if (! self::is_listed($default)) {
-                    DB::alteration_message("Creating a punctuation: ${default}", 'created');
+                    DB::alteration_message("Creating a punctuation: ".$default, 'created');
                     $obj = self::create();
                     $obj->Character = $default;
                     $obj->Custom = false;

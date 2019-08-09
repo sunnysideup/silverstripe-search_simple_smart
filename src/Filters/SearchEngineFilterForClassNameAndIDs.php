@@ -38,19 +38,19 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param array|SS_List $list
+     * @param array|SS_List|null $filterArray
      *
-     * @return array| null
+     * @return array|null
      */
-    public function getSqlFilterArray($list)
+    public function getSqlFilterArray($filterArray): ?array
     {
         if (! $filterArray) {
             return null;
         } elseif (is_array($filterArray) && count($filterArray) === 0) {
             return null;
         } elseif ($filterArray instanceof SS_List) {
-            $ids = $list->column('ID');
-            $classNames = $list->column('ClassName');
+            $ids = $filterArray->column('ID');
+            $classNames = $filterArray->column('ClassName');
             $preFilter = [];
             foreach ($ids as $position => $id) {
                 $className = $classNames[$position];
@@ -79,10 +79,10 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      * the filter array are the items selected by the
      * user, based on the filter options listed above
      * @see: getFilterList
-     * @param array $filterArray
+     * @param array|SS_List|null $filterArray
      * @return boolean
      */
-    public function hasCustomFilter($filterArray)
+    public function hasCustomFilter($filterArray): bool
     {
         return false;
     }
