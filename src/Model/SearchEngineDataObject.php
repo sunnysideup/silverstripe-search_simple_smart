@@ -387,7 +387,7 @@ class SearchEngineDataObject extends DataObject
         $key = $this->getKey();
         if (! isset(self::$_source_objects[$key])) {
             $className = $this->DataObjectClassName;
-            if($classname && class_exists($classname)) {
+            if($className && class_exists($className)) {
                 $id = $this->DataObjectID;
                 if($id) {
                     self::$_source_objects[$key] = $className::get()->byID($id);
@@ -618,9 +618,9 @@ class SearchEngineDataObject extends DataObject
 
             //get the full content
             $fullContentArray = $this->SearchEngineFullContentForIndexingBuild($sourceObject);
+
             if ($timeMeasure) {
-                $endTime = microtime(true);
-                $this->timeMeasure['FullContentBuild'] = $endTime - $startTime;
+                $this->timeMeasure['FullContentBuild'] = microtime(true) - $startTime;
                 $startTime = microtime(true);
             }
 
@@ -628,8 +628,7 @@ class SearchEngineDataObject extends DataObject
             SearchEngineFullContent::add_data_object_array($this, $fullContentArray);
 
             if ($timeMeasure) {
-                $endTime = microtime(true);
-                $this->timeMeasure['AddContent'] = $endTime - $startTime;
+                $this->timeMeasure['AddContent'] = microtime(true) - $startTime;
             }
             if ($withModeChange) {
                 SearchEngineDataObjectApi::end_indexing_mode();
