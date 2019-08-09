@@ -358,8 +358,8 @@ class SearchEngineBasicForm extends Form
                 );
             } else {
                 $this->Fields()->insertAfter(
-                    HiddenField::create('SortBy', '', $default),
-                    'SearchEngineKeywords'
+                    'SearchEngineKeywords',
+                    HiddenField::create('SortBy', '', $default)
                 );
             }
         }
