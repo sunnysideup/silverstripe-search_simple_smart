@@ -401,13 +401,19 @@ class SearchEngineDataObject extends DataObject
     /**
      * @return bool
      */
-    public function SourceObjectExists()
+    public function SourceObjectExists() :bool
     {
         $key = $this->getKey();
         if (! isset(self::$_source_objects_exists[$key])) {
+            self::$_source_objects_exists[$key] = false;
             $className = $this->DataObjectClassName;
             $id = $this->DataObjectID;
-            self::$_source_objects_exists[$key] = $className::get()->filter(['ID' => $id])->count() === 1 ? true : false;
+            if($id && $className && class_exists($classname)) {
+                self::$_source_objects_exists[$key] = $className::get()
+                    ->filter(['ID' => $id])
+                    ->count() === 1
+                    ? true : false;
+            }
         }
 
         return self::$_source_objects_exists[$key];
