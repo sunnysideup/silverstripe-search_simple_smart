@@ -23,7 +23,8 @@
     ],
     "require": {
         "silverstripe/cms": "~4@stable",
-        "silverstripe/errorpage": "*"
+        "silverstripe/errorpage": "*",
+        "camspiers/porter-stemmer": "dev-master"
     },
     "autoload": {
         "psr-4": {
