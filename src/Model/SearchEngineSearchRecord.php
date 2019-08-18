@@ -13,7 +13,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStemming;
+use Porter;
 use SilverStripe\Security\Member;
 use SilverStripe\Forms\FieldList;
 
@@ -264,7 +264,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $this->SearchEngineKeywords()->removeAll();
         $keywordArray = explode(' ', $this->FinalPhrase);
         foreach ($keywordArray as $position => $keyword) {
-            $stem = SearchEngineStemming::stem($keyword);
+            $stem = Porter::Stem($keyword);
             $realPosition = $position + 1;
             $selectArray = [0 => 0];
             $keywordsAfterFindReplace = explode(' ', SearchEngineKeywordFindAndReplace::find_replacements($keyword));
