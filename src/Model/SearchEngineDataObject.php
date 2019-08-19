@@ -663,7 +663,7 @@ class SearchEngineDataObject extends DataObject
             $sourceObject = $this->SourceObject();
         }
         return Injector::inst()->get(SearchEngineSourceObjectApi::class)
-            ->SearchEngineFullContentForIndexingBuild($sourceObject);
+            ->ContentForIndexBuilding($sourceObject);
     }
 
     #############################################
