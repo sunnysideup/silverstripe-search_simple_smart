@@ -121,7 +121,9 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        $this->verbose = $request->getVar('verbose') ? true : false;
+        if($request->getVar('verbose')) {
+            $this->verbose = $request->getVar('verbose') === 'on' ? true : false;
+        }
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
 
         if ($request->getVar('limit')) {
@@ -137,11 +139,15 @@ class SearchEngineBaseTask extends BuildTask
         $this->type = $request->getVar('type');
         $this->flushNow('<strong>type</strong>: ' . $this->type);
 
-        $this->oldOnesOnly = $request->getVar('oldonesonly') ? true : false;
+        if($request->getVar('oldonesonly')) {
+            $this->oldOnesOnly = $request->getVar('oldonesonly') === 'on' ? true : false;
+        }
         $this->flushNow('<strong>old ones only</strong>: ' . ($this->oldOnesOnly ? 'yes' : 'no'));
 
-        $this->unindexedOnly = $request->getVar('unindexedonly') ? true : false;
-        $this->flushNow('<strong>unindexed only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
+        if($request->getVar('unindexedonly')) {
+            $this->unindexedOnly = $request->getVar('unindexedonly') === 'on' ? true : false;
+        }
+        $this->flushNow('<strong>unindexedonly only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
 
         $this->task = $request->getVar('task') ?: self::$segment;
         $this->flushNow('<strong>task</strong>: ' . $this->task);
@@ -177,11 +183,11 @@ class SearchEngineBaseTask extends BuildTask
                     type
                 </div>
 
-                <div><input name="verbose" checked="checked" type="checkbox" /> verbose</div>
+                '.$this->onOffInput('verbose', 'verbose', 'verbose').'
                 <div><input name="limit" value="100000" type="number" /> limit</div>
                 <div><input name="step" value="10" type="number" /> step</div>
-                <div><input name="unindexedonly" checked="checked" type="checkbox" /> unindexed only</div>
-                <div><input name="oldonesonly" checked="checked" type="checkbox" /> old ones only</div>
+                '.$this->onOffInput('unindexedonly', 'unindexedOnly', 'Unindexed Only').'
+                '.$this->onOffInput('oldonesonly', 'oldOnesOnly', 'Old Ones Only').'
                 <div>
                     <select name="type">
                         <option value="">--- choose type ---</option>
@@ -205,5 +211,23 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>------ END -----------</h2>');
         $this->flushNow('<h2>======================</h2>');
+    }
+
+    protected function onOffInput(string $field, string $property, string $label) : string
+    {
+        $checkedOff = '';
+        $checkedOn = '';
+        if($this->{$property}) {
+            $checkedOn = 'checked="checked"';
+        } else {
+            $checkedOff = 'checked="checked"';
+        }
+        return '
+        <div>
+            '.$label.'
+            <input name="'.$field.'" '.$checkedOff.' value="off" type="radio" /> |
+            <input name="'.$field.'" '.$checkedOn.' value="on" type="radio" />
+        </div>
+        ';
     }
 }
