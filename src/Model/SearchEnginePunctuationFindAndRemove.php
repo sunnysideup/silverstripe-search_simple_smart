@@ -12,6 +12,13 @@ use SilverStripe\Forms\FieldList;
 
 class SearchEnginePunctuationFindAndRemove extends DataObject
 {
+
+    /**
+     *
+     * @var bool
+     */
+    private static $add_defaults = true;
+
     /**
      * Defines the database table name
      * @var string
