@@ -32,7 +32,7 @@ class SearchEngineSourceObjectApi
             if ($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
                 return $sourceObject->SearchEngineSourceObjectSortDate();
             }
-            $fieldsToCheck = Config::inst()->get(self::class, 'search_engine_date_fields_for_sorting');
+            $fieldsToCheck = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_date_fields_for_sorting');
             foreach ($fieldsToCheck as $field) {
                 if (! empty($sourceObject->{$field})) {
                     return $sourceObject->{$field};

@@ -167,36 +167,22 @@ class SearchEngineBaseTask extends BuildTask
             </style>
             <form method="get" action="/dev/tasks/searchenginebasetask/">
                 <fieldset>
-                <div>
-                    <select name="task">
-                        <option value="">--- choose task ---</option>
-                        <option value="searchengineremoveall">search engine removeall</option>
-                        <option value="searchengineindexall">index all</option>
-                        <option value="searchenginecleardataobjectdoubles">dataobject doubles</option>
-                        <option value="searchenginecleartobeindexeddoubles">remove index double</option>
-                        <option value="searchengineupdatesearchindex">update search index</option>
-                        <option value="searchenginesetsortdate">update search sort dates</option>
-                        <option value="searchengineclearobsoletes">clear obsoletes</option>
-                        <option value="searchenginecreatekeywordjs">create keyword js</option>
-                        <option value="searchenginespecialkeywords">special keywords</option>
-                    </select>
-                    type
-                </div>
+                    '.$this->createOptionList().'
 
-                '.$this->onOffInput('verbose', 'verbose', 'verbose').'
-                <div><input name="limit" value="100000" type="number" /> limit</div>
-                <div><input name="step" value="10" type="number" /> step</div>
-                '.$this->onOffInput('unindexedonly', 'unindexedOnly', 'Unindexed Only').'
-                '.$this->onOffInput('oldonesonly', 'oldOnesOnly', 'Old Ones Only').'
-                <div>
-                    <select name="type">
-                        <option value="">--- choose type ---</option>
-                        <option value="history">history</option>
-                        <option value="indexes">indexes</option>
-                        <option value="all">all</option>
-                    </select>
-                    type (only applicable to deletes)
-                </div>
+                    '.$this->onOffInput('verbose', 'verbose', 'verbose').'
+                    <div><input name="limit" value="100000" type="number" /> limit</div>
+                    <div><input name="step" value="10" type="number" /> step</div>
+                    '.$this->onOffInput('unindexedonly', 'unindexedOnly', 'Unindexed Only').'
+                    '.$this->onOffInput('oldonesonly', 'oldOnesOnly', 'Old Ones Only').'
+                    <div>
+                        <select name="type">
+                            <option value="">--- choose type ---</option>
+                            <option value="history">history</option>
+                            <option value="indexes">indexes</option>
+                            <option value="all">all</option>
+                        </select>
+                        type (only applicable to deletes)
+                    </div>
                 </fieldset>
 
                 <fieldset>
@@ -225,9 +211,32 @@ class SearchEngineBaseTask extends BuildTask
         return '
         <div>
             '.$label.'
-            <input name="'.$field.'" '.$checkedOff.' value="off" type="radio" /> |
-            <input name="'.$field.'" '.$checkedOn.' value="on" type="radio" />
+            <input name="'.$field.'" '.$checkedOff.' value="off" type="radio" /> no |
+            <input name="'.$field.'" '.$checkedOn.' value="on" type="radio" /> yes
         </div>
         ';
+    }
+
+    protected function createOptionList() : string
+    {
+        return '
+        <div>
+            <select name="task">
+                <option value="">--- choose task ---</option>
+                <option value="searchengineremoveall">search engine removeall: removes ALL the search data</option>
+                <option value="searchengineindexall">index all: index all the indexable objects on your site</option>
+                <option value="searchengineupdatesearchindex">update search index: update objects that need updating</option>
+                <option value="searchengineremovetobeindexed">remove all objects that are marked to be indexed</option>
+                <option value="">--- CLEAN UP ---</option>
+                <option value="searchenginecleardataobjectdoubles">dataobject doubles: look for doubles</option>
+                <option value="searchenginecleartobeindexeddoubles">remove index double: remove doubles</option>
+                <option value="searchenginesetsortdate">update search sort dates: update sort dates</option>
+                <option value="searchengineclearobsoletes">clear obsoletes</option>
+                <option value="">--- SPECIALTY ---</option>
+                <option value="searchenginecreatekeywordjs">create keyword js</option>
+                <option value="searchenginespecialkeywords">special keywords</option>
+            </select>
+            type
+        </div>';
     }
 }
