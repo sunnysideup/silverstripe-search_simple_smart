@@ -11,6 +11,7 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Member;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Control\Director;
 
 /**
  * presents a list of dataobjects
@@ -204,7 +205,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
                     $objToBeIndexedRecord = self::create($fieldArray);
                     $objToBeIndexedRecord->write();
                 }
-                if (Config::inst()->get(self::class, 'cron_job_running') && Director::isDev() === false) {
+                if (Config::inst()->get(self::class, 'cron_job_running') || Director::isDev()) {
                     //cron will take care of it...
                 } else {
                     //do it immediately...
