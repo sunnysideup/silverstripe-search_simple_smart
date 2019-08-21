@@ -144,7 +144,11 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         ),
                         HTMLReadonlyField::create(
                             SearchEngineDataObjectToBeIndexed::class,
-                            'Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing. If Not setup, the index will update immediately.',
+                            '
+                                Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
+                                If set to FALSE, the index will update immediately (pages will take longer to save).
+                                On DEV Environments, it always runs immediately (you never need to run the cron job)
+                            ',
                             Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, 'cron_job_running') ? 'True' : 'False'
                         ),
                         HTMLReadonlyField::create(
