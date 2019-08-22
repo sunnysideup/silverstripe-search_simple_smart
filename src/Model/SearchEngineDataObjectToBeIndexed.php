@@ -11,6 +11,7 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Member;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Control\Director;
 
 /**
  * presents a list of dataobjects
@@ -112,8 +113,6 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     private static $cron_job_running = false;
 
-    private static $_cache_for_items = [];
-
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
@@ -189,32 +188,30 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     public static function add(SearchEngineDataObject $searchEngineDataObject, $alsoIndex = true)
     {
         if ($searchEngineDataObject && $searchEngineDataObject->exists()) {
-            if (! isset(self::$_cache_for_items[$searchEngineDataObject->ID])) {
-                $fieldArray = [
-                    'SearchEngineDataObjectID' => $searchEngineDataObject->ID,
-                    'Completed' => 0,
-                ];
-                $objToBeIndexedRecord = DataObject::get_one(
-                    self::class,
-                    $fieldArray
-                );
-                if ($objToBeIndexedRecord && $objToBeIndexedRecord->exists()) {
-                    //do nothing
-                } else {
-                    $objToBeIndexedRecord = self::create($fieldArray);
-                    $objToBeIndexedRecord->write();
-                }
-                if (Config::inst()->get(self::class, 'cron_job_running') && Director::isDev() === false) {
-                    //cron will take care of it...
-                } else {
-                    //do it immediately...
-                    if ($alsoIndex) {
-                        $objToBeIndexedRecord->IndexNow($searchEngineDataObject);
-                    }
-                }
-                self::$_cache_for_items[$searchEngineDataObject->ID] = $objToBeIndexedRecord;
+            $fieldArray = [
+                'SearchEngineDataObjectID' => $searchEngineDataObject->ID,
+                'Completed' => 0,
+            ];
+            $objToBeIndexedRecord = DataObject::get_one(
+                self::class,
+                $fieldArray
+            );
+            if ($objToBeIndexedRecord && $objToBeIndexedRecord->exists()) {
+                //do nothing
+            } else {
+                $objToBeIndexedRecord = self::create($fieldArray);
+                $objToBeIndexedRecord->write();
             }
-            return self::$_cache_for_items[$searchEngineDataObject->ID];
+            if (Config::inst()->get(self::class, 'cron_job_running') && Director::isDev() === false) {
+                //cron will take care of it...
+            } else {
+                //do it immediately...
+                if ($alsoIndex) {
+                    $objToBeIndexedRecord->IndexNow($searchEngineDataObject);
+                }
+            }
+
+            return $objToBeIndexedRecord;
         }
         user_error('The SearchEngineDataObject needs to exist');
     }
