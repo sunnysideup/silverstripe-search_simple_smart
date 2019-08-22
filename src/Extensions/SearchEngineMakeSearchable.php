@@ -325,19 +325,18 @@ class SearchEngineMakeSearchable extends DataExtension
             if (! isset($this->_onAfterWriteCount[$this->owner->ID])) {
                 $this->_onAfterWriteCount[$this->owner->ID] = 0;
             }
-            $item = SearchEngineDataObjectApi::find_or_make($this->owner);
-            if($item) {
-                $this->_onAfterWriteCount[$this->owner->ID]++;
-                if ($this->_onAfterWriteCount[$this->owner->ID] > 2 && $this->_onAfterWriteCount[$this->owner->ID] < 5) {
-                    // ExportKeywordList::export_keyword_list();
+            register_shutdown_function([$this->owner, 'indexMeOnShutDown']);
 
-                    $item->write();
+        }
+    }
 
-                    $obj = SearchEngineDataObjectToBeIndexed::add($item, false);
-                } elseif($this->_onAfterWriteCount[$this->owner->ID] <= 2) {
-                    $this->write();
-                }
-            }
+    public function indexMeOnShutDown()
+    {
+        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        if($item) {
+            $item->write();
+            // ExportKeywordList::export_keyword_list();
+            $obj = SearchEngineDataObjectToBeIndexed::add($item);
         }
     }
 
