@@ -16,6 +16,7 @@ use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance;
 
 class SearchEngineCoreSearchMachine
@@ -339,9 +340,15 @@ class SearchEngineCoreSearchMachine
         $this->searchProviderName = 'not set';
         if (is_array($this->listOfIDsAsArray) && count($this->listOfIDsAsArray)) {
             $this->listOfIDsAsString = implode(',', $this->listOfIDsAsArray);
-            $this->dataList = SearchEngineDataObject::get()
-                ->filter(['ID' => $this->listOfIDsAsArray])
+            $this->dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                SearchEngineDataObject::class,
+                $this->listOfIDsAsArray
+            );
+            $this->dataList = $this->dataList
                 ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
+            // $this->dataList = SearchEngineDataObject::get()
+            //     ->filter(['ID' => $this->listOfIDsAsArray])
+            //     ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
         } else {
             if ($this->debug) {
                 $this->filterExecutedRAW = true;

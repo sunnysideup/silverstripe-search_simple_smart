@@ -7,6 +7,16 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 
+/**
+ * turns a query statement of select from XXX where ID IN (1,,2,3.......999999)
+ * into something like:
+ * - select from XXX where ID between 0 and 99 or between 200 and 433
+ * OR
+ * - select from XXX where ID NOT IN (1,,2,3.......999999)
+ *
+
+ */
+
 class FasterIDLists
 {
     use Extensible;
@@ -69,10 +79,10 @@ class FasterIDLists
 
     /**
      *
-     * @param string  $className
-     * @param array   $idList
-     * @param string  $field
-     * @param boolean $isNumber
+     * @param string  $className class name of Data Object being queried
+     * @param array   $idList array of ids (or other field) to be selected from class name
+     * @param string  $field usually the ID field, but could be another field
+     * @param boolean $isNumber is the field a number type (so that we can do ranges OR something else)
      */
     public function bestSQL(string $className, array $idList, $field = 'ID', $isNumber = true): DataList
     {

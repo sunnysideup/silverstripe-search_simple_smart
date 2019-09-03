@@ -128,7 +128,7 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
     public function getRawResults()
     {
         $filter = $this->getRawResultsAsArray();
-        return Injector::inst()->create(FasterIDLists::class)->bestSQL(
+        return Injector::inst()->get(FasterIDLists::class)->bestSQL(
             SearchEngineDataObject::class,
             $filter
         );
