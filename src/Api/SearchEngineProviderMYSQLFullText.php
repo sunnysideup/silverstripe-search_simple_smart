@@ -32,6 +32,7 @@ namespace Sunnysideup\SearchSimpleSmart\Api;
 
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Injector\Injectable;
 
 use SilverStripe\ORM\DB;
@@ -41,6 +42,7 @@ use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
 class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvider
 {
@@ -64,7 +66,6 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
 
     /**
     *
-    * @param  boolean $returnFilter
     */
     public function getRawResultsAsArray()
     {
@@ -127,7 +128,9 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
     public function getRawResults()
     {
         $filter = $this->getRawResultsAsArray();
-
-        return SearchEngineDataObject::get()->filter($filter);
+        return Injector::inst()->create(FasterIDLists::class)->bestSQL(
+            SearchEngineDataObject::class,
+            $filter
+        );
     }
 }
