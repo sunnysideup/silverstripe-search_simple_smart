@@ -3,9 +3,15 @@
 namespace Sunnysideup\SearchSimpleSmart\Api;
 use SilverStripe\ORM\DataList;
 
+use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Core\Extensible;
+use SilverStripe\Core\Injector\Injectable;
+
 class FasterIDLists
 {
-
+    use Extensible;
+    use Injectable;
+    use Configurable;
     /**
      *
      * @var int
@@ -68,19 +74,13 @@ class FasterIDLists
      * @param string  $field
      * @param boolean $isNumber
      */
-    public function __construct(string $className, array $idList, $field = 'ID', $isNumber = true)
+    public function bestSQL(string $className, array $idList, $field = 'ID', $isNumber = true): DataList
     {
         $this->className = $className;
         $this->idList = $idList;
         $this->field = $field;
         $this->isNumber = $isNumber;
 
-    }
-
-    public function bestSQL(): DataList
-    {
-        $className = $this->className;
-        $idList = $this->idList;
         if(count($idList) <= $this->Config()->acceptable_max_number_of_ids) {
             return $className::get()->filter([$this->field => $idList]);
         } else {
