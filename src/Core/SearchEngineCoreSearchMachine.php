@@ -393,7 +393,8 @@ class SearchEngineCoreSearchMachine
                 $this->filterExecutedSQL = true;
             }
             foreach ($this->filterProviders as $filterClassName => $filterValues) {
-                if ($this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray($filterValues)) {
+                $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray([$filterValues]);
+                if ($this->filter) {
                     $this->dataList = $this->dataList->filter($this->filter);
                     if ($this->debug) {
                         $this->filterStringForDebug .= $this->fancyPrintR($this->filter);
