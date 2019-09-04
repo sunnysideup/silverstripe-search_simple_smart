@@ -115,6 +115,45 @@ class FasterIDLists
 
     }
 
+    /**
+     *
+     * @param string  $className class name of Data Object being queried
+     * @param array   $idList array of ids (or other field) to be selected from class name
+     * @param string  $field usually the ID field, but could be another field
+     * @param boolean $isNumber is the field a number type (so that we can do ranges OR something else)
+     */
+    public function bestTurnRangeIntoWhereStatement(string $className, array $idList, $field = 'ID', $isNumber = true): string
+    {
+        $this->className = $className;
+        $this->idList = $idList;
+        $this->field = $field;
+        $this->isNumber = $isNumber;
+
+        return $this->turnRangeIntoWhereStatement($idList);
+    }
+    public function turnRangeIntoWhereStatement(array $idList) : ?string
+    {
+        $ranges = $this->findRanges($idList);
+        $otherArray = [];
+        if(count($ranges) === 0) {
+            return null;
+        }
+        $finalArray = [];
+        foreach($ranges as $range) {
+            $min = min($range);
+            $max = max($range);
+            if($min === $max) {
+                $otherArray[$min] = $min;
+            } else {
+                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
+            }
+        }
+        if(count($otherArray)) {
+            $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" IN('.implode(',', $otherArray).')';
+        }
+        return '('.implode(') OR (', $finalArray).')';
+    }
+
     protected function excludeList() : ?DataList
     {
         $className = $this->className;
@@ -137,25 +176,6 @@ class FasterIDLists
     }
 
 
-    protected function turnRangeIntoWhereStatement(array $idList) : ?string
-    {
-        $ranges = $this->findRanges($idList);
-        if(count($ranges) === 0) {
-            return null;
-        }
-        $finalArray = [];
-        foreach($ranges as $range) {
-            $min = min($range);
-            $max = max($range);
-            if($min === $max) {
-                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" = '.$min;
-            } else {
-                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
-            }
-        }
-        return '('.implode(') OR (', $finalArray).')';
-    }
-
     protected function getTableName()
     {
         return Config::inst()->get($this->className, 'table_name');
@@ -174,17 +194,19 @@ class FasterIDLists
         $currentRangeKey = 0;
         sort($idList);
         foreach($idList as $key => $id){
-            if(intval($id) === intval($lastOne + 1)) {
-                // do nothing
-            } else {
-                $currentRangeKey++;
+            if($id) {
+                if(intval($id) === intval($lastOne + 1)) {
+                    // do nothing
+                } else {
+                    $currentRangeKey++;
 
+                }
+                if(! isset($ranges[$currentRangeKey])) {
+                    $ranges[$currentRangeKey] = [];
+                }
+                $ranges[$currentRangeKey][$id] = $id;
+                $lastOne = $id;
             }
-            if(! isset($ranges[$currentRangeKey])) {
-                $ranges[$currentRangeKey] = [];
-            }
-            $ranges[$currentRangeKey][] = $id;
-            $lastOne = $id;
         }
         return $ranges;
     }
