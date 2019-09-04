@@ -9,11 +9,11 @@ use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
- * turns a query statement of select from XXX where ID IN (1,,2,3.......999999)
+ * turns a query statement of select from MyTable where ID IN (1,,2,3.......999999)
  * into something like:
- * - select from XXX where ID between 0 and 99 or between 200 and 433
+ * - select from MyTable where ID between 0 and 99 or between 200 and 433
  * OR
- * - select from XXX where ID NOT IN (1,,2,3.......999999)
+ * - select from MyTable where ID NOT IN (4543)
  *
 
  */
