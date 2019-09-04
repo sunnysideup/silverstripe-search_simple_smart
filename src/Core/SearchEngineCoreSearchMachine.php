@@ -393,12 +393,23 @@ class SearchEngineCoreSearchMachine
                 $this->filterExecutedSQL = true;
             }
             foreach ($this->filterProviders as $filterClassName => $filterValues) {
-                $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray([$filterValues]);
+                // print_r($this->dataList->sql());
+                $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray($filterValues);
                 if ($this->filter) {
-                    $this->dataList = $this->dataList->filter($this->filter);
+                    foreach($this->filter as $field => $idList) {
+                        $where = Injector::inst()->create(FasterIDLists::class)->bestTurnRangeIntoWhereStatement(
+                            SearchEngineDataObject::class,
+                            $idList,
+                            $field
+                        );
+                        if($where) {
+                            $this->dataList = $this->dataList->where($where);
+                        }
+                    }
                     if ($this->debug) {
                         $this->filterStringForDebug .= $this->fancyPrintR($this->filter);
                     }
+                    $this->dataList->count();
                 }
             }
             $this->listOfIDsSQLString = $this->searchRecord->setListOfIDs($this->dataList, 'SQL');
