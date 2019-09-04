@@ -31,12 +31,6 @@ class FasterIDLists
 
     /**
      *
-     * @var int
-     */
-    private static $acceptable_max_number_of_ranges = 50;
-
-    /**
-     *
      * @var array
      */
     protected $idList = [];
