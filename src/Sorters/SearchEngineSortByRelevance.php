@@ -3,7 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\Core\Convert;
-use SilverStripe\Core\Injector;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\DataList;

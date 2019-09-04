@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
-use SilverStripe\Core\Injector;
+use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;

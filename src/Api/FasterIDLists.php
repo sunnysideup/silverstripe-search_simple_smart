@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Api;
 use SilverStripe\ORM\DataList;
 
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
@@ -136,7 +137,7 @@ class FasterIDLists
     }
 
 
-    protected function turnRangeIntoWhereStatement(array $idList) : ?array
+    protected function turnRangeIntoWhereStatement(array $idList) : ?string
     {
         $ranges = $this->findRanges($idList);
         if(count($ranges) === 0) {
@@ -146,12 +147,26 @@ class FasterIDLists
         foreach($ranges as $range) {
             $min = min($range);
             $max = max($range);
-            $finalArray[] = '"'.$this->className.'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
+            if($min === $max) {
+                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" = '.$min;
+            } else {
+                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
+            }
         }
-        return implode(' OR ', $finalArray);
+        return '('.implode(') OR (', $finalArray).')';
     }
 
+    protected function getTableName()
+    {
+        return Config::inst()->get($this->className, 'table_name');
+    }
 
+    /**
+     * 0: 3,4,5,6
+     * 1: 8,9,10
+     * @param  array $idList [description]
+     * @return array         [description]
+     */
     protected function findRanges(array $idList) : array
     {
         $ranges = [];
@@ -159,12 +174,17 @@ class FasterIDLists
         $currentRangeKey = 0;
         sort($idList);
         foreach($idList as $key => $id){
-            if($id === ($lastOne + 1)) {
+            if(intval($id) === intval($lastOne + 1)) {
                 // do nothing
             } else {
                 $currentRangeKey++;
+
+            }
+            if(! isset($ranges[$currentRangeKey])) {
+                $ranges[$currentRangeKey] = [];
             }
             $ranges[$currentRangeKey][] = $id;
+            $lastOne = $id;
         }
         return $ranges;
     }

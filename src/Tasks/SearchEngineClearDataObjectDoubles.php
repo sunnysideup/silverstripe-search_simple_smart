@@ -54,14 +54,27 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         foreach ($ids as $id => $className) {
             $key = $className . '_' . $id;
             if (isset($test[$key])) {
-                $objects = SearchEngineDataObject::get()
+                $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                    SearchEngineDataObject::class,
+                    $id,
+                    'DataObjectID'
+                );
+                $objects = $objects
                     ->filter(
                         [
-                            'DataObjectID' => $id,
                             'DataObjectClassName' => $className,
                         ]
-                    )
+                    );
+                $objects = $objects
                     ->sort(['ID' => 'DESC']);
+                // $objects = SearchEngineDataObject::get()
+                //     ->filter(
+                //         [
+                //             'DataObjectID' => $id,
+                //             'DataObjectClassName' => $className,
+                //         ]
+                //     )
+                //     ->sort(['ID' => 'DESC']);
                 $count = 0;
                 foreach ($objects as $obj) {
                     if ($count === 0) {
