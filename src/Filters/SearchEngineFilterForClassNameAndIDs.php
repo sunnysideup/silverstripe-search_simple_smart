@@ -3,9 +3,11 @@
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Injector;
 use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
 class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescriptor
 {
@@ -65,9 +67,16 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
 
         foreach ($filterArray as $className => $ids) {
             $classNames = ClassInfo::subclassesFor($className);
-            $data = SearchEngineDataObject::get()
-                ->filter(['DataObjectClassName' => $classNames, 'DataObjectID' => $ids]);
-            $array = array_merge($array, $data->column('ID'));
+            $dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                SearchEngineDataObject::class,
+                $ids,
+                'DataObjectID'
+            );
+            // $dataList = SearchEngineDataObject::get()
+            //     ->filter(['DataObjectClassName' => $classNames, 'DataObjectID' => $ids]);
+            $dataList = $dataList
+                ->filter(['DataObjectClassName' => $classNames]);
+            $array = array_merge($array, $dataList->column('ID'));
         }
         $array = array_unique($array);
 

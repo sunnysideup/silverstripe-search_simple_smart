@@ -379,9 +379,15 @@ class SearchEngineCoreSearchMachine
         $this->filterStringForDebug = '';
         if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
             $this->listOfIDsSQLString = implode(',', $this->listOfIDsSQLAsArray);
-            $this->dataList = SearchEngineDataObject::get()
-                ->filter(['ID' => $this->listOfIDsSQLString])
+            $this->dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                SearchEngineDataObject::class,
+                $this->listOfIDsSQLAsArray
+            );
+            $this->dataList = $this->dataList
                 ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
+                // $this->dataList = SearchEngineDataObject::get()
+                //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
+                //     ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
         } else {
             if ($this->debug) {
                 $this->filterExecutedSQL = true;
@@ -415,7 +421,15 @@ class SearchEngineCoreSearchMachine
         $this->listOfIDsCustomAsArray = $this->searchRecord->getListOfIDs('CUSTOM');
         if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
             $this->listOfIDsCustomAsString = implode(',', $this->listOfIDsCustomAsArray);
-            $this->dataList = SearchEngineDataObject::get()->filter(['ID' => $this->listOfIDsCustomAsArray])->sort($this->nonCustomSort);
+            $this->dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                SearchEngineDataObject::class,
+                $this->listOfIDsCustomAsArray
+            );
+            $this->dataList = $this->dataList
+                ->sort($this->nonCustomSort);
+            // $this->dataList = SearchEngineDataObject::get()
+            // ->filter(['ID' => $this->listOfIDsCustomAsArray])
+            // ->sort($this->nonCustomSort);
         } else {
             if ($this->debug) {
                 $this->filterExecutedCustom = true;

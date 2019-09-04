@@ -2,9 +2,11 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
+use SilverStripe\Core\Injector;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use SilverStripe\ORM\SS_List;
 
 /**
@@ -69,9 +71,15 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
             //do nothing
         } else {
             //retrieve objects
-            $objects = SearchEngineDataObject::get()
-                ->filter(['ID' => explode(',', $searchRecord->ListOfIDsCUSTOM)])
+            $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                SearchEngineDataObject::class,
+                explode(',', $searchRecord->ListOfIDsCUSTOM)
+            );
+            $objects = $objects
                 ->sort(['DataObjectDate' => 'DESC']);
+            // $objects = SearchEngineDataObject::get()
+            //     ->filter(['ID' => explode(',', $searchRecord->ListOfIDsCUSTOM)])
+            //     ->sort(['DataObjectDate' => 'DESC']);
 
             //group results!
             $objects = $this->makeClassGroups($objects);
