@@ -340,10 +340,12 @@ class SearchEngineCoreSearchMachine
         $this->searchProviderName = 'not set';
         if (is_array($this->listOfIDsAsArray) && count($this->listOfIDsAsArray)) {
             $this->listOfIDsAsString = implode(',', $this->listOfIDsAsArray);
-            $this->dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+            $this->dataList = Injector::inst()->create(
+                FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $this->listOfIDsAsArray
-            );
+            )->bestSQL();
+
             $this->dataList = $this->dataList
                 ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
             // $this->dataList = SearchEngineDataObject::get()
@@ -379,12 +381,15 @@ class SearchEngineCoreSearchMachine
         $this->filterStringForDebug = '';
         if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
             $this->listOfIDsSQLString = implode(',', $this->listOfIDsSQLAsArray);
-            $this->dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+
+            $this->dataList = Injector::inst()->create(
+                FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $this->listOfIDsSQLAsArray
-            );
-            $this->dataList = $this->dataList
-                ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
+            )->bestSQL();
+
+            $this->dataList = $this->dataList->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
+
                 // $this->dataList = SearchEngineDataObject::get()
                 //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
                 //     ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
@@ -397,14 +402,14 @@ class SearchEngineCoreSearchMachine
                 $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray($filterValues);
                 if ($this->filter) {
                     foreach($this->filter as $field => $idList) {
-                        $where = Injector::inst()->create(FasterIDLists::class)->bestTurnRangeIntoWhereStatement(
+                        $where = Injector::inst()->create(
+                            FasterIDLists::class,
                             SearchEngineDataObject::class,
                             $idList,
                             $field
-                        );
-                        if($where) {
-                            $this->dataList = $this->dataList->where($where);
-                        }
+                        )->shortenIdList();
+
+                        $this->dataList = $this->dataList->where($where);
                     }
                     if ($this->debug) {
                         $this->filterStringForDebug .= $this->fancyPrintR($this->filter);
@@ -433,12 +438,13 @@ class SearchEngineCoreSearchMachine
         $this->listOfIDsCustomAsArray = $this->searchRecord->getListOfIDs('CUSTOM');
         if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
             $this->listOfIDsCustomAsString = implode(',', $this->listOfIDsCustomAsArray);
-            $this->dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+            $this->dataList = Injector::inst()->create(
+                FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $this->listOfIDsCustomAsArray
-            );
-            $this->dataList = $this->dataList
-                ->sort($this->nonCustomSort);
+            )->bestSQL();
+
+            $this->dataList = $this->dataList->sort($this->nonCustomSort);
             // $this->dataList = SearchEngineDataObject::get()
             // ->filter(['ID' => $this->listOfIDsCustomAsArray])
             // ->sort($this->nonCustomSort);

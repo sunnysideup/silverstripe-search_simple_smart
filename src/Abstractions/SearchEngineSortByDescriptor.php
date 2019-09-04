@@ -151,12 +151,13 @@ abstract class SearchEngineSortByDescriptor
                 }
                 $keys = array_keys($newArray);
                 //retrieve objects
-                $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                $objects = Injector::inst()->create(
+                    FasterIDLists::class,
                     SearchEngineDataObject::class,
                     $keys
-                );
-                $objects = $objects
-                    ->sort('FIELD("ID", ' . implode(',', $keys) . ')');
+                )->bestSQL();
+
+                $objects = $objects->sort('FIELD("ID", ' . implode(',', $keys) . ')');
                 // $objects = SearchEngineDataObject::get()
                 //     ->filter(['ID' => $keys])
                 //     ->sort('FIELD("ID", ' . implode(',', $keys) . ')');

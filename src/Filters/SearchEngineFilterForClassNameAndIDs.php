@@ -67,11 +67,13 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
 
         foreach ($filterArray as $className => $ids) {
             $classNames = ClassInfo::subclassesFor($className);
-            $dataList = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+            $dataList = Injector::inst()->create(
+                FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $ids,
                 'DataObjectID'
-            );
+            )->bestSQL();
+
             // $dataList = SearchEngineDataObject::get()
             //     ->filter(['DataObjectClassName' => $classNames, 'DataObjectID' => $ids]);
             $dataList = $dataList

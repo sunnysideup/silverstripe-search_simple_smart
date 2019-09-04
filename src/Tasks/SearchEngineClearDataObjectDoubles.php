@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
 class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
 {
@@ -54,19 +55,16 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         foreach ($ids as $id => $className) {
             $key = $className . '_' . $id;
             if (isset($test[$key])) {
-                $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+
+                $objects = Injector::inst()->create(
+                    FasterIDLists::class,
                     SearchEngineDataObject::class,
                     $id,
                     'DataObjectID'
-                );
-                $objects = $objects
-                    ->filter(
-                        [
-                            'DataObjectClassName' => $className,
-                        ]
-                    );
-                $objects = $objects
-                    ->sort(['ID' => 'DESC']);
+                )->bestSQL();
+                $objects = $objects->filter(['DataObjectClassName' => $className,]);
+                $objects = $objects->sort(['ID' => 'DESC']);
+
                 // $objects = SearchEngineDataObject::get()
                 //     ->filter(
                 //         [
