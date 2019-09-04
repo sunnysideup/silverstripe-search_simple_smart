@@ -110,7 +110,7 @@ class FasterIDLists
         if(count($this->idList) <= $this->Config()->acceptable_max_number_of_ids) {
             return $className::get()->filter([$this->field => $this->idList]);
         } else {
-            $whereStatement = $this->turnRangeIntoWhereStatement($this->idList);
+            $whereStatement = $this->shortenIdList($this->idList);
             if($whereStatement) {
                 return $className::get()->where($whereStatement);
             }
@@ -119,7 +119,7 @@ class FasterIDLists
         if($excludeList) {
             return $excludeList;
         } else {
-            $whereStatement = $this->turnRangeIntoWhereStatement($this->excludeList);
+            $whereStatement = $this->shortenIdList($this->excludeList);
             if($whereStatement) {
                 return $className::get()->where($whereStatement);
             }
