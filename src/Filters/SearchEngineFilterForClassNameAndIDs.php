@@ -3,7 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
 use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Injector;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
