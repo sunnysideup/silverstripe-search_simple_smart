@@ -336,7 +336,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if($item) {
             $item->write();
             // ExportKeywordList::export_keyword_list();
-            $obj = SearchEngineDataObjectToBeIndexed::add($item);
+            SearchEngineDataObjectToBeIndexed::add($item);
         }
     }
 
