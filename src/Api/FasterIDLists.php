@@ -23,6 +23,7 @@ class FasterIDLists
     use Extensible;
     use Injectable;
     use Configurable;
+
     /**
      *
      * @var int
@@ -43,24 +44,6 @@ class FasterIDLists
 
     /**
      *
-     * @var bool
-     */
-    protected $isBetterWithExclude = false;
-
-    /**
-     *
-     * @var array
-     */
-    protected $ranges = [];
-
-    /**
-     *
-     * @var int
-     */
-    protected $tableRowCount = 0;
-
-    /**
-     *
      * @var string
      */
     protected $field = 'ID';
@@ -71,6 +54,12 @@ class FasterIDLists
      */
     protected $isNumber = true;
 
+    /**
+     *
+     * @var string
+     */
+    protected $tableName = '';
+
 
     /**
      *
@@ -79,15 +68,46 @@ class FasterIDLists
      * @param string  $field usually the ID field, but could be another field
      * @param boolean $isNumber is the field a number type (so that we can do ranges OR something else)
      */
-    public function bestSQL(string $className, array $idList, $field = 'ID', $isNumber = true): DataList
+    public function __construct(string $className, array $idList, $field = 'ID', $isNumber = true)
     {
         $this->className = $className;
         $this->idList = $idList;
         $this->field = $field;
         $this->isNumber = $isNumber;
+    }
 
-        if(count($idList) <= $this->Config()->acceptable_max_number_of_ids) {
-            return $className::get()->filter([$this->field => $idList]);
+    public function setIdList(array $idList) : FasterIDList
+    {
+        $this->idList = $idList;
+
+        return $this;
+    }
+
+    public function setField(string $field) : FasterIDList
+    {
+        $this->field = $field;
+
+        return $this;
+    }
+
+    public function setIsNumber(bool $isNumber) : FasterIDList
+    {
+        $this->isNumber = $isNumber;
+
+        return $this;
+    }
+
+    public function setTableName(string $tableName) : FasterIDList
+    {
+        $this->tableName = $tableName;
+
+        return $this;
+    }
+
+    public function bestSQL(): DataList
+    {
+        if(count($this->idList) <= $this->Config()->acceptable_max_number_of_ids) {
+            return $className::get()->filter([$this->field => $this->idList]);
         } else {
             $whereStatement = $this->turnRangeIntoWhereStatement($this->idList);
             if($whereStatement) {
@@ -109,50 +129,38 @@ class FasterIDLists
 
     }
 
-    /**
-     *
-     * @param string  $className class name of Data Object being queried
-     * @param array   $idList array of ids (or other field) to be selected from class name
-     * @param string  $field usually the ID field, but could be another field
-     * @param boolean $isNumber is the field a number type (so that we can do ranges OR something else)
-     */
-    public function bestTurnRangeIntoWhereStatement(string $className, array $idList, $field = 'ID', $isNumber = true): string
+    public function shortenIdList() : string
     {
-        $this->className = $className;
-        $this->idList = $idList;
-        $this->field = $field;
-        $this->isNumber = $isNumber;
-
-        return $this->turnRangeIntoWhereStatement($idList);
-    }
-    public function turnRangeIntoWhereStatement(array $idList) : ?string
-    {
-        $ranges = $this->findRanges($idList);
-        $otherArray = [];
-        if(count($ranges) === 0) {
-            return null;
-        }
-        $finalArray = [];
-        foreach($ranges as $range) {
-            $min = min($range);
-            $max = max($range);
-            if($min === $max) {
-                $otherArray[$min] = $min;
-            } else {
-                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
+        if($this->isNumber) {
+            $ranges = $this->findRanges($this->idList);
+            $otherArray = [];
+            if(count($ranges) === 0) {
+                $ranges = [0 => [-1]];
             }
+            $finalArray = [];
+            foreach($ranges as $range) {
+                $min = min($range);
+                $max = max($range);
+                if($min === $max) {
+                    $otherArray[$min] = $min;
+                } else {
+                    $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
+                }
+            }
+            if(count($otherArray)) {
+                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" IN('.implode(',', $otherArray).')';
+            }
+        } else {
+            $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" IN(\''.implode('\',\'', $this->idList).'\')';
         }
-        if(count($otherArray)) {
-            $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" IN('.implode(',', $otherArray).')';
-        }
+
         return '('.implode(') OR (', $finalArray).')';
     }
 
-    protected function excludeList() : ?DataList
+    public function excludeList() : ?DataList
     {
         $className = $this->className;
-        $idList = $this->idList;
-        $countOfList = count($idList);
+        $countOfList = count($this->idList);
         $tableCount = $className::get()->count();
         if($countOfList === $tableCount) {
             return $className::get();
@@ -163,45 +171,61 @@ class FasterIDLists
             $fullList = $className::get()->column($this->field);
             $this->excludeList = array_diff($fullList, $this->idList);
             if(count($this->excludeList) <= $this->Config()->acceptable_max_number_of_ids) {
+
                 return $className::get()->exclude(['ID' => $this->idList]);
             }
         }
         return null;
     }
 
-
-    protected function getTableName()
+    /**
+     * get table name for query
+     * @return string
+     */
+    protected function getTableName() : string
     {
-        return Config::inst()->get($this->className, 'table_name');
+        if(! $this->tableName) {
+            $this->tableName = Config::inst()->get($this->className, 'table_name');
+        }
+
+        return $this->tableName;
     }
 
     /**
-     * 0: 3,4,5,6
-     * 1: 8,9,10
-     * @param  array $idList [description]
-     * @return array         [description]
+     * return value looks like this:
+     *      [
+     *          0: 3,4,5,6,
+     *          1: 8,9,10,
+     *          2: 91
+     *          3: 100,101
+     *          etc...
+     *      ]
+     *
+     *
+     * @return array
      */
-    protected function findRanges(array $idList) : array
+    protected function findRanges() : array
     {
         $ranges = [];
         $lastOne = 0;
         $currentRangeKey = 0;
-        sort($idList);
-        foreach($idList as $key => $id){
-            if($id) {
-                if(intval($id) === intval($lastOne + 1)) {
-                    // do nothing
-                } else {
-                    $currentRangeKey++;
+        sort($this->idList);
+        foreach($this->idList as $key => $id) {
+            //important
+            $id = intval($id);
+            if($id === ($lastOne + 1)) {
+                // do nothing
+            } else {
+                $currentRangeKey++;
 
-                }
-                if(! isset($ranges[$currentRangeKey])) {
-                    $ranges[$currentRangeKey] = [];
-                }
-                $ranges[$currentRangeKey][$id] = $id;
-                $lastOne = $id;
             }
+            if(! isset($ranges[$currentRangeKey])) {
+                $ranges[$currentRangeKey] = [];
+            }
+            $ranges[$currentRangeKey][$id] = $id;
+            $lastOne = $id;
         }
+
         return $ranges;
     }
 
