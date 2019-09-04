@@ -5,6 +5,7 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
+use SilverStripe\Core\Injector\Injector;
 
 class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
 {
