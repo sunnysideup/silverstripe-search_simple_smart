@@ -7,9 +7,11 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\DataList;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
 abstract class SearchEngineSortByDescriptor
 {
@@ -149,9 +151,15 @@ abstract class SearchEngineSortByDescriptor
                 }
                 $keys = array_keys($newArray);
                 //retrieve objects
-                $objects = SearchEngineDataObject::get()
-                    ->filter(['ID' => $keys])
+                $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                    SearchEngineDataObject::class,
+                    $keys
+                );
+                $objects = $objects
                     ->sort('FIELD("ID", ' . implode(',', $keys) . ')');
+                // $objects = SearchEngineDataObject::get()
+                //     ->filter(['ID' => $keys])
+                //     ->sort('FIELD("ID", ' . implode(',', $keys) . ')');
             }
         }
         return $objects;

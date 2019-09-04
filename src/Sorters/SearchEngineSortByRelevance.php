@@ -3,12 +3,14 @@
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\Core\Convert;
+use SilverStripe\Core\Injector;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\DataList;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
 /**
  * default sort option
@@ -127,9 +129,15 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             $ids = array_keys($array);
 
             //retrieve objects
-            $objects = SearchEngineDataObject::get()
-                ->filter(['ID' => $ids])
+            $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+                SearchEngineDataObject::class,
+                $ids
+            );
+            $objects = $objects
                 ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
+            // $objects = SearchEngineDataObject::get()
+            //     ->filter(['ID' => $ids])
+            //     ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 
             //group results!
             $objects = $this->makeClassGroups($objects);
