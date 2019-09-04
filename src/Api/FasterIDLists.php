@@ -76,28 +76,28 @@ class FasterIDLists
         $this->isNumber = $isNumber;
     }
 
-    public function setIdList(array $idList) : FasterIDList
+    public function setIdList(array $idList) : FasterIDLists
     {
         $this->idList = $idList;
 
         return $this;
     }
 
-    public function setField(string $field) : FasterIDList
+    public function setField(string $field) : FasterIDLists
     {
         $this->field = $field;
 
         return $this;
     }
 
-    public function setIsNumber(bool $isNumber) : FasterIDList
+    public function setIsNumber(bool $isNumber) : FasterIDLists
     {
         $this->isNumber = $isNumber;
 
         return $this;
     }
 
-    public function setTableName(string $tableName) : FasterIDList
+    public function setTableName(string $tableName) : FasterIDLists
     {
         $this->tableName = $tableName;
 
@@ -106,6 +106,7 @@ class FasterIDLists
 
     public function bestSQL(): DataList
     {
+        $className = $this->className;
         if(count($this->idList) <= $this->Config()->acceptable_max_number_of_ids) {
             return $className::get()->filter([$this->field => $this->idList]);
         } else {
@@ -125,19 +126,19 @@ class FasterIDLists
         }
 
         //default status ...
-        return $className::get()->filter([$this->field => $idList]);
+        return $className::get()->filter([$this->field => $this->idList]);
 
     }
 
     public function shortenIdList() : string
     {
+        $finalArray = [];
         if($this->isNumber) {
-            $ranges = $this->findRanges($this->idList);
+            $ranges = $this->findRanges();
             $otherArray = [];
             if(count($ranges) === 0) {
                 $ranges = [0 => [-1]];
             }
-            $finalArray = [];
             foreach($ranges as $range) {
                 $min = min($range);
                 $max = max($range);
