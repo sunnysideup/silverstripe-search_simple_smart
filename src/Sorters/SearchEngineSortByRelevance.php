@@ -129,12 +129,14 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             $ids = array_keys($array);
 
             //retrieve objects
-            $objects = Injector::inst()->get(FasterIDLists::class)->bestSQL(
+            $objects = Injector::inst()->create(
+                FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $ids
-            );
-            $objects = $objects
-                ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
+            )->bestSQL();
+
+            $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
+
             // $objects = SearchEngineDataObject::get()
             //     ->filter(['ID' => $ids])
             //     ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
