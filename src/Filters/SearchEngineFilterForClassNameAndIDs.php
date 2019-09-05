@@ -72,7 +72,7 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
                 SearchEngineDataObject::class,
                 $ids,
                 'DataObjectID'
-            )->bestSQL();
+            )->filteredDatalist();
 
             // $dataList = SearchEngineDataObject::get()
             //     ->filter(['DataObjectClassName' => $classNames, 'DataObjectID' => $ids]);

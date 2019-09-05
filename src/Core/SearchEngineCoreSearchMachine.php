@@ -122,11 +122,6 @@ class SearchEngineCoreSearchMachine
     protected $listOfIDsAsArray = [];
 
     /**
-     * @var string
-     */
-    protected $listOfIDsAsString = '';
-
-    /**
      * @var array
      */
     protected $filterObjects = [];
@@ -135,11 +130,6 @@ class SearchEngineCoreSearchMachine
      * @var array
      */
     protected $listOfIDsSQLAsArray = [];
-
-    /**
-     * @var string
-     */
-    protected $listOfIDsSQLAsString = '';
 
     /**
      * @var bool
@@ -174,7 +164,7 @@ class SearchEngineCoreSearchMachine
     /**
      * @var string
      */
-    protected $listOfIDsCustomAsString = '';
+    protected $filterStringForDebug = '';
 
     /**
      * class used to provide the raw results
@@ -254,13 +244,17 @@ class SearchEngineCoreSearchMachine
 
         $this->runGetSearchRecord();
 
-        $this->runGetPreviouslySavedData();
-
         $this->runCreateFilters();
 
-        $this->runFilterAndSortUsingSQL();
+        $this->runGetPreviouslySavedData();
 
-        $this->runFilterAndSortUsingCustom();
+        $this->runFilterUsingSQL();
+
+        $this->runSortUsingSQL();
+
+        $this->runFilterUsingCustom();
+
+        $this->runSortUsingCustom();
 
         if ($this->debug) {
             $this->runDebugPrep1();
@@ -312,11 +306,6 @@ class SearchEngineCoreSearchMachine
     protected function runInitVars()
     {
         //save variables
-        $this->filterProviders += $this->filterProviders;
-        if ($this->sortProvider) {
-            $this->sortProvider = $this->sortProvider;
-            $this->sortProviderValues = $this->sortProviderValues;
-        }
         if ($this->debug) {
             $this->startTimeForRun = microtime(true);
         }
@@ -332,22 +321,35 @@ class SearchEngineCoreSearchMachine
             //lets retrieve it again.
             $this->searchRecord->write();
         }
+        $this->listOfIDsAsArray = $this->searchRecord->getListOfIDs('RAW');
+        $this->listOfIDsSQLAsArray = $this->searchRecord->getListOfIDs('SQL');
+        $this->listOfIDsCustomAsArray = $this->searchRecord->getListOfIDs('CUSTOM');
     }
 
+    protected function runCreateFilters()
+    {
+        //create filters
+        if (is_array($this->filterProviders) && count($this->filterProviders)) {
+            foreach (array_keys($this->filterProviders) as $filterClassName) {
+                $this->filterObjects[$filterClassName] = $filterClassName::create($this->debug);
+            }
+        }
+    }
     protected function runGetPreviouslySavedData()
     {
-        $this->listOfIDsAsArray = $this->searchRecord->getListOfIDs('RAW');
+        if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
+            //skip
+            return;
+        }
         $this->searchProviderName = 'not set';
         if (is_array($this->listOfIDsAsArray) && count($this->listOfIDsAsArray)) {
-            $this->listOfIDsAsString = implode(',', $this->listOfIDsAsArray);
             $this->dataList = Injector::inst()->create(
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $this->listOfIDsAsArray
-            )->bestSQL();
+            )->filteredDatalist();
 
-            $this->dataList = $this->dataList
-                ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
+            $this->dataList = $this->dataList->sort('FIELD("ID", ' . implode(',', $this->listOfIDsAsArray) . ')');
             // $this->dataList = SearchEngineDataObject::get()
             //     ->filter(['ID' => $this->listOfIDsAsArray])
             //     ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
@@ -361,34 +363,27 @@ class SearchEngineCoreSearchMachine
             $this->searchProvider->setSearchRecord($this->searchRecord);
             //get search objects that match the keywords
             $this->dataList = $this->searchProvider->getRawResults();
-            $this->listOfIDsAsString = $this->searchRecord->setListOfIDs($this->dataList, 'RAW');
+            $this->listOfIDsAsArray = explode(',',$this->searchRecord->setListOfIDs($this->dataList, 'RAW'));
         }
     }
 
-    protected function runCreateFilters()
-    {
-        //create filters
-        if (is_array($this->filterProviders) && count($this->filterProviders)) {
-            foreach (array_keys($this->filterProviders) as $filterClassName) {
-                $this->filterObjects[$filterClassName] = $filterClassName::create($this->debug);
-            }
-        }
-    }
 
-    protected function runFilterAndSortUsingSQL()
+    protected function runFilterUsingSQL()
     {
-        $this->listOfIDsSQLAsArray = $this->searchRecord->getListOfIDs('SQL');
-        $this->filterStringForDebug = '';
+        if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
+            //skip
+            return;
+        }
         if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
-            $this->listOfIDsSQLString = implode(',', $this->listOfIDsSQLAsArray);
 
             $this->dataList = Injector::inst()->create(
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $this->listOfIDsSQLAsArray
-            )->bestSQL();
+            )->filteredDatalist();
 
-            $this->dataList = $this->dataList->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
+            $this->dataList = $this->dataList
+                ->sort('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')');
 
                 // $this->dataList = SearchEngineDataObject::get()
                 //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
@@ -417,13 +412,18 @@ class SearchEngineCoreSearchMachine
                     $this->dataList->count();
                 }
             }
-            $this->listOfIDsSQLString = $this->searchRecord->setListOfIDs($this->dataList, 'SQL');
+            $this->listOfIDsSQLAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'SQL'));
         }
+    }
+
+    protected function runSortUsingSQL()
+    {
         $this->hasCustomSort = false;
         $this->nonCustomSort = [];
         if ($this->sortProvider) {
             $this->nameForSortProvider = $this->sortProvider;
-            $this->sortProviderObject = $this->nameForSortProvider::create($this->debug);
+            $sorterClassName = $this->sortProvider;
+            $this->sortProviderObject = $sorterClassName::create($this->debug);
             $this->hasCustomSort = $this->sortProviderObject->hasCustomSort($this->sortProviderValues);
             $this->sortArray = $this->sortProviderObject->getSqlSortArray($this->sortProviderValues);
             if (is_array($this->sortArray) && count($this->sortArray)) {
@@ -433,16 +433,14 @@ class SearchEngineCoreSearchMachine
         }
     }
 
-    protected function runFilterAndSortUsingCustom()
+    protected function runFilterUsingCustom()
     {
-        $this->listOfIDsCustomAsArray = $this->searchRecord->getListOfIDs('CUSTOM');
         if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
-            $this->listOfIDsCustomAsString = implode(',', $this->listOfIDsCustomAsArray);
             $this->dataList = Injector::inst()->create(
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $this->listOfIDsCustomAsArray
-            )->bestSQL();
+            )->filteredDatalist();
 
             $this->dataList = $this->dataList->sort($this->nonCustomSort);
             // $this->dataList = SearchEngineDataObject::get()
@@ -463,8 +461,14 @@ class SearchEngineCoreSearchMachine
                     }
                 }
             }
-            $this->listOfIDsCustomAsString = $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM');
+            if($this->debug) {
+                $this->listOfIDsCustomAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM'));
+            }
         }
+    }
+
+    protected function runSortUsingCustom()
+    {
         if ($this->hasCustomSort) {
             if ($this->debug) {
                 $this->startTimeForCustomSort = microtime(true);
@@ -474,6 +478,8 @@ class SearchEngineCoreSearchMachine
                 $this->endTimeForCustomSort = microtime(true);
             }
         }
+
+
     }
 
     protected function runDebugPrep1()
@@ -504,9 +510,6 @@ class SearchEngineCoreSearchMachine
         $this->filter1 = ' (' . ($this->filterExecutedRAW ? 'executed ' : 'from cache') . '): carried out by: ' . $this->searchProviderName . '';
         $this->filter2 = ' (' . ($this->filterExecutedSQL ? 'executed' : 'from cache') . '): <pre>' . print_r($this->filterStringForDebug, 1) . '</pre>';
         $this->filter3 = ' (' . ($this->filterExecutedCustom ? 'executed' : 'from cache') . '): ' . $this->customFilterTime;
-        $this->listOfIDsAsArray = explode(',', $this->listOfIDsAsString);
-        $this->listOfIDsSQLAsArray = explode(',', $this->listOfIDsSQLString);
-        $this->listOfIDsCustomAsArray = explode(',', $this->listOfIDsCustomAsString);
         $this->matches1 =
             count($this->listOfIDsAsArray) .
             ': <pre>' . $this->fancyPrintIDList($this->listOfIDsAsArray) . '</pre>';

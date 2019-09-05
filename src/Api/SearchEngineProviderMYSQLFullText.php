@@ -133,6 +133,6 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
             FasterIDLists::class,
             SearchEngineDataObject::class,
             $filter['ID']
-        )->bestSQL();
+        )->filteredDatalist();
     }
 }

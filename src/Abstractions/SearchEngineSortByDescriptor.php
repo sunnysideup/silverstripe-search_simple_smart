@@ -155,7 +155,7 @@ abstract class SearchEngineSortByDescriptor
                     FasterIDLists::class,
                     SearchEngineDataObject::class,
                     $keys
-                )->bestSQL();
+                )->filteredDatalist();
 
                 $objects = $objects->sort('FIELD("ID", ' . implode(',', $keys) . ')');
                 // $objects = SearchEngineDataObject::get()
