@@ -176,7 +176,7 @@ class FasterIDLists
             }
         }
         if(count($finalArray) === 0) {
-            $finalArray = '"'.$this->getTableName().'"."'.$this->field.'" '.$operator.'  IN(-1)';
+            $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" '.$operator.'  IN(-1)';
         }
 
         return '('.implode(') '.$glue.' (', $finalArray).')';
