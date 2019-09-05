@@ -370,7 +370,7 @@ class SearchEngineCoreSearchMachine
 
     protected function runFilterUsingSQL()
     {
-        if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
+        if (is_array($this->listOfIDsCustomAsArray) && count($this->listOfIDsCustomAsArray)) {
             //skip
             return;
         }
@@ -461,9 +461,7 @@ class SearchEngineCoreSearchMachine
                     }
                 }
             }
-            if($this->debug) {
-                $this->listOfIDsCustomAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM'));
-            }
+            $this->listOfIDsCustomAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM'));
         }
     }
 
