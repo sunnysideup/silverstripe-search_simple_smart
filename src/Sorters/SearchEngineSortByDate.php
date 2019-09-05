@@ -75,7 +75,7 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
                 explode(',', $searchRecord->ListOfIDsCUSTOM)
-            )->bestSQL();
+            )->filteredDatalist();
 
             $objects = $objects
                 ->sort(['DataObjectDate' => 'DESC']);

@@ -133,7 +133,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
                 $ids
-            )->bestSQL();
+            )->filteredDatalist();
 
             $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 

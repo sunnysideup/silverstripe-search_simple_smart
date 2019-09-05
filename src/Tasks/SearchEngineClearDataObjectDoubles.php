@@ -62,7 +62,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
                     SearchEngineDataObject::class,
                     $id,
                     'DataObjectID'
-                )->bestSQL();
+                )->filteredDatalist();
                 $objects = $objects->filter(['DataObjectClassName' => $className,]);
                 $objects = $objects->sort(['ID' => 'DESC']);
 

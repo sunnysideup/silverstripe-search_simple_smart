@@ -28,7 +28,7 @@ class FasterIDLists
      *
      * @var int
      */
-    private static $acceptable_max_number_of_ids = 50;
+    private static $acceptable_max_number_of_select_statements = 50;
 
     /**
      *
@@ -104,28 +104,19 @@ class FasterIDLists
         return $this;
     }
 
-    public function bestSQL(): DataList
+    public function filteredDatalist(): DataList
     {
         $className = $this->className;
-        if(count($this->idList) <= $this->Config()->acceptable_max_number_of_ids) {
+        if(count($this->idList) <= $this->Config()->acceptable_max_number_of_select_statements) {
             return $className::get()->filter([$this->field => $this->idList]);
         } else {
-            $whereStatement = $this->shortenIdList($this->idList);
-            if($whereStatement) {
-                return $className::get()->where($whereStatement);
-            }
-        }
-        $excludeList = $this->excludeList();
-        if($excludeList) {
-            return $excludeList;
-        } else {
-            $whereStatement = $this->shortenIdList($this->excludeList);
+            $whereStatement = $this->shortenIdList();
             if($whereStatement) {
                 return $className::get()->where($whereStatement);
             }
         }
 
-        //default status ...
+        //default option ...
         return $className::get()->filter([$this->field => $this->idList]);
 
     }
@@ -133,32 +124,65 @@ class FasterIDLists
     public function shortenIdList() : string
     {
         $finalArray = [];
-        if($this->isNumber) {
-            $ranges = $this->findRanges();
-            $otherArray = [];
-            if(count($ranges) === 0) {
-                $ranges = [0 => [-1]];
-            }
-            foreach($ranges as $range) {
-                $min = min($range);
-                $max = max($range);
-                if($min === $max) {
-                    $otherArray[$min] = $min;
-                } else {
-                    $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" BETWEEN '.$min.' AND '.$max;
+        $operator = '';
+        $glue = 'OR';
+        $myIDList = $this->idList;
+        $countMyIDList = count($myIDList);
+        if($countMyIDList > 0) {
+            if($this->isNumber) {
+                $otherArray = [];
+
+                //simplify select statement
+                $ranges = $this->findRanges($myIDList);
+                $rangesCount = count($ranges);
+
+                //if it is long, then see if exclude is a better solution ...
+                if($rangesCount > $this->Config()->acceptable_max_number_of_select_statements) {
+                    $excludeList = $this->excludeList();
+                    if($excludeList) {
+                        $newRanges = $this->findRanges($excludeList);
+                        if(count($newRanges) < $rangesCount) {
+                            $ranges = $newRanges;
+                            $glue = 'AND';
+                            $operator = 'NOT';
+                        }
+                    }
+                }
+                foreach($ranges as $range) {
+                    $min = min($range);
+                    $max = max($range);
+                    if($min === $max) {
+                        $otherArray[$min] = $min;
+                    } else {
+                        $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" '.$operator.' BETWEEN '.$min.' AND '.$max;
+                    }
+                }
+                if(count($otherArray)) {
+                    $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" '.$operator.'  IN('.implode(',', $otherArray).')';
+                }
+            } else {
+                //if it is long, then see if exclude is a better solution ...
+                if($countMyIDList > $this->Config()->acceptable_max_number_of_select_statements) {
+                    $excludeList = $this->excludeList();
+                    if($excludeList) {
+                        if(count($excludeList) < $countMyIDList) {
+                            $myIDList = $excludeList;
+                            $glue = 'AND';
+                            $operator = 'NOT';
+                        }
+                    }
+                    $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" '.$operator.'  IN(\''.implode('\',\'', $myIDList).'\')';
                 }
             }
-            if(count($otherArray)) {
-                $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" IN('.implode(',', $otherArray).')';
-            }
-        } else {
-            $finalArray[] = '"'.$this->getTableName().'"."'.$this->field.'" IN(\''.implode('\',\'', $this->idList).'\')';
+        }
+        if(count($finalArray) === 0) {
+            $finalArray = '"'.$this->getTableName().'"."'.$this->field.'" '.$operator.'  IN(-1)';
         }
 
-        return '('.implode(') OR (', $finalArray).')';
+        return '('.implode(') '.$glue.' (', $finalArray).')';
     }
 
-    public function excludeList() : ?DataList
+    public function excludeList() : ?array
     {
         $className = $this->className;
         $countOfList = count($this->idList);
@@ -167,14 +191,10 @@ class FasterIDLists
             return $className::get();
         }
         //only run exclude if there is clear win
-        if($countOfList > (($tableCount / 2) + ($this->Config()->acceptable_max_number_of_ids / 2))) {
-            $this->isBetterWithExclude = true;
+        if($countOfList > (($tableCount / 2) + ($this->Config()->acceptable_max_number_of_select_statements / 2))) {
             $fullList = $className::get()->column($this->field);
-            $this->excludeList = array_diff($fullList, $this->idList);
-            if(count($this->excludeList) <= $this->Config()->acceptable_max_number_of_ids) {
 
-                return $className::get()->exclude(['ID' => $this->idList]);
-            }
+            return array_diff($fullList, $this->idList);
         }
         return null;
     }
@@ -205,13 +225,13 @@ class FasterIDLists
      *
      * @return array
      */
-    protected function findRanges() : array
+    protected function findRanges($idList) : array
     {
         $ranges = [];
         $lastOne = 0;
         $currentRangeKey = 0;
-        sort($this->idList);
-        foreach($this->idList as $key => $id) {
+        sort($idList);
+        foreach($idList as $key => $id) {
             //important
             $id = intval($id);
             if($id === ($lastOne + 1)) {
