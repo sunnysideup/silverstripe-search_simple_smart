@@ -114,9 +114,6 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
         return ['ID' => $finalArray];
     }
 
-    /**
-     * @param  boolean $returnFilter
-     */
     public function getRawResults()
     {
         $filter = $this->getRawResultsAsArray();

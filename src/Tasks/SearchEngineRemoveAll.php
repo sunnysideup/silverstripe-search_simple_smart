@@ -2,7 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
+
 use SilverStripe\ORM\DB;
 
 class SearchEngineRemoveAll extends SearchEngineBaseTask

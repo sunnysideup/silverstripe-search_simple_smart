@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use SilverStripe\Control\HTTPRequest;
+
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
 class SearchEngineSpecialKeywords extends SearchEngineBaseTask

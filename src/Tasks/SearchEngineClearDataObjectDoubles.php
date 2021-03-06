@@ -2,7 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
+
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
