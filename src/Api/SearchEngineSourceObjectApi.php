@@ -1,25 +1,18 @@
 <?php
 
-
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
+use Psr\SimpleCache\CacheInterface;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
-use SilverStripe\Versioned\Versioned;
-use SilverStripe\Core\ClassInfo;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Injector\Injector;
-use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
-use Psr\SimpleCache\CacheInterface;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
 class SearchEngineSourceObjectApi
 {
-
     /**
      * used for caching...
      * @var array
@@ -42,11 +35,10 @@ class SearchEngineSourceObjectApi
     }
 
     /**
-     *
      * @param  DataObject $sourceObject
      * @return array
      */
-    public function FieldsForIndexing(DataObject $sourceObject) : array
+    public function FieldsForIndexing(DataObject $sourceObject): array
     {
         $className = $sourceObject->getKey(true);
         if (! isset(self::$_search_engine_fields_for_indexing[$className])) {
@@ -82,7 +74,7 @@ class SearchEngineSourceObjectApi
         return self::$_search_engine_fields_for_indexing[$className];
     }
 
-    public function ContentForIndexBuilding(DataObject $sourceObject) : array
+    public function ContentForIndexBuilding(DataObject $sourceObject): array
     {
         $finalArray = [];
         if ($sourceObject->hasMethod('SearchEngineFullContentForIndexingProvider')) {
@@ -111,14 +103,13 @@ class SearchEngineSourceObjectApi
         return $finalArray;
     }
 
-
     /**
      * returns a template for formatting the object
      * in the search results.
      *
      * @return array
      */
-    public function SearchEngineResultsTemplates($sourceObject = null, $moreDetails = false) : array
+    public function SearchEngineResultsTemplates($sourceObject = null, $moreDetails = false): array
     {
         $arrayOfTemplates = [];
         if ($sourceObject) {
@@ -152,7 +143,6 @@ class SearchEngineSourceObjectApi
                 $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject_MoreDetails';
             }
             $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject';
-
         }
         return $arrayOfTemplates;
     }
@@ -193,12 +183,10 @@ class SearchEngineSourceObjectApi
         return $str;
     }
 
-
-
     /**
      * @param bool $moreDetails
      */
-    public function getHTMLOutput($sourceObject, $moreDetails = false) : DBField
+    public function getHTMLOutput($sourceObject, $moreDetails = false): DBField
     {
         if ($sourceObject) {
             $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
@@ -221,5 +209,4 @@ class SearchEngineSourceObjectApi
 
         return DBField::create_field('HTMLText', '');
     }
-
 }

@@ -3,8 +3,8 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\ORM\DB;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 
 class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
 {

@@ -2,8 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use SilverStripe\ORM\SS_List;
+use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
 {
@@ -50,7 +50,7 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      *
      * @return array|null
      */
-    public function getSqlFilterArray($filterArray):?array
+    public function getSqlFilterArray($filterArray): ?array
     {
         $recentTS = strtotime($this->Config()->get('recent_string'));
 

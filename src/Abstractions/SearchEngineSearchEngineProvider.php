@@ -2,8 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 use SilverStripe\ORM\DataList;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 /***
  * Interface for the class that returns the matching

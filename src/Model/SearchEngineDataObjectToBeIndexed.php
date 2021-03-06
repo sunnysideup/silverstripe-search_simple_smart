@@ -2,16 +2,16 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\DataList;
-use SilverStripe\Security\Permission;
 use SilverStripe\Security\Member;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Control\Director;
+use SilverStripe\Security\Permission;
 
 /**
  * presents a list of dataobjects
@@ -127,8 +127,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -138,8 +137,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -149,8 +147,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -160,8 +157,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)

@@ -12,8 +12,6 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
@@ -36,7 +34,6 @@ class SearchEngineMakeSearchable extends DataExtension
      * @var int
      */
     private $_onAfterWriteCount = [];
-
 
     /**
      * @var array
@@ -194,7 +191,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 return;
             }
             $item = SearchEngineDataObjectApi::find_or_make($this->owner);
-            if($item) {
+            if ($item) {
                 $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->owner->LastEdited));
@@ -326,14 +323,13 @@ class SearchEngineMakeSearchable extends DataExtension
                 $this->_onAfterWriteCount[$this->owner->ID] = 0;
             }
             register_shutdown_function([$this->owner, 'indexMeOnShutDown']);
-
         }
     }
 
     public function indexMeOnShutDown()
     {
         $item = SearchEngineDataObjectApi::find_or_make($this->owner);
-        if($item) {
+        if ($item) {
             $item->write();
             // ExportKeywordList::export_keyword_list();
             SearchEngineDataObjectToBeIndexed::add($item);
@@ -386,7 +382,6 @@ class SearchEngineMakeSearchable extends DataExtension
 
         return SearchEngineFullContent::get()->filter(['ID' => 0]);
     }
-
 
     ######################################
     # Status

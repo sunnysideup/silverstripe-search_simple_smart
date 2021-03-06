@@ -8,8 +8,8 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\View\Requirements;
 use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 class SearchEngineManifest extends Controller
 {

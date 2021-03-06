@@ -2,8 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use SilverStripe\ORM\SS_List;
+use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
 {

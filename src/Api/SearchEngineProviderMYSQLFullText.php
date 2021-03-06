@@ -3,46 +3,44 @@
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
 /**
-* 1. finds DataObjects with the keywords listed.
-*
-* 2. mysql methods:
-*
-*  a. exact phrase match for whole full content
-*  b. exact phrase match for any part of full content
-*  c. natural langue without query expansion
-*  d. natural language with query expansion
-*  e. all keyword match
-*  f. any keyword match
-*  g. all / any keyword match using soundex
-*
-* 3. getting more words
-*  - sounds like
-*  - stemming
-*  - bla
-*  - metaphone match
-*
-* references:
-*  - http://php.net/manual/en/function.levenshtein.php
-*  - http://php.net/manual/en/function.similar-text.php
-*  - http://php.net/manual/en/function.soundex.php
-*  - SELECT * FROM  `SearchEngineKeyword` WHERE Keyword SOUNDS LIKE  "Home" LIMIT 0 , 30
-*  - http://www.php.net/manual/en/function.metaphone.php
-*  - http://www.pythian.com/blog/mysql-sounds-like-vs-full-text-search/
-*/
+ * 1. finds DataObjects with the keywords listed.
+ *
+ * 2. mysql methods:
+ *
+ *  a. exact phrase match for whole full content
+ *  b. exact phrase match for any part of full content
+ *  c. natural langue without query expansion
+ *  d. natural language with query expansion
+ *  e. all keyword match
+ *  f. any keyword match
+ *  g. all / any keyword match using soundex
+ *
+ * 3. getting more words
+ *  - sounds like
+ *  - stemming
+ *  - bla
+ *  - metaphone match
+ *
+ * references:
+ *  - http://php.net/manual/en/function.levenshtein.php
+ *  - http://php.net/manual/en/function.similar-text.php
+ *  - http://php.net/manual/en/function.soundex.php
+ *  - SELECT * FROM  `SearchEngineKeyword` WHERE Keyword SOUNDS LIKE  "Home" LIMIT 0 , 30
+ *  - http://www.php.net/manual/en/function.metaphone.php
+ *  - http://www.pythian.com/blog/mysql-sounds-like-vs-full-text-search/
+ */
 
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
 
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\DataList;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
 
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
-use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
 class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvider
 {
@@ -56,17 +54,13 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
     protected $searchRecord = null;
 
     /**
-    * @param SearchEngineSearchRecord $searchRecord
-    */
+     * @param SearchEngineSearchRecord $searchRecord
+     */
     public function setSearchRecord(SearchEngineSearchRecord $searchRecord)
     {
         $this->searchRecord = $searchRecord;
     }
 
-
-    /**
-    *
-    */
     public function getRawResultsAsArray()
     {
 
@@ -117,14 +111,12 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
         } else {
             $finalArray = $dataObjectArray[1];
         }
-        $filter = ['ID' => $finalArray];
-
-        return $filter;
+        return ['ID' => $finalArray];
     }
+
     /**
-    *
-    * @param  boolean $returnFilter
-    */
+     * @param  boolean $returnFilter
+     */
     public function getRawResults()
     {
         $filter = $this->getRawResultsAsArray();

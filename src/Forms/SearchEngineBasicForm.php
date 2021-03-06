@@ -196,13 +196,12 @@ class SearchEngineBasicForm extends Form
      * this method submits the Search Engine Form
      * @param array $data
      * @param SearchEngineBasicForm $form
-     *
      */
     public function doSubmitForm($data, $form)
     {
         if (Director::is_ajax()) {
             if ($this->outputAsJSON) {
-                if($this->controller->getResponse()) {
+                if ($this->controller->getResponse()) {
                     $this->controller->getResponse()->addHeader('Content-Type', 'text/json');
                 }
             }
@@ -217,7 +216,7 @@ class SearchEngineBasicForm extends Form
      *
      * @return SearchEngineBasicForm
      */
-    public function setIncludeSort($b) : self
+    public function setIncludeSort($b): self
     {
         $this->includeSort = $b;
         $this->Fields()->removeByName('SortBy');
@@ -229,7 +228,7 @@ class SearchEngineBasicForm extends Form
      *
      * @return SearchEngineBasicForm
      */
-    public function setIncludeFilter($b)  : self
+    public function setIncludeFilter($b): self
     {
         $this->includeFilter = $b;
         $this->Fields()->removeByName('FilterFor');
@@ -334,7 +333,7 @@ class SearchEngineBasicForm extends Form
      *
      * @return SearchEngineBasicForm
      */
-    public function setUpdateBrowserHistory($b) : self
+    public function setUpdateBrowserHistory($b): self
     {
         $this->updateBrowserHistory = $b;
         return $this;
@@ -428,7 +427,6 @@ class SearchEngineBasicForm extends Form
 
     /**
      * @param array $data
-     *
      */
     protected function workOutResults($data)
     {

@@ -2,8 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use SilverStripe\Core\Config\Config;
+use Porter;
 
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Forms\ReadonlyField;
@@ -13,10 +14,6 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
-use Porter;
-use SilverStripe\Security\Member;
-use SilverStripe\Forms\FieldList;
-
 
 class SearchEngineSearchRecord extends DataObject implements Flushable
 {
@@ -318,7 +315,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $field = $this->getListIDField($filterStep);
         //default to nothing
         $this->{$field} = -1;
-        if($list) {
+        if ($list) {
             if ($list instanceof SS_List && $list->count()) {
                 return $this->setListOfIDs($list->column('ID'), $filterStep);
             } elseif (is_string($list)) {

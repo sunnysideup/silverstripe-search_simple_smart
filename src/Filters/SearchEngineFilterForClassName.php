@@ -3,9 +3,9 @@
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
-use SilverStripe\ORM\SS_List;
 
 class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 {

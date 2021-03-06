@@ -5,11 +5,9 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
+use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStopWords;
-use SilverStripe\Security\Member;
-use SilverStripe\Forms\FieldList;
-
 
 class SearchEngineKeywordFindAndRemove extends DataObject
 {
@@ -96,8 +94,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -107,8 +104,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -118,8 +114,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -129,8 +124,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)

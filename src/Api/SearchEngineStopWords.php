@@ -775,7 +775,7 @@ class SearchEngineStopWords
 
     ];
 
-    public static function get_list($size) : array
+    public static function get_list($size): array
     {
         $listNames = [
             'short',

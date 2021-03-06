@@ -2,8 +2,6 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use Psr\SimpleCache\CacheInterface;
-
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\VirtualPage;
@@ -14,13 +12,11 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineSourceObjectApi;
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
 
 /**
  * List of dataobjects that are indexed.
@@ -205,7 +201,6 @@ class SearchEngineDataObject extends DataObject
 
     private $recalculateCount = 0;
 
-
     /**
      * used for caching...
      * @var array
@@ -230,8 +225,7 @@ class SearchEngineDataObject extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -241,8 +235,7 @@ class SearchEngineDataObject extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -252,8 +245,7 @@ class SearchEngineDataObject extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -263,8 +255,7 @@ class SearchEngineDataObject extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)
@@ -348,7 +339,7 @@ class SearchEngineDataObject extends DataObject
             ->SearchEngineFieldsForIndexing($sourceObject);
     }
 
-    public function getObjectClassName() : string
+    public function getObjectClassName(): string
     {
         $className = $this->DataObjectClassName;
         if (! class_exists($className)) {
@@ -359,14 +350,13 @@ class SearchEngineDataObject extends DataObject
             self::$_object_class_name[$className] = $objectClassName;
         }
         return self::$_object_class_name[$className];
-
     }
 
     /**
      * @casted variable
      * @return string
      */
-    public function getTitle() : string
+    public function getTitle(): string
     {
         $objectClassName = $this->getObjectClassName();
         $object = $this->SourceObject();
@@ -382,14 +372,14 @@ class SearchEngineDataObject extends DataObject
     /**
      * @return DataObject|null
      */
-    public function SourceObject() : ?DataObject
+    public function SourceObject(): ?DataObject
     {
         $key = $this->getKey();
         if (! isset(self::$_source_objects[$key])) {
             $className = $this->DataObjectClassName;
-            if($className && class_exists($className)) {
+            if ($className && class_exists($className)) {
                 $id = $this->DataObjectID;
-                if($id) {
+                if ($id) {
                     self::$_source_objects[$key] = $className::get()->byID($id);
                 }
             }
@@ -401,14 +391,14 @@ class SearchEngineDataObject extends DataObject
     /**
      * @return bool
      */
-    public function SourceObjectExists() :bool
+    public function SourceObjectExists(): bool
     {
         $key = $this->getKey();
         if (! isset(self::$_source_objects_exists[$key])) {
             self::$_source_objects_exists[$key] = false;
             $className = $this->DataObjectClassName;
             $id = $this->DataObjectID;
-            if($id && $className && class_exists($className)) {
+            if ($id && $className && class_exists($className)) {
                 self::$_source_objects_exists[$key] = $className::get()
                     ->filter(['ID' => $id])
                     ->count() === 1
@@ -530,7 +520,7 @@ class SearchEngineDataObject extends DataObject
     {
         $className = str_replace('\\', '-', self::class);
 
-        return '/admin/searchengine/'.$className.'/EditForm/field/'.$className.'/item/' . $this->ID . '/edit';
+        return '/admin/searchengine/' . $className . '/EditForm/field/' . $className . '/item/' . $this->ID . '/edit';
     }
 
     #####################
@@ -541,7 +531,7 @@ class SearchEngineDataObject extends DataObject
      * @param bool $moreDetails
      * @return string
      */
-    public function getHTMLOutput($moreDetails = false) : DBField
+    public function getHTMLOutput($moreDetails = false): DBField
     {
         $sourceObject = $this->SourceObject();
         return Injector::inst()->get(SearchEngineSourceObjectApi::class)
@@ -554,7 +544,7 @@ class SearchEngineDataObject extends DataObject
     /**
      * @return string
      */
-    public function getHTMLOutputMoreDetails() : DBField
+    public function getHTMLOutputMoreDetails(): DBField
     {
         return $this->getHTMLOutput(true);
     }
@@ -590,7 +580,6 @@ class SearchEngineDataObject extends DataObject
                 $includeExample
             );
     }
-
 
     /**
      * deletes cached search results
@@ -671,11 +660,10 @@ class SearchEngineDataObject extends DataObject
     #############################################
 
     /**
-     *
      * @param  bool $classNameOnly
      * @return string
      */
-    public function getKey($classNameOnly = false) : string
+    public function getKey($classNameOnly = false): string
     {
         if ($classNameOnly) {
             return $this->DataObjectClassName . '';
