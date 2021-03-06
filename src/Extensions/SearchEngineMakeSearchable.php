@@ -177,7 +177,7 @@ class SearchEngineMakeSearchable extends DataExtension
                             'SearchEngineHeader',
                             '<h2>
                                 See
-                                <a href="/admin/pages/settings/show/' . $this->owner->ID . '/">Settings Tab<a>
+                                <a href="/admin/pages/settings/show/' . $this->owner->ID . '/">Settings Tab</a>
                                 for Search Engine Details
                             </h2>'
                         )
