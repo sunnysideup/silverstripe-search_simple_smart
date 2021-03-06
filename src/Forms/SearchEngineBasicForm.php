@@ -143,8 +143,9 @@ class SearchEngineBasicForm extends Form
 
     /**
      * this function constructs a new Search Engine Basic Form
-     * @param object $controller
-     * @param string $name
+     * @param mixed    $controller
+     * @param string   $name
+     *
      * @return SearchEngineBasicForm
      */
     public function __construct($controller, $name)
@@ -153,11 +154,11 @@ class SearchEngineBasicForm extends Form
             $this->keywords = $_GET['SearchEngineKeywords'];
         }
         $fields = new FieldList(
-            $keywordField = TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', 'Search for ...'), $this->keywords)
+            TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', 'Search for ...'), $this->keywords)
+                ->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'What are you looking for ...'))
+                ->addExtraClass('awesomplete')
+                ->setAttribute('autocomplete', 'off')
         );
-        $keywordField->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'What are you looking for ...'));
-        $keywordField->extraClass('awesomplete');
-        $keywordField->setAttribute('autocomplete', 'off');
 
         $actions = new FieldList(
             FormAction::create('doSubmitForm', 'Search')
@@ -228,7 +229,7 @@ class SearchEngineBasicForm extends Form
      *
      * @return SearchEngineBasicForm
      */
-    public function setIncludeFilter($b): self
+    public function setIncludeFilter(bool $b): self
     {
         $this->includeFilter = $b;
         $this->Fields()->removeByName('FilterFor');
@@ -238,11 +239,11 @@ class SearchEngineBasicForm extends Form
     /**
      * this function sets the number of items to return
      * per page when a search is conducted
-     * @param $i
+     * @param int $i
      *
      * @return SearchEngineBasicForm
      */
-    public function setNumberOfResultsPerPage($i)
+    public function setNumberOfResultsPerPage(int $i): self
     {
         $this->numberOfResultsPerPage = $i;
         return $this;
@@ -250,11 +251,11 @@ class SearchEngineBasicForm extends Form
 
     /**
      * total number of items to return
-     * @param $i
+     * @param int $i
      *
      * @return SearchEngineBasicForm
      */
-    public function setTotalNumberOfItemsToReturn($i)
+    public function setTotalNumberOfItemsToReturn(int $i): self
     {
         $this->totalNumberOfItemsToReturn = $i;
         return $this;
@@ -262,11 +263,11 @@ class SearchEngineBasicForm extends Form
 
     /**
      * what is the first item to return
-     * @param $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setIsMoreDetailsResult($b)
+    public function setIsMoreDetailsResult(bool $b): self
     {
         $this->isMoreDetailsResult = $b;
         return $this;
@@ -274,55 +275,55 @@ class SearchEngineBasicForm extends Form
 
     /**
      * what is the first item to return
-     * @param $i
+     * @param int $i
      *
      * @return SearchEngineBasicForm
      */
-    public function setStart($i)
+    public function setStart(int $i): self
     {
         $this->start = $i;
         return $this;
     }
 
     /**
-     * @param $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setUseAutoComplete($b)
+    public function setUseAutoComplete(bool $b): self
     {
         $this->useAutoComplete = $b;
         return $this;
     }
 
     /**
-     * @param $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setUseInfiniteScroll($b)
+    public function setUseInfiniteScroll(bool $b): self
     {
         $this->useInfiniteScroll = $b;
         return $this;
     }
 
     /**
-     * @param $string
+     * @param string $string
      *
      * @return SearchEngineBasicForm
      */
-    public function setdisplayedFormInputSelector($string)
+    public function setdisplayedFormInputSelector(string $string): self
     {
         $this->displayedFormInputSelector = $string;
         return $this;
     }
 
     /**
-     * @param $b
+     * @param bool $b
      *
      * @return SearchEngineBasicForm
      */
-    public function setOutputAsJSON($b)
+    public function setOutputAsJSON(bool $b): self
     {
         $this->outputAsJSON = $b;
         return $this;

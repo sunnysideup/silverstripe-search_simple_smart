@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use SilverStripe\Control\HTTPRequest;
+
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -39,6 +41,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
         $classNames = SearchEngineDataObjectApi::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
             $filter = ['ClassName' => $className];
+            $className = (string) $className;
             $count = $className::get()
                 ->filter($filter)
                 ->count();

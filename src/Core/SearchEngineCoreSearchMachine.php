@@ -330,6 +330,7 @@ class SearchEngineCoreSearchMachine
         //create filters
         if (is_array($this->filterProviders) && count($this->filterProviders)) {
             foreach (array_keys($this->filterProviders) as $filterClassName) {
+                $filterClassName = (string) $filterClassName;
                 $this->filterObjects[$filterClassName] = $filterClassName::create($this->debug);
             }
         }
@@ -469,7 +470,9 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $this->startTimeForCustomSort = microtime(true);
             }
-            $this->dataList = $this->sortProviderObject->doCustomSort($this->dataList, $this->searchRecord);
+            if ($this->sortProviderObject) {
+                $this->dataList = $this->sortProviderObject->doCustomSort($this->dataList, $this->searchRecord);
+            }
             if ($this->debug) {
                 $this->endTimeForCustomSort = microtime(true);
             }

@@ -531,7 +531,7 @@ class SearchEngineDataObject extends DataObject
      * @param bool $moreDetails
      * @return string
      */
-    public function getHTMLOutput($moreDetails = false): DBField
+    public function getHTMLOutput($moreDetails = false)
     {
         $sourceObject = $this->SourceObject();
         return Injector::inst()->get(SearchEngineSourceObjectApi::class)
@@ -544,7 +544,7 @@ class SearchEngineDataObject extends DataObject
     /**
      * @return string
      */
-    public function getHTMLOutputMoreDetails(): DBField
+    public function getHTMLOutputMoreDetails()
     {
         return $this->getHTMLOutput(true);
     }
@@ -598,6 +598,7 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
+        $startTime = 0;
         if ($sourceObject) {
             if ($withModeChange) {
                 SearchEngineDataObjectApi::start_indexing_mode();

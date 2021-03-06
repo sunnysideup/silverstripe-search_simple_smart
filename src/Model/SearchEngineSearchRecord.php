@@ -305,12 +305,12 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * note that it returns the list as an array
      * to match getListOfIDs
      *
-     * @param $list
-     * @param string $filterStep ("RAW", "SQL", "CUSTOM")
+     * @param mixed   $list
+     * @param string  $filterStep ("RAW", "SQL", "CUSTOM")
      *
      * @return string
      */
-    public function setListOfIDs($list, $filterStep): string
+    public function setListOfIDs($list, string $filterStep): string
     {
         $field = $this->getListIDField($filterStep);
         //default to nothing

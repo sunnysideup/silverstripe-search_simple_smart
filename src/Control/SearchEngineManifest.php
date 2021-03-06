@@ -28,8 +28,7 @@ class SearchEngineManifest extends Controller
 
     /**
      * record the click that the user chooses from the search results.
-     * @param HTTPRequest
-     * @return string
+     * @return DBField
      */
     public function getContent()
     {
@@ -47,6 +46,7 @@ class SearchEngineManifest extends Controller
                             <h3>${classNameTitle} (${numberOfIndexedObjects})</h3>
                             <ul>";
                 $class = Injector::inst()->get($className);
+                $className = (string) $className;
                 $example = $className::get()->first();
                 if (! $example) {
                     $example = $class;
