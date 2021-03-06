@@ -6,11 +6,9 @@ use SilverStripe\Core\Flushable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
-use SilverStripe\Security\Member;
-use SilverStripe\Forms\FieldList;
-
 
 /**
  * getExtraData($componentName, $itemID) method on the ManyManyList to retrieve those extra fields values:
@@ -140,8 +138,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -151,8 +148,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -162,8 +158,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -173,8 +168,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)

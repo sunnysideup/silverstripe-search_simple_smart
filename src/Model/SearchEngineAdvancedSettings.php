@@ -4,7 +4,6 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-use SilverStripe\Forms\FieldList;
 
 use SilverStripe\Security\Permission;
 
@@ -42,8 +41,7 @@ class SearchEngineAdvancedSettings extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -53,8 +51,7 @@ class SearchEngineAdvancedSettings extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -64,8 +61,7 @@ class SearchEngineAdvancedSettings extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -75,8 +71,7 @@ class SearchEngineAdvancedSettings extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)

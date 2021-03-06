@@ -5,16 +5,12 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\Security\Permission;
 use SilverStripe\Security\Member;
-use SilverStripe\Forms\FieldList;
-
+use SilverStripe\Security\Permission;
 
 class SearchEnginePunctuationFindAndRemove extends DataObject
 {
-
     /**
-     *
      * @var bool
      */
     private static $add_defaults = true;
@@ -87,8 +83,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -98,8 +93,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -109,8 +103,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -120,8 +113,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)
@@ -133,7 +125,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      * @param string $character
      * @return bool
      */
-    public static function is_listed($character) : bool
+    public static function is_listed($character): bool
     {
         return self::get()
             ->filter(['Character' => $character])->count() ? true : false;
@@ -146,7 +138,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
             $defaults = Config::inst()->get(self::class, 'defaults');
             foreach ($defaults as $default) {
                 if (! self::is_listed($default)) {
-                    DB::alteration_message("Creating a punctuation: ".$default, 'created');
+                    DB::alteration_message('Creating a punctuation: ' . $default, 'created');
                     $obj = self::create();
                     $obj->Character = $default;
                     $obj->Custom = false;

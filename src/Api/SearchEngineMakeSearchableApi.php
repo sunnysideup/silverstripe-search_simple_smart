@@ -2,14 +2,12 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
-use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Config\Config;
-
 use SilverStripe\Core\Config\Configurable;
+
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
-
+use SilverStripe\ORM\DataObject;
 
 class SearchEngineMakeSearchableApi
 {
@@ -30,7 +28,7 @@ class SearchEngineMakeSearchableApi
      *
      * @return string
      */
-    public static function make_searchable_rel_object($object, $fields, $str = '') : string
+    public static function make_searchable_rel_object($object, $fields, $str = ''): string
     {
         if (is_array($fields) && count($fields)) {
             $fieldCount = count($fields);
@@ -96,8 +94,8 @@ class SearchEngineMakeSearchableApi
             self::$_array_of_relations[$object->ClassName] = [];
         }
         if (! isset(self::$_array_of_relations[$object->ClassName][$relType])) {
-            $value =  Config::inst()->get($object->ClassName, $relType);
-            if(! is_array($value)) {
+            $value = Config::inst()->get($object->ClassName, $relType);
+            if (! is_array($value)) {
                 $value = [];
             }
             self::$_array_of_relations[$object->ClassName][$relType] = $value;

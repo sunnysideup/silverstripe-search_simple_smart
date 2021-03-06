@@ -4,7 +4,6 @@ namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
-use SilverStripe\Forms\FormField;
 
 class SearchEngineFormField extends LiteralField
 {
@@ -120,7 +119,7 @@ class SearchEngineFormField extends LiteralField
      * @param int $days
      * @return self
      */
-    public function setNumberOfDays($days) : self
+    public function setNumberOfDays($days): self
     {
         $this->numberOfDays = intval($days);
         return $this;
@@ -130,7 +129,7 @@ class SearchEngineFormField extends LiteralField
      * @param int $count
      * @return self
      */
-    public function setMinimumCount($count) : self
+    public function setMinimumCount($count): self
     {
         $this->minimumCount = intval($count);
         return $this;
@@ -140,7 +139,7 @@ class SearchEngineFormField extends LiteralField
      * @param int $count
      * @return self
      */
-    public function setEndingDaysBack($count) : self
+    public function setEndingDaysBack($count): self
     {
         $this->endingDaysBack = intval($count);
         return $this;

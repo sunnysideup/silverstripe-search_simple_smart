@@ -8,10 +8,10 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\DataList;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 abstract class SearchEngineSortByDescriptor
 {

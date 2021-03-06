@@ -2,21 +2,18 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
-use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBString;
-use SilverStripe\Versioned\Versioned;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Injector\Injector;
-use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineMakeSearchableApi;
-
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Versioned\Versioned;
+
+use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 class SearchEngineDataObjectApi
 {
@@ -38,7 +35,7 @@ class SearchEngineDataObjectApi
      *
      * @return SearchEngineDataObject|null
      */
-    public static function find_or_make(DataObject $obj, $doNotMake = false) : ?SearchEngineDataObject
+    public static function find_or_make(DataObject $obj, $doNotMake = false): ?SearchEngineDataObject
     {
         if ($obj->hasExtension(SearchEngineMakeSearchable::class)) {
             if ($obj->SearchEngineExcludeFromIndex()) {
@@ -144,6 +141,4 @@ class SearchEngineDataObjectApi
             $item->delete();
         }
     }
-
-
 }

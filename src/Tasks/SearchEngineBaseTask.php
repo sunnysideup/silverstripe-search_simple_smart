@@ -88,15 +88,14 @@ class SearchEngineBaseTask extends BuildTask
         if ($this->verbose) {
             echo '';
             // check that buffer is actually set before flushing
-            try{
+            try {
                 if (ob_get_length()) {
                     ob_flush();
                     flush();
                     ob_end_flush();
                 }
                 ob_start();
-
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 echo ' ';
             }
             if ($bullet) {
@@ -121,7 +120,7 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        if($request->getVar('verbose')) {
+        if ($request->getVar('verbose')) {
             $this->verbose = $request->getVar('verbose') === 'on' ? true : false;
         }
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
@@ -139,12 +138,12 @@ class SearchEngineBaseTask extends BuildTask
         $this->type = $request->getVar('type');
         $this->flushNow('<strong>type</strong>: ' . $this->type);
 
-        if($request->getVar('oldonesonly')) {
+        if ($request->getVar('oldonesonly')) {
             $this->oldOnesOnly = $request->getVar('oldonesonly') === 'on' ? true : false;
         }
         $this->flushNow('<strong>old ones only</strong>: ' . ($this->oldOnesOnly ? 'yes' : 'no'));
 
-        if($request->getVar('unindexedonly')) {
+        if ($request->getVar('unindexedonly')) {
             $this->unindexedOnly = $request->getVar('unindexedonly') === 'on' ? true : false;
         }
         $this->flushNow('<strong>unindexedonly only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
@@ -167,13 +166,13 @@ class SearchEngineBaseTask extends BuildTask
             </style>
             <form method="get" action="/dev/tasks/searchenginebasetask/">
                 <fieldset>
-                    '.$this->createOptionList().'
+                    ' . $this->createOptionList() . '
 
-                    '.$this->onOffInput('verbose', 'verbose', 'verbose').'
+                    ' . $this->onOffInput('verbose', 'verbose', 'verbose') . '
                     <div><input name="limit" value="100000" type="number" /> limit</div>
                     <div><input name="step" value="10" type="number" /> step</div>
-                    '.$this->onOffInput('unindexedonly', 'unindexedOnly', 'Unindexed Only').'
-                    '.$this->onOffInput('oldonesonly', 'oldOnesOnly', 'Old Ones Only').'
+                    ' . $this->onOffInput('unindexedonly', 'unindexedOnly', 'Unindexed Only') . '
+                    ' . $this->onOffInput('oldonesonly', 'oldOnesOnly', 'Old Ones Only') . '
                     <div>
                         <select name="type">
                             <option value="">--- choose type ---</option>
@@ -199,25 +198,25 @@ class SearchEngineBaseTask extends BuildTask
         $this->flushNow('<h2>======================</h2>');
     }
 
-    protected function onOffInput(string $field, string $property, string $label) : string
+    protected function onOffInput(string $field, string $property, string $label): string
     {
         $checkedOff = '';
         $checkedOn = '';
-        if($this->{$property}) {
+        if ($this->{$property}) {
             $checkedOn = 'checked="checked"';
         } else {
             $checkedOff = 'checked="checked"';
         }
         return '
         <div>
-            '.$label.'
-            <input name="'.$field.'" '.$checkedOff.' value="off" type="radio" /> no |
-            <input name="'.$field.'" '.$checkedOn.' value="on" type="radio" /> yes
+            ' . $label . '
+            <input name="' . $field . '" ' . $checkedOff . ' value="off" type="radio" /> no |
+            <input name="' . $field . '" ' . $checkedOn . ' value="on" type="radio" /> yes
         </div>
         ';
     }
 
-    protected function createOptionList() : string
+    protected function createOptionList(): string
     {
         return '
         <div>

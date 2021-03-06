@@ -5,10 +5,8 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-use SilverStripe\Security\Security;
 use SilverStripe\Security\Permission;
-use SilverStripe\Forms\FieldList;
-
+use SilverStripe\Security\Security;
 
 /**
  * the DataObject ClassName + ID is recorded separately
@@ -86,8 +84,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canCreate($member = null, $context = [])
@@ -97,8 +94,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canEdit($member = null)
@@ -108,8 +104,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canDelete($member = null)
@@ -119,8 +114,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
     /**
      * @param Member $member
-     * @param array $context Additional context-specific data which might
-     * affect whether (or where) this object could be created.
+     *
      * @return boolean
      */
     public function canView($member = null)
@@ -137,7 +131,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         //a real request - lets start a new search record history ...
         $currentUserID = 0;
         $currentUser = Security::getCurrentUser();
-        if($currentUser) {
+        if ($currentUser) {
             $currentUserID = $currentUser->ID;
         }
         $fieldArray = [

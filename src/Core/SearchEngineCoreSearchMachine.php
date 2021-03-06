@@ -7,16 +7,16 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
-use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
+use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 
+use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
-use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance;
 
 class SearchEngineCoreSearchMachine
@@ -226,15 +226,14 @@ class SearchEngineCoreSearchMachine
      */
     public function run($searchPhrase, $filterProviders = [], $sortProvider = '', $sortProviderValues = null)
     {
-
         $this->searchPhrase = $searchPhrase;
-        if(! empty($filterProviders)) {
+        if (! empty($filterProviders)) {
             $this->filterProviders += $filterProviders;
         }
-        if(! empty($sortProvider)) {
+        if (! empty($sortProvider)) {
             $this->sortProvider = $sortProvider;
         }
-        if(! empty($sortProviderValues)) {
+        if (! empty($sortProviderValues)) {
             $this->sortProviderValues = $sortProviderValues;
         }
 
@@ -335,6 +334,7 @@ class SearchEngineCoreSearchMachine
             }
         }
     }
+
     protected function runGetPreviouslySavedData()
     {
         if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
@@ -350,7 +350,7 @@ class SearchEngineCoreSearchMachine
             )->filteredDatalist();
 
             $this->dataList = $this->dataList->sort('FIELD("ID", ' . implode(',', $this->listOfIDsAsArray) . ')');
-            // $this->dataList = SearchEngineDataObject::get()
+        // $this->dataList = SearchEngineDataObject::get()
             //     ->filter(['ID' => $this->listOfIDsAsArray])
             //     ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
         } else {
@@ -363,10 +363,9 @@ class SearchEngineCoreSearchMachine
             $this->searchProvider->setSearchRecord($this->searchRecord);
             //get search objects that match the keywords
             $this->dataList = $this->searchProvider->getRawResults();
-            $this->listOfIDsAsArray = explode(',',$this->searchRecord->setListOfIDs($this->dataList, 'RAW'));
+            $this->listOfIDsAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'RAW'));
         }
     }
-
 
     protected function runFilterUsingSQL()
     {
@@ -375,7 +374,6 @@ class SearchEngineCoreSearchMachine
             return;
         }
         if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
-
             $this->dataList = Injector::inst()->create(
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
@@ -385,7 +383,7 @@ class SearchEngineCoreSearchMachine
             $this->dataList = $this->dataList
                 ->sort('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')');
 
-                // $this->dataList = SearchEngineDataObject::get()
+        // $this->dataList = SearchEngineDataObject::get()
                 //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
                 //     ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
         } else {
@@ -396,7 +394,7 @@ class SearchEngineCoreSearchMachine
                 // print_r($this->dataList->sql());
                 $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray($filterValues);
                 if ($this->filter) {
-                    foreach($this->filter as $field => $idList) {
+                    foreach ($this->filter as $field => $idList) {
                         $where = Injector::inst()->create(
                             FasterIDLists::class,
                             SearchEngineDataObject::class,
@@ -435,7 +433,7 @@ class SearchEngineCoreSearchMachine
 
     protected function runFilterUsingCustom()
     {
-        if (is_array($this->listOfIDsCustomAsArray) &&  count($this->listOfIDsCustomAsArray)) {
+        if (is_array($this->listOfIDsCustomAsArray) && count($this->listOfIDsCustomAsArray)) {
             $this->dataList = Injector::inst()->create(
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
@@ -443,7 +441,7 @@ class SearchEngineCoreSearchMachine
             )->filteredDatalist();
 
             $this->dataList = $this->dataList->sort($this->nonCustomSort);
-            // $this->dataList = SearchEngineDataObject::get()
+        // $this->dataList = SearchEngineDataObject::get()
             // ->filter(['ID' => $this->listOfIDsCustomAsArray])
             // ->sort($this->nonCustomSort);
         } else {
@@ -476,8 +474,6 @@ class SearchEngineCoreSearchMachine
                 $this->endTimeForCustomSort = microtime(true);
             }
         }
-
-
     }
 
     protected function runDebugPrep1()
@@ -533,14 +529,14 @@ class SearchEngineCoreSearchMachine
         $this->debugArray[] = 'Cleaned Searched: <pre>' . print_r($this->searchRecord->FinalPhrase, 1) . '</pre>';
         $this->debugArray[] = 'Keywords SQL (excludes keywords that are not in index): <pre> (' . implode(') AND (', $this->keywordArray) . ')</pre>';
         $this->debugArray[] = '---------------- Filters --------------';
-        $this->debugArray[] = "STEP 1: RAW Filter ".$this->filter1;
-        $this->debugArray[] = "... RAW matches $this->matches1";
+        $this->debugArray[] = 'STEP 1: RAW Filter ' . $this->filter1;
+        $this->debugArray[] = "... RAW matches {$this->matches1}";
         $this->debugArray[] = '<hr />';
-        $this->debugArray[] = "STEP 2: SQL Filter ".$this->filter2;
-        $this->debugArray[] = "... SQL matches ".$this->matches2;
+        $this->debugArray[] = 'STEP 2: SQL Filter ' . $this->filter2;
+        $this->debugArray[] = '... SQL matches ' . $this->matches2;
         $this->debugArray[] = '<hr />';
-        $this->debugArray[] = "STEP 3: CUSTOM Filter ".$this->filter3;
-        $this->debugArray[] = "... CUSTOM matches ".$this->matches3;
+        $this->debugArray[] = 'STEP 3: CUSTOM Filter ' . $this->filter3;
+        $this->debugArray[] = '... CUSTOM matches ' . $this->matches3;
         $this->debugArray[] = '<hr />';
         $this->debugArray[] = '---------------- Sorting --------------';
         $this->debugArray[] = '<hr />';

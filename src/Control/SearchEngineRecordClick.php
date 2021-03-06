@@ -22,14 +22,14 @@ class SearchEngineRecordClick extends Controller
     public function add(HTTPRequest $request)
     {
         $itemID = intval($request->param('ID'));
-        if($itemID) {
-            $item = SearchEngineDataObject::get()->byID(($itemID));
+        if ($itemID) {
+            $item = SearchEngineDataObject::get()->byID($itemID);
             if ($item) {
                 SearchEngineSearchRecordHistory::register_click($item);
                 return $this->redirect($item->SourceObject()->Link());
             }
         }
-        $url = empty($_GET['finaldestination']) ? '404' : $_GET['finaldestination'] ;
+        $url = empty($_GET['finaldestination']) ? '404' : $_GET['finaldestination'];
 
         return $this->redirect(Director::absoluteURL($url));
     }
