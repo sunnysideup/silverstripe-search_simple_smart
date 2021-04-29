@@ -24,7 +24,7 @@
     "require": {
         "silverstripe/cms": "~4@stable",
         "silverstripe/errorpage": "*",
-        "camspiers/porter-stemmer": "dev-master"
+        "wamania/php-stemmer": "^2.2"
     },
     "autoload": {
         "psr-4": {
