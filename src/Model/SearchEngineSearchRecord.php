@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use Porter;
+use Wamania\Snowball\StemmerFactory;
 
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
@@ -261,7 +261,8 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $this->SearchEngineKeywords()->removeAll();
         $keywordArray = explode(' ', $this->FinalPhrase);
         foreach ($keywordArray as $position => $keyword) {
-            $stem = Porter::Stem($keyword);
+            $stemmer = StemmerFactory::create('en');
+            $stem = $stemmer->stem($keyword);
             $realPosition = $position + 1;
             $selectArray = [0 => 0];
             $keywordsAfterFindReplace = explode(' ', SearchEngineKeywordFindAndReplace::find_replacements($keyword));
