@@ -67,7 +67,7 @@ First of all you need to decide what DataObjects are going to be indexed.
 You do this as follows:
     `yml
 
-    File:
+    SilverStripe\Assets\File:
       extensions:
         - SearchEngineMakeSearchable
       search_engine_full_contents_fields_array:
@@ -76,7 +76,7 @@ You do this as follows:
         2:
           - Content
 
-    HomePage:
+    Vendor\Package\HomePage:
       search_engine_full_contents_fields_array:
         1:
           - Title
