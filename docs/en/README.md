@@ -65,9 +65,9 @@ CUSTOMISATION OF INDEXING
 -------------------------
 First of all you need to decide what DataObjects are going to be indexed.
 You do this as follows:
-    `yml
+```yml
 
-    SilverStripe\Assets\File:
+    File:
       extensions:
         - SearchEngineMakeSearchable
       search_engine_full_contents_fields_array:
@@ -76,7 +76,7 @@ You do this as follows:
         2:
           - Content
 
-    Vendor\Package\HomePage:
+    HomePage:
       search_engine_full_contents_fields_array:
         1:
           - Title
@@ -86,7 +86,7 @@ You do this as follows:
         2:
           - Content
           - MyThirdDataObject.Title
-    `
+```
 
 
 CUSTOMISATION OF SEARCHING
@@ -104,6 +104,33 @@ For customisation of the
         SearchEngineInitFunctions.myMethod = function(){...}
     this will replace methods and variables in SearchEngineInitFunctions
 
+
+HOW TO SET UP A SEARCH
+----------------------
+```php
+use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
+use Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName;
+use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByCreated;
+
+class ExampleClass
+{
+    function basic() 
+    {
+        $results = (new SearchEngineCoreSearchMachine())
+            ->run('my keywords');
+    }   
+    function moreDetailed() 
+    {
+        $results =  (new SearchEngineCoreSearchMachine())
+            // see https://github.com/sunnysideup/silverstripe-search_simple_smart/tree/master/src/Filters for examples
+            ->addFilter(SearchEngineFilterForClassName::class, SiteTree::class) 
+            // see https://github.com/sunnysideup/silverstripe-search_simple_smart/tree/master/src/Sorters for examples
+            ->setSorter(SearchEngineSortByCreated::class) 
+            ->run('my keywords');
+    }   
+    
+}
+```
 
 HOW TO INDEX AN OBJECT
 ----------------------
