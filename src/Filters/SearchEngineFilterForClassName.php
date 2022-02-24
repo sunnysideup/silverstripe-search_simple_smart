@@ -83,6 +83,10 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         }
         $array = [];
 
+        if (is_string($filterArray)) {
+            $filterArray = [$filterArray];
+        }
+
         foreach ($filterArray as $className) {
             $array += ClassInfo::subclassesFor($className);
         }
