@@ -40,10 +40,14 @@ ANALYSIS
 --------
  - The module provides basic analytics of searches carried out on the site.
 
-
 DEBUG
 -----
 You can turn on debug in `admin/settings` or with an `.env` variable: `SEARCH_ENGINE_ADMIN` - set it to `true`
+
+PREPARING DATA
+--------------
+
+Run `dev/tasks/searchengineindexall` to index all objects when you start. In general, objects are (re)indexed `onAfterWrite`.
 
 DEPENDENCIES
 ------------
