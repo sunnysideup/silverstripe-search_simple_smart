@@ -40,7 +40,7 @@ class SearchEngineSourceObjectApi
      */
     public function FieldsForIndexing(DataObject $sourceObject): array
     {
-        $className = $sourceObject->getKey(true);
+        $className = $sourceObject->getSearchEngineKey(true);
         if (! isset(self::$_search_engine_fields_for_indexing[$className])) {
             $levelFields = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
             if (is_array($levelFields) && count($levelFields)) {
