@@ -3,14 +3,14 @@ Name: my_search_simple_smart_searcheableobjects
 ---
 SilverStripe\Assets\File:
   extensions:
-    - SearchEngineMakeSearchable
+    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable
   search_engine_full_contents_fields_array:
     1:
       - Title
     2:
       - Content
 
-HomePage:
+MyVendor\MyPackage\HomePage:
   search_engine_full_contents_fields_array:
     1:
       - Title
