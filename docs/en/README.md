@@ -41,6 +41,10 @@ ANALYSIS
  - The module provides basic analytics of searches carried out on the site.
 
 
+DEBUG
+-----
+You can turn on debug in `admin/settings` or with an `.env` variable: `SEARCH_ENGINE_ADMIN` - set it to `true`
+
 DEPENDENCIES
 ------------
 There are no additional requirements for the Silverstripe Search.
