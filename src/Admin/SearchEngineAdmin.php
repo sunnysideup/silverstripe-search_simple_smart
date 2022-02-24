@@ -83,7 +83,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 <br /><br />
                 To bypass all caching please add ?flush=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
                 <br /><br />
-                Also please review the <a href="/searchenginemanifest">full search manifest</a>.
+                Also please review the <a href="/admin/searchenginemanifest">full search manifest</a>.
                 </h4>'
             );
             $linkFields[] = HTMLReadonlyField::create(
