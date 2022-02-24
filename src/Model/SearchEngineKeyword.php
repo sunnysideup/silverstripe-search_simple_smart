@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
@@ -9,7 +10,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
-
+use SilverStripe\Security\Security;
 /**
  * getExtraData($componentName, $itemID) method on the ManyManyList to retrieve those extra fields values:
  */
@@ -123,7 +124,9 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     public static function flush()
     {
-        ExportKeywordList::export_keyword_list();
+        if(Security::database_is_ready() && !Director::is_cli()) {
+            ExportKeywordList::export_keyword_list();
+        }
     }
 
     public function i18n_singular_name()
