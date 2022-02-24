@@ -100,7 +100,7 @@ class SearchEngineContentControllerExtension extends Extension
         if (Director::is_ajax()) {
             //do nothing
         } else {
-            $request = $this->owner->getRequest();
+            $request = $this->getOwner()->getRequest();
             $request->getSession()->clear('SearchEngineSearchRecordHistoryID');
             $request->getSession()->set('SearchEngineSearchRecordHistoryID', 0);
             $request->getSession()->save($request);

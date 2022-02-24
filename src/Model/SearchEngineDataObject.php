@@ -336,7 +336,7 @@ class SearchEngineDataObject extends DataObject
             $sourceObject = $this->SourceObject();
         }
         return Injector::inst()->get(SearchEngineSourceObjectApi::class)
-            ->SearchEngineFieldsForIndexing($sourceObject);
+            ->FieldsForIndexing($sourceObject);
     }
 
     public function getObjectClassName(): string
@@ -374,7 +374,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SourceObject(): ?DataObject
     {
-        $key = $this->getKey();
+        $key = $this->getSearchEngineKey();
         if (! isset(self::$_source_objects[$key])) {
             $className = $this->DataObjectClassName;
             if ($className && class_exists($className)) {
@@ -393,7 +393,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SourceObjectExists(): bool
     {
-        $key = $this->getKey();
+        $key = $this->getSearchEngineKey();
         if (! isset(self::$_source_objects_exists[$key])) {
             self::$_source_objects_exists[$key] = false;
             $className = $this->DataObjectClassName;
@@ -435,7 +435,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SpecialSortGroup()
     {
-        $className = $this->getKey(true);
+        $className = $this->getSearchEngineKey(true);
         if (! isset(self::$_special_sort_group[$className])) {
             self::$_special_sort_group[$className] = '';
             $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups');
@@ -664,7 +664,7 @@ class SearchEngineDataObject extends DataObject
      * @param  bool $classNameOnly
      * @return string
      */
-    public function getKey($classNameOnly = false): string
+    public function getSearchEngineKey($classNameOnly = false): string
     {
         if ($classNameOnly) {
             return $this->DataObjectClassName . '';
