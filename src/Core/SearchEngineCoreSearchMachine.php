@@ -167,6 +167,11 @@ class SearchEngineCoreSearchMachine
     protected $filterStringForDebug = '';
 
     /**
+     * @var string
+     */
+    protected $searchPhrase = '';
+
+    /**
      * class used to provide the raw results
      * raw results are the SearchEngineDataObject matches for a particular keyword
      * phrase, without any filters or sort.
