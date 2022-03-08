@@ -172,6 +172,11 @@ class SearchEngineCoreSearchMachine
     protected $searchPhrase = '';
 
     /**
+     * @var null|DataList
+     */
+    protected $dataList = null;
+
+    /**
      * class used to provide the raw results
      * raw results are the SearchEngineDataObject matches for a particular keyword
      * phrase, without any filters or sort.
