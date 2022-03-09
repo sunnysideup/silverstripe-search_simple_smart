@@ -177,6 +177,29 @@ class SearchEngineCoreSearchMachine
     protected $dataList = null;
 
     /**
+     * @var null|DataList
+     */
+    protected $filter = null;
+
+    /**
+     * @var array
+     */
+    protected $keywordArray = [];
+
+    /**
+     * @var string
+     */
+    protected $customFilterTime = '';
+
+    /**
+     * @var string
+     */
+    protected $customSortTime = '';
+
+    protected $filter1, $filter2, $filter3 = '';
+
+    protected $matches1, $matches2, $matches3 = '';
+    /**
      * class used to provide the raw results
      * raw results are the SearchEngineDataObject matches for a particular keyword
      * phrase, without any filters or sort.
