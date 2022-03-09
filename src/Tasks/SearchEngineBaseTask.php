@@ -131,7 +131,7 @@ class SearchEngineBaseTask extends BuildTask
         }
         $this->flushNow('<strong>limit</strong>: ' . $this->limit);
 
-        if ($request->getVar('step')) {
+        if ($request && $request->getVar('step')) {
             $this->step = intval($request->getVar('step'));
         }
         $this->flushNow('<strong>step</strong>: ' . $this->step);
