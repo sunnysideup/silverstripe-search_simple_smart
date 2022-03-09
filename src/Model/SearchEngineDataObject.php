@@ -629,6 +629,8 @@ class SearchEngineDataObject extends DataObject
             if ($withModeChange) {
                 SearchEngineDataObjectApi::end_indexing_mode();
             }
+        } else {
+            echo 'Can not find object';
         }
     }
 

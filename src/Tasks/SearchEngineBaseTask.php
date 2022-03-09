@@ -121,12 +121,12 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        if ($request->getVar('verbose')) {
+        if ($request && $request->getVar('verbose')) {
             $this->verbose = $request->getVar('verbose') === 'on' ? true : false;
         }
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
 
-        if ($request->getVar('limit')) {
+        if ($request && $request->getVar('limit')) {
             $this->limit = intval($request->getVar('limit'));
         }
         $this->flushNow('<strong>limit</strong>: ' . $this->limit);
@@ -139,17 +139,18 @@ class SearchEngineBaseTask extends BuildTask
         $this->type = $request->getVar('type');
         $this->flushNow('<strong>type</strong>: ' . $this->type);
 
-        if ($request->getVar('oldonesonly')) {
+        if ($request && $request->getVar('oldonesonly')) {
             $this->oldOnesOnly = $request->getVar('oldonesonly') === 'on' ? true : false;
         }
         $this->flushNow('<strong>old ones only</strong>: ' . ($this->oldOnesOnly ? 'yes' : 'no'));
 
-        if ($request->getVar('unindexedonly')) {
+        if ($request && $request->getVar('unindexedonly')) {
             $this->unindexedOnly = $request->getVar('unindexedonly') === 'on' ? true : false;
         }
         $this->flushNow('<strong>unindexedonly only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
-
-        $this->task = $request->getVar('task') ?: self::$segment;
+        if($request) {
+            $this->task = $request->getVar('task') ?: self::$segment;
+        }
         $this->flushNow('<strong>task</strong>: ' . $this->task);
 
         $this->flushNow('==========================', false);
