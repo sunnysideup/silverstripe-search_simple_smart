@@ -121,38 +121,36 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        if ($request && $request->getVar('verbose')) {
-            $this->verbose = $request->getVar('verbose') === 'on' ? true : false;
+        if($request) {
+            if ($request->getVar('verbose')) {
+                $this->verbose = $request->getVar('verbose') === 'on' ? true : false;
+            }
+            if ($request->getVar('limit')) {
+                $this->limit = intval($request->getVar('limit'));
+            }
+            if ($request->getVar('step')) {
+                $this->step = intval($request->getVar('step'));
+            }
+            if ($request->getVar('type')) {
+                $this->type = $request->getVar('type');
+            }
+            if ($request->getVar('oldonesonly')) {
+                $this->oldOnesOnly = $request->getVar('oldonesonly') === 'on' ? true : false;
+            }
+            if ($request->getVar('unindexedonly')) {
+                $this->unindexedOnly = $request->getVar('unindexedonly') === 'on' ? true : false;
+            }
+            $this->task = $request->getVar('task');
+        } else {
+            $this->task = self::$segment;
         }
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
-
-        if ($request && $request->getVar('limit')) {
-            $this->limit = intval($request->getVar('limit'));
-        }
         $this->flushNow('<strong>limit</strong>: ' . $this->limit);
-
-        if ($request && $request->getVar('step')) {
-            $this->step = intval($request->getVar('step'));
-        }
         $this->flushNow('<strong>step</strong>: ' . $this->step);
-
-        $this->type = $request->getVar('type');
         $this->flushNow('<strong>type</strong>: ' . $this->type);
-
-        if ($request && $request->getVar('oldonesonly')) {
-            $this->oldOnesOnly = $request->getVar('oldonesonly') === 'on' ? true : false;
-        }
         $this->flushNow('<strong>old ones only</strong>: ' . ($this->oldOnesOnly ? 'yes' : 'no'));
-
-        if ($request && $request->getVar('unindexedonly')) {
-            $this->unindexedOnly = $request->getVar('unindexedonly') === 'on' ? true : false;
-        }
         $this->flushNow('<strong>unindexedonly only</strong>: ' . ($this->unindexedOnly ? 'yes' : 'no'));
-        if($request) {
-            $this->task = $request->getVar('task') ?: self::$segment;
-        }
         $this->flushNow('<strong>task</strong>: ' . $this->task);
-
         $this->flushNow('==========================', false);
     }
 
