@@ -257,22 +257,13 @@ class SearchEngineCoreSearchMachine
      *
      * @return DataList
      */
-    public function run($searchPhrase, $filterProviders = [], $sortProvider = '', $sortProviderValues = null)
+    public function run(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null)
     {
-        $this->searchPhrase = $searchPhrase;
-        if (! empty($filterProviders)) {
-            $this->filterProviders += $filterProviders;
-        }
-        if (! empty($sortProvider)) {
-            $this->sortProvider = $sortProvider;
-        }
-        if (! empty($sortProviderValues)) {
-            $this->sortProviderValues = $sortProviderValues;
-        }
-
+        // special get vars
         $this->runGetGetVars();
 
-        $this->runInitVars();
+        //initialise vars
+        $this->runInitVars($searchPhrase, $filterProviders, $sortProvider, $sortProviderValues);
 
         $this->runGetSearchRecord();
 
@@ -333,13 +324,24 @@ class SearchEngineCoreSearchMachine
         if (isset($_GET['flush'])) {
             $this->bypassCaching = true;
         }
-    }
-
-    protected function runInitVars()
-    {
-        //save variables
         if ($this->debug) {
             $this->startTimeForRun = microtime(true);
+        }
+    }
+
+    protected function runInitVars(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null)
+    {
+        $this->searchPhrase = $searchPhrase;
+
+        //save variables
+        if (! empty($filterProviders)) {
+            $this->filterProviders += $filterProviders;
+        }
+        if (! empty($sortProvider)) {
+            $this->sortProvider = $sortProvider;
+        }
+        if (! empty($sortProviderValues)) {
+            $this->sortProviderValues = $sortProviderValues;
         }
     }
 
@@ -353,6 +355,8 @@ class SearchEngineCoreSearchMachine
             //lets retrieve it again.
             $this->searchRecord->write();
         }
+
+        //cached data ...
         $this->listOfIDsAsArray = $this->searchRecord->getListOfIDs('RAW');
         $this->listOfIDsSQLAsArray = $this->searchRecord->getListOfIDs('SQL');
         $this->listOfIDsCustomAsArray = $this->searchRecord->getListOfIDs('CUSTOM');
@@ -360,7 +364,6 @@ class SearchEngineCoreSearchMachine
 
     protected function runCreateFilters()
     {
-        //create filters
         if (is_array($this->filterProviders) && count($this->filterProviders)) {
             foreach (array_keys($this->filterProviders) as $filterClassName) {
                 $filterClassName = (string) $filterClassName;
