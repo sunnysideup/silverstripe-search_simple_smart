@@ -5,18 +5,18 @@ SilverStripe\Assets\File:
   extensions:
     - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable
   search_engine_full_contents_fields_array:
-    1:
+    level1:
       - Title
-    2:
+    level2:
       - Content
 
 MyVendor\MyPackage\HomePage:
   search_engine_full_contents_fields_array:
-    1:
+    level1:
       - Title
       - MenuTitle
       - HeaderCustomHeading
       - HeaderCustomSubHeading
-    2:
+    level2:
       - Content
       - MyThirdDataObject.Title

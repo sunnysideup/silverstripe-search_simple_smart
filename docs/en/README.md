@@ -79,19 +79,19 @@ You do this as follows:
       extensions:
         - SearchEngineMakeSearchable
       search_engine_full_contents_fields_array:
-        1:
+        level1:
           - Title
-        2:
+        level2:
           - Content
 
     HomePage:
       search_engine_full_contents_fields_array:
-        1:
+        level1:
           - Title
           - MenuTitle
           - HeaderCustomHeading
           - HeaderCustomSubHeading
-        2:
+        level2:
           - Content
           - MyThirdDataObject.Title
 ```
@@ -122,21 +122,21 @@ use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByCreated;
 
 class ExampleClass
 {
-    function basic() 
+    function basic()
     {
         $results = (new SearchEngineCoreSearchMachine())
             ->run('my keywords');
     }   
-    function moreDetailed() 
+    function moreDetailed()
     {
         $results =  (new SearchEngineCoreSearchMachine())
             // see https://github.com/sunnysideup/silverstripe-search_simple_smart/tree/master/src/Filters for examples
-            ->addFilter(SearchEngineFilterForClassName::class, SiteTree::class) 
+            ->addFilter(SearchEngineFilterForClassName::class, SiteTree::class)
             // see https://github.com/sunnysideup/silverstripe-search_simple_smart/tree/master/src/Sorters for examples
-            ->setSorter(SearchEngineSortByCreated::class) 
+            ->setSorter(SearchEngineSortByCreated::class)
             ->run('my keywords');
     }   
-    
+
 }
 ```
 
