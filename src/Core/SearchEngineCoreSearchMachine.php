@@ -365,9 +365,10 @@ class SearchEngineCoreSearchMachine
     protected function runCreateFilters()
     {
         if (is_array($this->filterProviders) && count($this->filterProviders)) {
-            foreach (array_keys($this->filterProviders) as $filterClassName) {
+            foreach ($this->filterProviders as $filterClassName => $filterValues) {
                 $filterClassName = (string) $filterClassName;
-                $this->filterObjects[$filterClassName] = $filterClassName::create($this->debug);
+                $this->filterObjects[$filterClassName] = $filterClassName::create($this->debug)
+                    ->setFilterValues($filterValues);
             }
         }
     }

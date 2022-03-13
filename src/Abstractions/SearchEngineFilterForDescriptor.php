@@ -16,6 +16,8 @@ abstract class SearchEngineFilterForDescriptor
 
     protected $debug = false;
 
+    protected $filterValues = null;
+
     /**
      * retains debug information if turned on.
      * @var array
@@ -97,5 +99,11 @@ abstract class SearchEngineFilterForDescriptor
     public function getDebugArray()
     {
         return '<ul><li>' . implode('</li>li><li>', $this->debugArray) . '</li></ul>';
+    }
+
+    public function setFilterValues($filterValues)
+    {
+        $this->filterValues = $filterValues;
+        return $this;
     }
 }
