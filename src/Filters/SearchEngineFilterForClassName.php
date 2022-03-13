@@ -49,7 +49,13 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         if (is_array($myInclusions) && count($myInclusions)) {
             $checkInclusion = true;
         }
-
+        if(! empty($this->filterValues)) {
+            if(! is_array($this->filterValues)) {
+                $this->filterValues = [$this->filterValues => $this->filterValues];
+            }
+            $myInclusions = $this->filterValues;
+            $checkInclusion = true;
+        }
         foreach ($filterArray as $className => $title) {
             if ($checkInclusion) {
                 if (in_array($className, $myInclusions, true)) {
@@ -62,6 +68,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
             }
         }
 
+
         return $array;
     }
 
@@ -70,7 +77,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      * query prior to searching the SearchEngineDataObjects
      *
      * return an array like
-     *     "ClassName" => array("A", "B", "C"),
+     *     "DataObjectClassName" => array("A", "B", "C"),
      *
      * @param array|SS_List|null $filterArray
      *
