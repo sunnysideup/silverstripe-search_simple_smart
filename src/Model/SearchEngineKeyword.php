@@ -236,7 +236,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
     /**
      * level can be formatted as Level1, level1 or 1
-     * @param int | string $level
+     * @param int|string $level
      * @return int
      */
     public static function level_sanitizer($level)
@@ -244,7 +244,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         $level = str_ireplace('level', '', $level);
         $level = intval($level);
         if (! in_array($level, [1, 2, 3], true)) {
-            user_error('Level needs to be between 1 and 3', E_USER_WARNING);
+            user_error('Level needs to be between 1 and 3. It is '.$level, E_USER_WARNING);
             return 1;
         }
         return $level;

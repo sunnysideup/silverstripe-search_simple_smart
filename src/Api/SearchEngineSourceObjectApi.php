@@ -11,6 +11,8 @@ use SilverStripe\ORM\FieldType\DBString;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
+use Sunnysideup\Vardump\Vardump;
+
 class SearchEngineSourceObjectApi
 {
     /**
