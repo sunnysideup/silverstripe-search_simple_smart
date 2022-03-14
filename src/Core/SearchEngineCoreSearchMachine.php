@@ -277,6 +277,7 @@ class SearchEngineCoreSearchMachine
 
         $this->runFilterUsingCustom();
 
+
         $this->runSortUsingCustom();
 
         if ($this->debug) {
@@ -433,19 +434,21 @@ class SearchEngineCoreSearchMachine
                 $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray($filterValues);
                 if ($this->filter) {
                     foreach ($this->filter as $field => $idList) {
-                        $where = Injector::inst()->create(
-                            FasterIDLists::class,
-                            SearchEngineDataObject::class,
-                            $idList,
-                            $field
-                        )->shortenIdList();
-
-                        $this->dataList = $this->dataList->where($where);
+                        if($field === 'ID') {
+                            $where = Injector::inst()->create(
+                                FasterIDLists::class,
+                                SearchEngineDataObject::class,
+                                $idList,
+                                $field
+                            )->shortenIdList();
+                            $this->dataList = $this->dataList->where($where);
+                        } else {
+                            $this->dataList = $this->dataList->filter([$field => $idList]);
+                        }
                     }
                     if ($this->debug) {
                         $this->filterStringForDebug .= $this->fancyPrintR($this->filter);
                     }
-                    $this->dataList->count();
                 }
             }
             $this->listOfIDsSQLAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'SQL'));

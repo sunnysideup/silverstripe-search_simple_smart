@@ -7,6 +7,8 @@ use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 
+use Match\App\Dev\Console;
+
 class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 {
     /**
@@ -88,12 +90,12 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         if (empty($filterArray)) {
             $filterArray = array_keys($this->getFilterList());
         }
-        $array = [];
 
         if (is_string($filterArray)) {
             $filterArray = [$filterArray];
         }
 
+        $array = [];
         foreach ($filterArray as $className) {
             $array += ClassInfo::subclassesFor($className);
         }
