@@ -53,7 +53,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     /*
      * @var string
      */
-    private static $menu_title = 'Search Engine';
+    private static $menu_title = 'Keyword Search';
 
     public function providePermissions()
     {

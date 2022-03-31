@@ -169,7 +169,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     $this->updateSettingsFields($fields);
                 } elseif ($this->owner instanceof SiteTree) {
                     $fields->addFieldToTab(
-                        'Root.Main',
+                        'Root.Search',
                         LiteralField::create(
                             'SearchEngineHeader',
                             '<h2>
