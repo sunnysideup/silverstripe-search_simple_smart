@@ -181,7 +181,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     /**
      * @param SearchEngineDataObject $searchEngineDataObject
-     * @return SearchEngineDataObjectToBeIndexed
+     * @return SearchEngineDataObjectToBeIndexed|null
      */
     public static function add(SearchEngineDataObject $searchEngineDataObject, $alsoIndex = true)
     {
@@ -215,6 +215,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
             return self::$_cache_for_items[$searchEngineDataObject->ID];
         }
         user_error('The SearchEngineDataObject needs to exist');
+        return null;
     }
 
     public function IndexNow(SearchEngineDataObject $searchEngineDataObject = null)
