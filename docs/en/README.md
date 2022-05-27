@@ -94,6 +94,9 @@ You do this as follows:
         level2:
           - Content
           - MyThirdDataObject.Title
+    Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed:
+      cron_job_running: true
+
 ```
 
 
