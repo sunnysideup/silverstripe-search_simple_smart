@@ -202,7 +202,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
                     $objToBeIndexedRecord->write();
                 }
                 //we do not want this on DEV
-                if (Config::inst()->get(self::class, 'cron_job_running') && Director::isDev() === false) {
+                if (Config::inst()->get(self::class, 'cron_job_running')) {
                     //cron will take care of it...
                 } else {
                     //do it immediately...
