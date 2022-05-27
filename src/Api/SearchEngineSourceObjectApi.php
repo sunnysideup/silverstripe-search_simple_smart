@@ -19,7 +19,7 @@ class SearchEngineSourceObjectApi
      * used for caching...
      * @var array
      */
-    private static $_search_engine_fields_for_indexing = [];
+    protected static $_search_engine_fields_for_indexing = [];
 
     public function SearchEngineSourceObjectSortDate(?DataObject $sourceObject = null)
     {

@@ -38,12 +38,12 @@ class SearchEngineMakeSearchable extends DataExtension
     /**
      * @var array
      */
-    private static $_search_engine_exclude_from_index = [];
+    protected static $_search_engine_exclude_from_index = [];
 
     /**
      * @var array
      */
-    private static $_search_engine_exclude_from_index_per_class = [];
+    protected static $_search_engine_exclude_from_index_per_class = [];
 
     ############################
     # do stuff ....

@@ -80,7 +80,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
         'Custom' => 'Manually Entered',
     ];
 
-    private static $_is_listed = [];
+    protected static $_is_listed = [];
 
     public function i18n_singular_name()
     {

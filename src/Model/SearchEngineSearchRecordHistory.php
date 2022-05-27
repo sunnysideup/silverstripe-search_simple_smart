@@ -70,7 +70,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         'DataObjectID' => true,
     ];
 
-    private static $_latest_search_cache = null;
+    protected static $_latest_search_cache = null;
 
     public function i18n_singular_name()
     {

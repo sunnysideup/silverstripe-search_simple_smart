@@ -25,9 +25,9 @@ class SearchEngineDataObjectApi
      * used for caching...
      * @var array
      */
-    private static $_searchable_class_names = [];
+    protected static $_searchable_class_names = [];
 
-    private static $_original_mode = null;
+    protected static $_original_mode = null;
 
     /**
      * @param DataObject $obj

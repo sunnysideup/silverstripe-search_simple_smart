@@ -113,14 +113,14 @@ class SearchEngineKeyword extends DataObject implements Flushable
         MySQLSchemaManager::ID => 'ENGINE=MyISAM',
     ];
 
-    private static $_keyword_cache = [];
+    protected static $_keyword_cache = [];
 
-    private static $_keyword_cache_request_count = [];
+    protected static $_keyword_cache_request_count = [];
 
     /*
      * @var array
      */
-    private static $_clean_keyword_cache = [];
+    protected static $_clean_keyword_cache = [];
 
     public static function flush()
     {

@@ -139,7 +139,7 @@ class SearchEngineBasicForm extends Form
      */
     private static $full_results_page_type = '';
 
-    private static $_for_template_completed = false;
+    protected static $_for_template_completed = false;
 
     /**
      * this function constructs a new Search Engine Basic Form

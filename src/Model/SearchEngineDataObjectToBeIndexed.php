@@ -113,7 +113,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     private static $cron_job_running = false;
 
-    private static $_cache_for_items = [];
+    protected static $_cache_for_items = [];
 
     public function i18n_singular_name()
     {

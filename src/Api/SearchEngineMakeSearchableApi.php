@@ -18,7 +18,7 @@ class SearchEngineMakeSearchableApi
     /**
      * @var array
      */
-    private static $_array_of_relations = [];
+    protected static $_array_of_relations = [];
 
     /**
      * @param DataObject $object

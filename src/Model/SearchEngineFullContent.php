@@ -136,7 +136,7 @@ class SearchEngineFullContent extends DataObject
      */
     private static $remove_all_non_letters = true;
 
-    private static $_punctuation_objects = null;
+    protected static $_punctuation_objects = null;
 
     public function i18n_singular_name()
     {

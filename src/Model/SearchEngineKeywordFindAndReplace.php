@@ -84,7 +84,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      * making sure that we do not have infinite loops...
      * @var int
      */
-    private static $_words_used = [];
+    protected static $_words_used = [];
 
     public function i18n_singular_name()
     {

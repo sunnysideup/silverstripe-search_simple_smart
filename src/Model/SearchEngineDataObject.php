@@ -205,13 +205,13 @@ class SearchEngineDataObject extends DataObject
      * used for caching...
      * @var array
      */
-    private static $_object_class_name = [];
+    protected static $_object_class_name = [];
 
-    private static $_source_objects = [];
+    protected static $_source_objects = [];
 
-    private static $_source_objects_exists = [];
+    protected static $_source_objects_exists = [];
 
-    private static $_special_sort_group = [];
+    protected static $_special_sort_group = [];
 
     #####################
     # do stuff
