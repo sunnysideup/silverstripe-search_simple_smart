@@ -161,6 +161,9 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
+        if($this->owner->SearchEngineExcludeFromIndex()) {
+            return;
+        }
         if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN')) {
             if ($fields->fieldByName('Root')) {
                 $fields->findOrMakeTab('Root.Main');
