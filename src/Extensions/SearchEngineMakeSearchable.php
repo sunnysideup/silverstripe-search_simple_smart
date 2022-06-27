@@ -172,7 +172,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     $this->updateSettingsFields($fields);
                 } elseif ($this->owner instanceof SiteTree) {
                     $fields->addFieldToTab(
-                        'Root.KeywordSearch',
+                        'Root.Keywords',
                         LiteralField::create(
                             'SearchEngineHeader',
                             '<h2>
@@ -197,7 +197,7 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($item) {
                 $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->getOwner()->LastEdited));
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->getOwner()->HasBeenIndexed ? $this->getOwner()->LastEdited : 'n/a'));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed));
                 $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
