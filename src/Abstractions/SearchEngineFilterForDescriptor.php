@@ -16,10 +16,11 @@ abstract class SearchEngineFilterForDescriptor
 
     protected $debug = false;
 
-    protected $filterValues = null;
+    protected $filterValues;
 
     /**
      * retains debug information if turned on.
+     *
      * @var array
      */
     protected $debugArray = [];
@@ -30,13 +31,15 @@ abstract class SearchEngineFilterForDescriptor
     }
 
     /**
-     * returns the name - e.g. "Pages Only", "Files Only"
+     * returns the name - e.g. "Pages Only", "Files Only".
+     *
      * @return string
      */
     abstract public function getShortTitle();
 
     /**
-     * returns the description - e.g. "sort by the last Edited date"
+     * returns the description - e.g. "sort by the last Edited date".
+     *
      * @return string
      */
     public function getDescription()
@@ -49,8 +52,9 @@ abstract class SearchEngineFilterForDescriptor
      * e.g.
      *    LARGE => Large Pages
      *    SMALL => Small Pages
-     *    RED => Red Pages
-     * @return array|null
+     *    RED => Red Pages.
+     *
+     * @return null|array
      */
     abstract public function getFilterList();
 
@@ -58,33 +62,36 @@ abstract class SearchEngineFilterForDescriptor
      * returns the filter statement that is addeded to search
      * query prior to searching the SearchEngineDataObjects
      * the filter array are the items selected by the
-     * user, based on the filter options listed above
+     * user, based on the filter options listed above.
+     *
      * @see: getFilterList
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param array|SS_List|null $filterArray
-     *
-     * @return array| null
+     * @param null|array|SS_List $filterArray
      */
     abstract public function getSqlFilterArray($filterArray): ?array;
 
     /**
      * do we need to do custom filtering
      * the filter array are the items selected by the
-     * user, based on the filter options listed above
+     * user, based on the filter options listed above.
+     *
      * @see: getFilterList
-     * @param array|SS_List|null $filterArray
-     * @return boolean
+     *
+     * @param null|array|SS_List $filterArray
+     *
+     * @return bool
      */
     abstract public function hasCustomFilter($filterArray);
 
     /**
-     * Does any custom filtering
-     * @param SS_List $objects
+     * Does any custom filtering.
+     *
+     * @param SS_List                  $objects
      * @param SearchEngineSearchRecord $searchRecord
-     * @param array|SS_List|null $filterArray
+     * @param null|array|SS_List       $filterArray
      *
      * @return SS_List
      */
@@ -104,6 +111,7 @@ abstract class SearchEngineFilterForDescriptor
     public function setFilterValues($filterValues)
     {
         $this->filterValues = $filterValues;
+
         return $this;
     }
 }

@@ -29,9 +29,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory;
 
 class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
 {
-    /*
-     * @var array
-     */
+    // @var array
     private static $managed_models = [
         SearchEngineDataObject::class,
         SearchEngineDataObjectToBeIndexed::class,
@@ -45,14 +43,10 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         SearchEngineAdvancedSettings::class,
     ];
 
-    /*
-     * @var string
-     */
+    // @var string
     private static $url_segment = 'searchengine';
 
-    /*
-     * @var string
-     */
+    // @var string
     private static $menu_title = 'Keyword Search';
 
     public function providePermissions()
@@ -65,14 +59,10 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     public function getEditForm($id = null, $fields = null)
     {
         $form = parent::getEditForm();
-        if ($this->modelClass === SearchEngineAdvancedSettings::class) {
+        if (SearchEngineAdvancedSettings::class === $this->modelClass) {
             $jsLastChanged = '';
             $fileName = ExportKeywordList::get_js_keyword_file_name(true);
-            if ($fileName && file_exists($fileName)) {
-                $jsLastChanged = Date('Y-m-d H:i', filemtime($fileName));
-            } else {
-                $jsLastChanged = 'unknown';
-            }
+            $jsLastChanged = $fileName && file_exists($fileName) ? date('Y-m-d H:i', filemtime($fileName)) : 'unknown';
             $linkFields = [];
             $linkFields[] = HTMLReadonlyField::create(
                 'DebugTestField',
@@ -194,7 +184,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 'Root.Links',
                 $linkFields
             );
-        } elseif ($this->modelClass === SearchEngineSearchRecordHistory::class) {
+        } elseif (SearchEngineSearchRecordHistory::class === $this->modelClass) {
             // $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
             // $field = new FieldList(
             //     new TabSet(
@@ -211,6 +201,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
             // );
             // $form->setFields($field);
         }
+
         return $form;
     }
 
@@ -223,6 +214,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         if (is_array($arr)) {
             return self::array2ul($arr);
         }
+
         return '<pre>' . print_r($arr, true) . '</pre>';
     }
 
@@ -232,7 +224,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         $out = '<ul>';
         foreach ($array as $key => $elem) {
             if (! is_array($elem)) {
-                if ($key === intval($key)) {
+                if ($key === (int) $key) {
                     $out .= '<li><span>' . $elem . '</span></li>';
                 } else {
                     $out .= '<li><span><em>' . $key . ' --- </em> ' . $elem . '</span></li>';
@@ -241,6 +233,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 $out .= '<li><span>' . $key . '</span>' . self::array2ul($elem) . '</li>';
             }
         }
+
         return $out . '</ul>';
     }
 

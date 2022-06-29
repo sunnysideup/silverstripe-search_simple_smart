@@ -19,7 +19,8 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      * e.g.
      *    LARGE => Large Pages
      *    SMALL => Small Pages
-     *    RED => Red Pages
+     *    RED => Red Pages.
+     *
      * @return array
      */
     public function getFilterList()
@@ -29,22 +30,21 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
 
     /**
      * returns the filter statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param array|SS_List|null $filterArray
-     *
-     * @return array|null
+     * @param null|array|SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
         if ($filterArray instanceof SS_List) {
-            if ($filterArray->count() === 0) {
+            if (0 === $filterArray->count()) {
                 return ['ID' => -1];
             }
+
             $ids = $filterArray->column('ID');
             $classNames = $filterArray->column('ClassName');
             $preFilter = [];
@@ -53,8 +53,10 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
                 if (! isset($preFilter[$className])) {
                     $preFilter[$className] = [];
                 }
+
                 $preFilter[$className][$id] = $id;
             }
+
             return parent::getSqlFilterArray($preFilter);
         }
 
@@ -64,10 +66,11 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
     /**
      * do we need to do custom filtering
      * the filter array are the items selected by the
-     * user, based on the filter options listed above
+     * user, based on the filter options listed above.
+     *
      * @see: getFilterList
-     * @param array|SS_List|null $filterArray
-     * @return boolean
+     *
+     * @param null|array|SS_List $filterArray
      */
     public function hasCustomFilter($filterArray): bool
     {

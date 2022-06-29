@@ -26,15 +26,8 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
  * Add this DataExtension to any object that you would like to make
  * searchable.
  */
-
-
 class SearchEngineMakeSearchable extends DataExtension
 {
-    /**
-     * @var int
-     */
-    private $_onAfterWriteCount = [];
-
     /**
      * @var array
      */
@@ -45,18 +38,24 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     protected static $_search_engine_exclude_from_index_per_class = [];
 
-    ############################
-    # do stuff ....
-    ############################
+    /**
+     * @var int
+     */
+    private $_onAfterWriteCount = [];
+
+    //###########################
+    // do stuff ....
+    //###########################
 
     /**
      * deletes cached search results
      * sets stage to LIVE
      * indexes the current object.
+     *
      * @param SearchEngineDataObject $searchEngineDataObject
-     * @param bool $withModeChange everything necessary for indexings.
-     *                        Setting this to false means the stage will not be set
-     *                        and the cache will not be cleared.
+     * @param bool                   $withModeChange         everything necessary for indexings.
+     *                                                       Setting this to false means the stage will not be set
+     *                                                       and the cache will not be cleared.
      */
     public function doSearchEngineIndex($searchEngineDataObject = null, $withModeChange = true)
     {
@@ -67,8 +66,10 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($this->SearchEngineExcludeFromIndex()) {
                 $searchEngineDataObject = null;
             }
+
             //do nothing
         }
+
         if ($searchEngineDataObject) {
             $searchEngineDataObject->doSearchEngineIndex($this->owner, $withModeChange);
         }
@@ -82,6 +83,8 @@ class SearchEngineMakeSearchable extends DataExtension
      * );
      * where 1 and 2 are the levels of importance of each string.
      *
+     * @param null|mixed $item
+     *
      * @return array
      */
     public function SearchEngineFullContentForIndexingBuild($item = null)
@@ -89,6 +92,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if (! $item) {
             $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         }
+
         if ($item) {
             return $item->SearchEngineFullContentForIndexingBuild($this->owner);
         }
@@ -103,7 +107,8 @@ class SearchEngineMakeSearchable extends DataExtension
      *          [0] => array('ClassName' => MyOtherClassname, 'ID' => 123),
      *          [1] => array('ClassName' => FooClassName, 'ID' => 122)
      *          [1] => array('ClassName' => BarClassName, 'ID' => 124)
-     *      )
+     *      ).
+     *
      * @return array
      */
     public function SearchEngineAlsoTrigger()
@@ -111,15 +116,19 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($this->getOwner()->hasMethod('SearchEngineAlsoTriggerProvider')) {
             return $this->getOwner()->SearchEngineAlsoTriggerProvider();
         }
+
         return [];
     }
 
-    ############################
-    # searches
-    ############################
+    //###########################
+    // searches
+    //###########################
 
     /**
-     * Indexed Keywords
+     * Indexed Keywords.
+     *
+     * @param mixed $level
+     *
      * @return DataList
      */
     public function SearchEngineKeywordDataObjectMatches($level = 1)
@@ -134,9 +143,9 @@ class SearchEngineMakeSearchable extends DataExtension
         return SearchEngineKeyword::get()->filter(['ID' => 0]);
     }
 
-    ############################
-    # display....
-    ############################
+    //###########################
+    // display....
+    //###########################
 
     /**
      * returns a template for formatting the object
@@ -144,7 +153,7 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @param bool $moreDetails
      *
-     * @return array|null
+     * @return null|array
      */
     public function SearchEngineResultsTemplates($moreDetails = false)
     {
@@ -152,18 +161,20 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($item) {
             $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
         }
+
         return [];
     }
 
-    ############################
-    # CMS
-    ############################
+    //###########################
+    // CMS
+    //###########################
 
     public function updateCMSFields(FieldList $fields)
     {
-        if($this->owner->SearchEngineExcludeFromIndex()) {
+        if ($this->owner->SearchEngineExcludeFromIndex()) {
             return;
         }
+
         if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN')) {
             if ($fields->fieldByName('Root')) {
                 $fields->findOrMakeTab('Root.Main');
@@ -193,6 +204,7 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($this->SearchEngineExcludeFromIndex()) {
                 return;
             }
+
             $item = SearchEngineDataObjectApi::find_or_make($this->owner);
             if ($item) {
                 $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
@@ -256,9 +268,9 @@ class SearchEngineMakeSearchable extends DataExtension
         }
     }
 
-    ############################
-    # on Before And After CRUD ...
-    ############################
+    //###########################
+    // on Before And After CRUD ...
+    //###########################
 
     public function onAfterPublish()
     {
@@ -287,7 +299,7 @@ class SearchEngineMakeSearchable extends DataExtension
     }
 
     /**
-     * Mark for update
+     * Mark for update.
      */
     public function onBeforeWrite()
     {
@@ -300,6 +312,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     user_error('Object can not trigger itself');
                     die();
                 }
+
                 $obj = $className::get()->byID($id);
                 if ($obj->hasExtension(Versioned::class)) {
                     $doPublish = $obj->isPublished();
@@ -315,7 +328,7 @@ class SearchEngineMakeSearchable extends DataExtension
     }
 
     /**
-     * Mark for update
+     * Mark for update.
      */
     public function onAfterWrite()
     {
@@ -325,6 +338,7 @@ class SearchEngineMakeSearchable extends DataExtension
             if (! isset($this->_onAfterWriteCount[$this->getOwner()->ID])) {
                 $this->_onAfterWriteCount[$this->getOwner()->ID] = 0;
             }
+
             register_shutdown_function([$this->owner, 'indexMeOnShutDown']);
         }
     }
@@ -347,14 +361,14 @@ class SearchEngineMakeSearchable extends DataExtension
         }
     }
 
-    #####################################
-    # get index data ...
-    #####################################
+    //####################################
+    // get index data ...
+    //####################################
 
     /**
      * returns array like this:
      * 1 => array('Title', 'MenuTitle')
-     * 2 => array('Content')
+     * 2 => array('Content').
      *
      * can be replaced by a method in the object itself!
      *
@@ -366,6 +380,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($item) {
             return $item->SearchEngineFieldsForIndexing($this->owner);
         }
+
         return [
             1 => [],
             2 => [],
@@ -373,7 +388,8 @@ class SearchEngineMakeSearchable extends DataExtension
     }
 
     /**
-     * Indexed Full Content Data
+     * Indexed Full Content Data.
+     *
      * @return DataList
      */
     public function SearchEngineDataObjectFullContent()
@@ -386,12 +402,13 @@ class SearchEngineMakeSearchable extends DataExtension
         return SearchEngineFullContent::get()->filter(['ID' => 0]);
     }
 
-    ######################################
-    # Status
-    ######################################
+    //#####################################
+    // Status
+    //#####################################
 
     /**
      * Is this object indexed?
+     *
      * @return bool
      */
     public function SearchEngineIsIndexed()
@@ -405,7 +422,7 @@ class SearchEngineMakeSearchable extends DataExtension
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function SearchEngineExcludeFromIndex()
     {
@@ -413,15 +430,16 @@ class SearchEngineMakeSearchable extends DataExtension
             return true;
         }
 
-        $key = $this->getOwner()->ClassName . '_' . $this->getOwner()->ID;
+        $key = $this->getOwner()->ClassName . \_::class . $this->getOwner()->ID;
         if (! isset(self::$_search_engine_exclude_from_index[$key])) {
             if (! isset(self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName])) {
                 $classNameList = SearchEngineDataObjectApi::searchable_class_names();
-                $exclude = isset($classNameList[$this->getOwner()->ClassName]) ? false : true;
+                $exclude = ! isset($classNameList[$this->getOwner()->ClassName]);
                 self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName] = $exclude;
             }
+
             $exclude = self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName];
-            if ($exclude === false) {
+            if (false === $exclude) {
                 if ($this->getOwner()->hasMethod('SearchEngineExcludeFromIndexProvider')) {
                     $exclude = $this->getOwner()->SearchEngineExcludeFromIndexProvider();
                 } else {
@@ -444,6 +462,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     }
                 }
             }
+
             //if it is to be excluded then remove from
             //search index.
             if ($exclude) {
@@ -461,14 +480,14 @@ class SearchEngineMakeSearchable extends DataExtension
     }
 
     /**
-     * @param  bool $classNameOnly
-     * @return string
+     * @param bool $classNameOnly
      */
     public function getSearchEngineKey($classNameOnly = false): string
     {
         if ($classNameOnly) {
             return $this->getOwner()->ClassName . '';
         }
-        return $this->getOwner()->ID . '_' . $this->getOwner()->ClassName;
+
+        return $this->getOwner()->ID . \_::class . $this->getOwner()->ClassName;
     }
 }

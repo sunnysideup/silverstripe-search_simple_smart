@@ -12,11 +12,13 @@ use SilverStripe\Security\Security;
  * the DataObject ClassName + ID is recorded separately
  * so that the log is not affected if the SearchEngineDataObject is deleted.
  */
-
 class SearchEngineSearchRecordHistory extends DataObject
 {
+    protected static $_latest_search_cache;
+
     /**
-     * Defines the database table name
+     * Defines the database table name.
+     *
      * @var string
      */
     private static $table_name = 'SearchEngineSearchRecordHistory';
@@ -70,8 +72,6 @@ class SearchEngineSearchRecordHistory extends DataObject
         'DataObjectID' => true,
     ];
 
-    protected static $_latest_search_cache = null;
-
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
@@ -84,8 +84,9 @@ class SearchEngineSearchRecordHistory extends DataObject
 
     /**
      * @param Member $member
+     * @param mixed  $context
      *
-     * @return boolean
+     * @return bool
      */
     public function canCreate($member = null, $context = [])
     {
@@ -95,7 +96,7 @@ class SearchEngineSearchRecordHistory extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canEdit($member = null)
     {
@@ -105,7 +106,7 @@ class SearchEngineSearchRecordHistory extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canDelete($member = null)
     {
@@ -115,7 +116,7 @@ class SearchEngineSearchRecordHistory extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canView($member = null)
     {
@@ -123,7 +124,8 @@ class SearchEngineSearchRecordHistory extends DataObject
     }
 
     /**
-     * add an entry SearchEngineSearchRecordHistory entry
+     * add an entry SearchEngineSearchRecordHistory entry.
+     *
      * @param SearchEngineSearchRecord $searchEngineSearchRecord
      */
     public static function add_entry($searchEngineSearchRecord)
@@ -134,6 +136,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         if ($currentUser) {
             $currentUserID = $currentUser->ID;
         }
+
         $fieldArray = [
             'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
             'MemberID' => $currentUserID - 0,
@@ -153,15 +156,16 @@ class SearchEngineSearchRecordHistory extends DataObject
         }
 
         Controller::curr()->getRequest()->getSession()->set('SearchEngineSearchRecordHistoryID', $obj->write());
+
         return $obj;
     }
 
     /**
-     * add an entry SearchEngineSearchRecordHistory entry
+     * add an entry SearchEngineSearchRecordHistory entry.
      *
      * @param int $count
      *
-     * @return SearchEngineSearchRecordHistory | null
+     * @return null|SearchEngineSearchRecordHistory
      */
     public static function add_number_of_results($count)
     {
@@ -169,6 +173,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         if ($obj) {
             $obj->NumberOfResults = $count;
             $obj->write();
+
             return $obj;
         }
     }
@@ -178,7 +183,7 @@ class SearchEngineSearchRecordHistory extends DataObject
      *
      * @param SearchEngineDataObject $item
      *
-     * @return SearchEngineSearchRecordHistory | null
+     * @return null|SearchEngineSearchRecordHistory
      */
     public static function register_click($item)
     {
@@ -187,22 +192,24 @@ class SearchEngineSearchRecordHistory extends DataObject
             $obj->DataObjectClassName = $item->DataObjectClassName;
             $obj->DataObjectID = $item->DataObjectID;
             $obj->write();
+
             return $obj;
         }
     }
 
     /**
-     * @return SearchEngineSearchRecordHistory | null
+     * @return null|SearchEngineSearchRecordHistory
      */
     public static function get_latest_search()
     {
-        if (self::$_latest_search_cache === null) {
+        if (null === self::$_latest_search_cache) {
             self::$_latest_search_cache = false;
-            $id = intval(Controller::curr()->getRequest()->getSession()->get('SearchEngineSearchRecordHistoryID')) - 0;
+            $id = (int) Controller::curr()->getRequest()->getSession()->get('SearchEngineSearchRecordHistoryID') - 0;
             if ($id) {
                 self::$_latest_search_cache = self::get()->byID($id);
             }
         }
+
         return self::$_latest_search_cache;
     }
 }

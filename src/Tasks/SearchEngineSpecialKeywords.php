@@ -3,39 +3,42 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
-
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
 class SearchEngineSpecialKeywords extends SearchEngineBaseTask
 {
     /**
-     * title of the task
+     * title of the task.
+     *
      * @var string
      */
     protected $title = 'Find special characters in keywords';
 
     /**
-     * description of the task
+     * description of the task.
+     *
      * @var string
      */
     protected $description = 'Go through all the keywords and work out what keywords have special characters.';
 
     protected $regex1 = '/[^A-Za-z0-9 ]/';
 
-    protected $regex2 = "/\P{L}+/u";
+    protected $regex2 = '/\\P{L}+/u';
 
     protected $step = 1000;
 
     /**
-     * Set a custom url segment (to follow dev/tasks/)
+     * Set a custom url segment (to follow dev/tasks/).
      *
      * @config
+     *
      * @var string
      */
     private static $segment = 'searchenginespecialkeywords';
 
     /**
-     * this function runs the SearchEngineRemoveAll task
+     * this function runs the SearchEngineRemoveAll task.
+     *
      * @param HTTPRequest $request
      */
     public function run($request)
@@ -60,7 +63,7 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
                     $this->flushNow('x', '', false);
                     $array = str_split($keyword);
                     foreach ($array as $char) {
-                        if (strpos($newKeyword, $char) === false) {
+                        if (false === strpos($newKeyword, $char)) {
                             $this->flushNow('!', '', false);
                             if (! isset($characters[$char])) {
                                 $characters[$char] = $char;

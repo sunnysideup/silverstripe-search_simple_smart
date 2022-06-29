@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 use SilverStripe\Core\Config\Config;
-
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
@@ -23,6 +22,7 @@ abstract class SearchEngineSortByDescriptor
 
     /**
      * retains debug information if turned on.
+     *
      * @var array
      */
     protected $debugArray = [];
@@ -33,7 +33,7 @@ abstract class SearchEngineSortByDescriptor
      * e.g. always put Product Pages at the top.
      * array is like this:
      *    1 => array(MyFirstClassName, MySecondClassName)
-     *    2 => array(MyOtherClassName, MyFooBarClassName)
+     *    2 => array(MyOtherClassName, MyFooBarClassName).
      *
      * @var array
      */
@@ -43,7 +43,7 @@ abstract class SearchEngineSortByDescriptor
      * set the total number of results per class_group
      * e.g.
      * 1 => 12
-     * 2 => 5
+     * 2 => 5.
      *
      * @var array
      */
@@ -55,20 +55,22 @@ abstract class SearchEngineSortByDescriptor
     }
 
     /**
-     * returns the name - e.g. "Date", "Relevance"
+     * returns the name - e.g. "Date", "Relevance".
+     *
      * @return string
      */
     abstract public function getShortTitle();
 
     /**
-     * returns the description - e.g. "sort by the last Edited date"
+     * returns the description - e.g. "sort by the last Edited date".
+     *
      * @return string
      */
     abstract public function getDescription();
 
     /**
      * returns the sort statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     Date => ASC
@@ -76,27 +78,30 @@ abstract class SearchEngineSortByDescriptor
      *
      * @param mixed $sortProviderValues
      *
-     * @return array|null
+     * @return null|array
      */
     abstract public function getSqlSortArray($sortProviderValues = null);
 
     /**
      * Do we need to do custom sorting?
-     * @return boolean
+     *
+     * @param null|mixed $sortProviderValues
+     *
+     * @return bool
      */
     public function hasCustomSort($sortProviderValues = null)
     {
         $array = $this->getSqlSortArray($sortProviderValues);
-        if (is_array($array) && count($array) > 0) {
-            return false;
-        }
-        return true;
+
+        return ! (is_array($array) && [] !== $array);
     }
 
     /**
-     * Do any custom sorting
+     * Do any custom sorting.
      *
-     * @param array $objects - id => ClassName
+     * @param array $objects      - id => ClassName
+     * @param mixed $searchRecord
+     *
      * @return SS_List
      */
     abstract public function doCustomSort($objects, $searchRecord);
@@ -120,6 +125,7 @@ abstract class SearchEngineSortByDescriptor
 
     /**
      * @param DataList $objects
+     *
      * @return DataList
      */
     protected function makeClassGroups($objects)
@@ -135,12 +141,14 @@ abstract class SearchEngineSortByDescriptor
                     if (! isset($classGroupCounts[$key])) {
                         $classGroupCounts[$key] = 0;
                     }
+
                     foreach ($array as $id => $className) {
                         if (in_array($className, $classGroupGroup, true)) {
                             if (! isset($classGroupLimits[$key]) || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
-                                $classGroupCounts[$key]++;
+                                ++$classGroupCounts[$key];
                                 $newArray[$id] = $className;
                             }
+
                             unset($array[$id]);
                         }
                     }
@@ -149,6 +157,7 @@ abstract class SearchEngineSortByDescriptor
                 foreach ($array as $id => $className) {
                     $newArray[$id] = $className;
                 }
+
                 $keys = array_keys($newArray);
                 //retrieve objects
                 $objects = Injector::inst()->create(
@@ -163,6 +172,7 @@ abstract class SearchEngineSortByDescriptor
                 //     ->sort('FIELD("ID", ' . implode(',', $keys) . ')');
             }
         }
+
         return $objects;
     }
 
@@ -170,11 +180,11 @@ abstract class SearchEngineSortByDescriptor
     {
         $classGroups = Config::inst()->get(self::class, 'class_groups');
 
-        return is_array($classGroups) && count($classGroups) ? true : false;
+        return is_array($classGroups) && count($classGroups);
     }
 
     protected function hasNoClassGroups()
     {
-        return $this->hasClassGroups() ? false : true;
+        return ! (bool) $this->hasClassGroups();
     }
 }

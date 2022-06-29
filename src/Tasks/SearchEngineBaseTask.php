@@ -32,13 +32,15 @@ class SearchEngineBaseTask extends BuildTask
     protected $step = 10;
 
     /**
-     * title of the task
+     * title of the task.
+     *
      * @var string
      */
     protected $title = 'Base Search Engine Task';
 
     /**
-     * description of the task
+     * description of the task.
+     *
      * @var string
      */
     protected $description = 'Does not do anything special, just sets up the task.';
@@ -59,15 +61,17 @@ class SearchEngineBaseTask extends BuildTask
     protected $oldOnesOnly = false;
 
     /**
-     * Set a custom url segment (to follow dev/tasks/)
+     * Set a custom url segment (to follow dev/tasks/).
      *
      * @config
+     *
      * @var string
      */
     private static $segment = 'searchenginebasetask';
 
     /**
-     * this function runs the SearchEngineRemoveAll task
+     * this function runs the SearchEngineRemoveAll task.
+     *
      * @param HTTPRequest $request
      */
     public function run($request)
@@ -75,9 +79,9 @@ class SearchEngineBaseTask extends BuildTask
         //set basics
         $this->runStart($request);
 
-        if ($this->task && $this->task !== 'searchenginebasetask') {
-            unset($_GET['task']);
-            unset($_GET['submit']);
+        if ($this->task && 'searchenginebasetask' !== $this->task) {
+            unset($_GET['task'], $_GET['submit']);
+
             return Controller::curr()->redirect('/dev/tasks/' . $this->task . '/?' . http_build_query($_GET));
         }
 
@@ -95,10 +99,12 @@ class SearchEngineBaseTask extends BuildTask
                     flush();
                     ob_end_flush();
                 }
+
                 ob_start();
-            } catch (\Exception $e) {
+            } catch (\Exception $exception) {
                 echo ' ';
             }
+
             if ($bullet) {
                 DB::alteration_message($message, $type);
             } else {
@@ -121,29 +127,36 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        if($request) {
+        if ($request) {
             if ($request->getVar('verbose')) {
-                $this->verbose = $request->getVar('verbose') === 'on' ? true : false;
+                $this->verbose = 'on' === $request->getVar('verbose');
             }
+
             if ($request->getVar('limit')) {
-                $this->limit = intval($request->getVar('limit'));
+                $this->limit = (int) $request->getVar('limit');
             }
+
             if ($request->getVar('step')) {
-                $this->step = intval($request->getVar('step'));
+                $this->step = (int) $request->getVar('step');
             }
+
             if ($request->getVar('type')) {
                 $this->type = $request->getVar('type');
             }
+
             if ($request->getVar('oldonesonly')) {
-                $this->oldOnesOnly = $request->getVar('oldonesonly') === 'on' ? true : false;
+                $this->oldOnesOnly = 'on' === $request->getVar('oldonesonly');
             }
+
             if ($request->getVar('unindexedonly')) {
-                $this->unindexedOnly = $request->getVar('unindexedonly') === 'on' ? true : false;
+                $this->unindexedOnly = 'on' === $request->getVar('unindexedonly');
             }
+
             $this->task = $request->getVar('task');
         } else {
             $this->task = self::$segment;
         }
+
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
         $this->flushNow('<strong>limit</strong>: ' . $this->limit);
         $this->flushNow('<strong>step</strong>: ' . $this->step);
@@ -207,6 +220,7 @@ class SearchEngineBaseTask extends BuildTask
         } else {
             $checkedOff = 'checked="checked"';
         }
+
         return '
         <div>
             ' . $label . '

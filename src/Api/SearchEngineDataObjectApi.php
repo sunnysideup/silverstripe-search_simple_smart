@@ -10,7 +10,6 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
-
 use Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
@@ -23,17 +22,15 @@ class SearchEngineDataObjectApi
 
     /**
      * used for caching...
+     *
      * @var array
      */
     protected static $_searchable_class_names = [];
 
-    protected static $_original_mode = null;
+    protected static $_original_mode;
 
     /**
-     * @param DataObject $obj
      * @param bool $doNotMake
-     *
-     * @return SearchEngineDataObject|null
      */
     public static function find_or_make(DataObject $obj, $doNotMake = false): ?SearchEngineDataObject
     {
@@ -41,6 +38,7 @@ class SearchEngineDataObjectApi
             if ($obj->SearchEngineExcludeFromIndex()) {
                 return null;
             }
+
             $fieldArray = [
                 'DataObjectClassName' => $obj->ClassName,
                 'DataObjectID' => $obj->ID,
@@ -55,6 +53,7 @@ class SearchEngineDataObjectApi
 
             return $item;
         }
+
         return null;
     }
 
@@ -71,16 +70,14 @@ class SearchEngineDataObjectApi
     }
 
     /**
-     * returns it like this:
+     * returns it like this:.
      *
      *     Page => General Page
      *     HomePage => Home Page
-     *
-     * @return array
      */
     public static function searchable_class_names(): array
     {
-        if (count(self::$_searchable_class_names) === 0) {
+        if ([] === self::$_searchable_class_names) {
             $allClasses = ClassInfo::subclassesFor(DataObject::class);
             //specifically include
             $includeClassNames = [];
@@ -98,10 +95,11 @@ class SearchEngineDataObjectApi
                     $includeClassNames = array_merge($includeClassNames, ClassInfo::subclassesFor($includeOne));
                 }
             }
+
             $includeClassNames = array_unique($includeClassNames);
 
             //if we have inclusions then this is the final list
-            if (count($includeClassNames)) {
+            if ([] !== $includeClassNames) {
                 $testArray = $includeClassNames;
             } else {
                 //lets see which ones are excluded from full list.
@@ -112,28 +110,28 @@ class SearchEngineDataObjectApi
                         $excludeClassNames = array_merge($excludeClassNames, ClassInfo::subclassesFor($excludeOne));
                     }
                 }
+
                 $excludeClassNames = array_unique($excludeClassNames);
-                if (count($excludeClassNames)) {
+                if ([] !== $excludeClassNames) {
                     foreach ($excludeClassNames as $excludeOne) {
                         unset($testArray[$excludeOne]);
                     }
                 }
             }
+
             foreach ($testArray as $className) {
                 //does it have the extension?
                 if ($className::has_extension(SearchEngineMakeSearchable::class)) {
                     $finalClasses[$className] = Injector::inst()->get($className)->i18n_singular_name();
                 }
             }
+
             self::$_searchable_class_names = $finalClasses;
         }
 
         return self::$_searchable_class_names;
     }
 
-    /**
-     * @param DataObject $obj
-     */
     public static function remove(DataObject $obj)
     {
         $item = self::find_or_make($obj, $doNotMake = true);

@@ -16,19 +16,21 @@ class SearchEngineRecordClick extends Controller
 
     /**
      * record the click that the user chooses from the search results.
-     * @param HTTPRequest $request
+     *
      * @return string
      */
     public function add(HTTPRequest $request)
     {
-        $itemID = intval($request->param('ID'));
+        $itemID = (int) $request->param('ID');
         if ($itemID) {
             $item = SearchEngineDataObject::get()->byID($itemID);
             if ($item) {
                 SearchEngineSearchRecordHistory::register_click($item);
+
                 return $this->redirect($item->SourceObject()->Link());
             }
         }
+
         $url = empty($_GET['finaldestination']) ? '404' : $_GET['finaldestination'];
 
         return $this->redirect(Director::absoluteURL($url));

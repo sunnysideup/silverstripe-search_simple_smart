@@ -28,6 +28,7 @@ class SearchEngineManifest extends Controller
 
     /**
      * record the click that the user chooses from the search results.
+     *
      * @return DBField
      */
     public function getContent()
@@ -43,7 +44,7 @@ class SearchEngineManifest extends Controller
                 $numberOfIndexedObjects = SearchEngineDataObject::get()->filter(['DataObjectClassName' => $className])->count();
                 $manifest .=
                         '<li class="' . ($numberOfIndexedObjects ? 'hasEntries' : 'doesNotHaveEntries') . "\">
-                            <h3>${classNameTitle} (${numberOfIndexedObjects})</h3>
+                            <h3>{$classNameTitle} ({$numberOfIndexedObjects})</h3>
                             <ul>";
                 $class = Injector::inst()->get($className);
                 $className = (string) $className;
@@ -51,6 +52,7 @@ class SearchEngineManifest extends Controller
                 if (! $example) {
                     $example = $class;
                 }
+
                 $manifest .=
                                 '<li>
                                     <strong>Fields Indexed (level 1 / 2  is used to determine importance for relevance sorting):</strong>' .
@@ -75,6 +77,7 @@ class SearchEngineManifest extends Controller
                             '</ul>
                         </li>';
             }
+
             $manifest .=
                     '</ul>
                 </div>';

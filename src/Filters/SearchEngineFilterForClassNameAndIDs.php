@@ -24,7 +24,8 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      * e.g.
      *    LARGE => Large Pages
      *    SMALL => Small Pages
-     *    RED => Red Pages
+     *    RED => Red Pages.
+     *
      * @return array
      */
     public function getFilterList()
@@ -34,23 +35,25 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
 
     /**
      * returns the filter statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param array|SS_List|null $filterArray
-     *
-     * @return array|null
+     * @param null|array|SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
         if (! $filterArray) {
             return null;
-        } elseif (is_array($filterArray) && count($filterArray) === 0) {
+        }
+
+        if (is_array($filterArray) && [] === $filterArray) {
             return null;
-        } elseif ($filterArray instanceof SS_List) {
+        }
+
+        if ($filterArray instanceof SS_List) {
             $ids = $filterArray->column('ID');
             $classNames = $filterArray->column('ClassName');
             $preFilter = [];
@@ -59,10 +62,13 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
                 if (! isset($preFilter[$className])) {
                     $preFilter[$className] = [];
                 }
+
                 $preFilter[$className][$id] = $id;
             }
+
             return $this->getSqlFilterArray($preFilter);
         }
+
         $array = [];
 
         foreach ($filterArray as $className => $ids) {
@@ -77,9 +83,11 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
             // $dataList = SearchEngineDataObject::get()
             //     ->filter(['DataObjectClassName' => $classNames, 'DataObjectID' => $ids]);
             $dataList = $dataList
-                ->filter(['DataObjectClassName' => $classNames]);
+                ->filter(['DataObjectClassName' => $classNames])
+            ;
             $array = array_merge($array, $dataList->column('ID'));
         }
+
         $array = array_unique($array);
 
         return ['ID' => $array];
@@ -88,10 +96,11 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
     /**
      * do we need to do custom filtering
      * the filter array are the items selected by the
-     * user, based on the filter options listed above
+     * user, based on the filter options listed above.
+     *
      * @see: getFilterList
-     * @param array|SS_List|null $filterArray
-     * @return boolean
+     *
+     * @param null|array|SS_List $filterArray
      */
     public function hasCustomFilter($filterArray): bool
     {

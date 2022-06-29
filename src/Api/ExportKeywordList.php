@@ -20,6 +20,7 @@ class ExportKeywordList
 
     /**
      * if this is not set, the list will NOT be exported!
+     *
      * @var string
      */
     private static $keyword_list_folder_name = '';
@@ -33,20 +34,24 @@ class ExportKeywordList
                 return 'no new file created as the current one is less than 120 seconds old: ' . $fileName;
                 //do nothing
             }
+
             if (Security::database_is_ready()) {
                 $rows = DB::query('SELECT "Keyword" FROM "SearchEngineKeyword" ORDER BY "Keyword";');
                 $array = [];
                 foreach ($rows as $row) {
-                    $array[] = str_replace('\'', '', Convert::raw2js($row['Keyword']));
+                    $array[] = str_replace("'", '', Convert::raw2js($row['Keyword']));
                 }
+
                 $written = 0;
                 if ($fh = fopen($fileName, 'w')) {
-                    $written = fwrite($fh, 'SearchEngineInitFunctions.keywordList = [\'' . implode('\',\'', $array) . '\'];');
+                    $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = ['" . implode("','", $array) . "'];");
                     fclose($fh);
                 }
-                if (intval($written) === 0) {
+
+                if (0 === (int) $written) {
                     user_error('Could not write keyword list to $fileName', E_USER_NOTICE);
                 }
+
                 return 'Writing: <br />' . implode('<br />', $array);
             }
         } else {
@@ -56,9 +61,10 @@ class ExportKeywordList
 
     /**
      * returns the location of the keyword file...
-     * @param boolean $includeBase
      *
-     * @return string|null
+     * @param bool $includeBase
+     *
+     * @return null|string
      */
     public static function get_js_keyword_file_name($includeBase = false)
     {
@@ -73,9 +79,11 @@ class ExportKeywordList
             } else {
                 $str = $myFolder->getFilename();
             }
+
             if (! file_exists($str)) {
                 mkdir($str);
             }
+
             return rtrim(str_replace('//', '/', $str), '/') . '/' . $fileName;
         }
     }

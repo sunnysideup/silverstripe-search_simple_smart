@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Forms;
 
 use SilverStripe\CMS\Model\SiteTree;
-
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
@@ -36,7 +35,8 @@ class SearchEngineBasicForm extends Form
     protected $isMoreDetailsResult = false;
 
     /**
-     * starting point
+     * starting point.
+     *
      * @var int
      */
     protected $start = 0;
@@ -72,7 +72,8 @@ class SearchEngineBasicForm extends Form
     protected $updateBrowserHistory = false;
 
     /**
-     * alternative input field selector
+     * alternative input field selector.
+     *
      * @var string
      */
     protected $displayedFormInputSelector = '';
@@ -102,6 +103,8 @@ class SearchEngineBasicForm extends Form
      */
     protected $setLimitToZero = false;
 
+    protected static $_for_template_completed = false;
+
     /**
      * @var string
      */
@@ -111,7 +114,7 @@ class SearchEngineBasicForm extends Form
      * classnames of sort classes to be used
      * - ClassName
      * - ClassName
-     * - ClassName
+     * - ClassName.
      *
      * @var array
      */
@@ -124,7 +127,7 @@ class SearchEngineBasicForm extends Form
      * classnames of filters to be used
      * - ClassName
      * - ClassName
-     * - ClassName
+     * - ClassName.
      *
      * @var array
      */
@@ -135,16 +138,16 @@ class SearchEngineBasicForm extends Form
 
     /**
      * class name of the page that is used to show search results.
+     *
      * @var string
      */
     private static $full_results_page_type = '';
 
-    protected static $_for_template_completed = false;
-
     /**
-     * this function constructs a new Search Engine Basic Form
-     * @param mixed    $controller
-     * @param string   $name
+     * this function constructs a new Search Engine Basic Form.
+     *
+     * @param mixed  $controller
+     * @param string $name
      *
      * @return SearchEngineBasicForm
      */
@@ -153,6 +156,7 @@ class SearchEngineBasicForm extends Form
         if (isset($_GET['SearchEngineKeywords'])) {
             $this->keywords = $_GET['SearchEngineKeywords'];
         }
+
         $fields = new FieldList(
             TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', 'Search for ...'), $this->keywords)
                 ->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'What are you looking for ...'))
@@ -169,7 +173,7 @@ class SearchEngineBasicForm extends Form
         $this->setFormMethod('GET');
         $this->setAttribute('autocomplete', 'false');
         $this->disableSecurityToken();
-        $this->customScript[] = 'SearchEngineInitFunctions.formSelector = \'#' . $this->FormName() . '\';';
+        $this->customScript[] = "SearchEngineInitFunctions.formSelector = '#" . $this->FormName() . "';";
 
         return $this;
     }
@@ -190,12 +194,14 @@ class SearchEngineBasicForm extends Form
                 $this->addExtraClass('searchEngineFormWithoutSideBar');
             }
         }
+
         return parent::forTemplate();
     }
 
     /**
-     * this method submits the Search Engine Form
-     * @param array $data
+     * this method submits the Search Engine Form.
+     *
+     * @param array                 $data
      * @param SearchEngineBasicForm $form
      */
     public function doSubmitForm($data, $form)
@@ -206,9 +212,12 @@ class SearchEngineBasicForm extends Form
                     $this->controller->getResponse()->addHeader('Content-Type', 'text/json');
                 }
             }
+
             Requirements::clear();
+
             return $this->workOutResults($data);
         }
+
         return [];
     }
 
@@ -221,111 +230,107 @@ class SearchEngineBasicForm extends Form
     {
         $this->includeSort = $b;
         $this->Fields()->removeByName('SortBy');
+
         return $this;
     }
 
     /**
-     * @param bool $b
-     *
      * @return SearchEngineBasicForm
      */
     public function setIncludeFilter(bool $b): self
     {
         $this->includeFilter = $b;
         $this->Fields()->removeByName('FilterFor');
+
         return $this;
     }
 
     /**
      * this function sets the number of items to return
-     * per page when a search is conducted
-     * @param int $i
+     * per page when a search is conducted.
      *
      * @return SearchEngineBasicForm
      */
     public function setNumberOfResultsPerPage(int $i): self
     {
         $this->numberOfResultsPerPage = $i;
+
         return $this;
     }
 
     /**
-     * total number of items to return
-     * @param int $i
+     * total number of items to return.
      *
      * @return SearchEngineBasicForm
      */
     public function setTotalNumberOfItemsToReturn(int $i): self
     {
         $this->totalNumberOfItemsToReturn = $i;
+
         return $this;
     }
 
     /**
-     * what is the first item to return
-     * @param bool $b
+     * what is the first item to return.
      *
      * @return SearchEngineBasicForm
      */
     public function setIsMoreDetailsResult(bool $b): self
     {
         $this->isMoreDetailsResult = $b;
+
         return $this;
     }
 
     /**
-     * what is the first item to return
-     * @param int $i
+     * what is the first item to return.
      *
      * @return SearchEngineBasicForm
      */
     public function setStart(int $i): self
     {
         $this->start = $i;
+
         return $this;
     }
 
     /**
-     * @param bool $b
-     *
      * @return SearchEngineBasicForm
      */
     public function setUseAutoComplete(bool $b): self
     {
         $this->useAutoComplete = $b;
+
         return $this;
     }
 
     /**
-     * @param bool $b
-     *
      * @return SearchEngineBasicForm
      */
     public function setUseInfiniteScroll(bool $b): self
     {
         $this->useInfiniteScroll = $b;
+
         return $this;
     }
 
     /**
-     * @param string $string
-     *
      * @return SearchEngineBasicForm
      */
     public function setdisplayedFormInputSelector(string $string): self
     {
         $this->displayedFormInputSelector = $string;
+
         return $this;
     }
 
     /**
-     * @param bool $b
-     *
      * @return SearchEngineBasicForm
      */
     public function setOutputAsJSON(bool $b): self
     {
         $this->outputAsJSON = $b;
+
         return $this;
     }
 
@@ -337,6 +342,7 @@ class SearchEngineBasicForm extends Form
     public function setUpdateBrowserHistory($b): self
     {
         $this->updateBrowserHistory = $b;
+
         return $this;
     }
 
@@ -384,6 +390,7 @@ class SearchEngineBasicForm extends Form
                 $results = $this->workOutResults($_GET);
             }
         }
+
         $this->Fields()->push(LiteralField::create(
             'SearchEngineResultsHolderOuter',
             '<div id="SearchEngineResultsHolderOuter">' . $results . '</div>'
@@ -398,15 +405,18 @@ class SearchEngineBasicForm extends Form
         } else {
             Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
         }
+
         Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/SearchEngineInitFunctions.js');
 
         if ($this->useInfiniteScroll) {
             Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/jquery.infinitescroll.min.js');
             $this->customScript[] = 'SearchEngineInitFunctions.useInfiniteScroll = true;';
         }
+
         if ($this->displayedFormInputSelector) {
             $this->customScript[] = 'SearchEngineInitFunctions.displayedFormInputSelector = "' . $this->displayedFormInputSelector . '";';
         }
+
         if ($this->useAutoComplete) {
             Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/awesomplete.min.js');
             $this->customScript[] = 'SearchEngineInitFunctions.useAutoComplete = true;';
@@ -415,6 +425,7 @@ class SearchEngineBasicForm extends Form
                 Requirements::javascript(ExportKeywordList::get_js_keyword_file_name($includeBase = false));
             }
         }
+
         if ($this->updateBrowserHistory) {
             $this->customScript[] = 'SearchEngineInitFunctions.updateBrowserHistory = true;';
         }
@@ -436,6 +447,7 @@ class SearchEngineBasicForm extends Form
         if ($results) {
             $count = $results->count();
         }
+
         SearchEngineSearchRecordHistory::add_number_of_results($count);
 
         $resultsPaginated = $this->workOutResultsPaginated($results);
@@ -454,6 +466,7 @@ class SearchEngineBasicForm extends Form
                 }
             }
         }
+
         $arrayData = new ArrayData(
             [
                 'SearchedFor' => Convert::raw2xml($data['SearchEngineKeywords']),
@@ -471,6 +484,7 @@ class SearchEngineBasicForm extends Form
         if (is_array($classGroups) && count($classGroups)) {
             return $arrayData->renderWith('SearchEngineSearchResultsOuterWithSpecialSortGrouping');
         }
+
         return $arrayData->renderWith('SearchEngineSearchResultsOuter');
     }
 
@@ -486,8 +500,9 @@ class SearchEngineBasicForm extends Form
                 $filterForArray[$filterForClass] = $filterForClass;
             }
         }
+
         $sortBy = (! empty($data['SortBy']) && class_exists($data['SortBy']) ? $data['SortBy'] : '');
-        $this->start = (isset($_GET['start']) ? intval($_GET['start']) : 0);
+        $this->start = (isset($_GET['start']) ? (int) $_GET['start'] : 0);
         if ($this->totalNumberOfItemsToReturn && $this->totalNumberOfItemsToReturn < $this->start) {
             //$results = SearchEngineDataObject::get()->filter("ID", -1);
             $this->setLimitToZero = true;
@@ -505,20 +520,18 @@ class SearchEngineBasicForm extends Form
                 }
             }
         }
+
         if (! $results) {
             $results = ArrayList::create();
         }
+
         return $results;
     }
 
     protected function workOutResultsPaginated($results): PaginatedList
     {
         //paginate
-        if ($this->setLimitToZero) {
-            $results = $results->limit(0);
-        } else {
-            $results = $results->limit($this->totalNumberOfItemsToReturn);
-        }
+        $results = $this->setLimitToZero ? $results->limit(0) : $results->limit($this->totalNumberOfItemsToReturn);
         $resultsPaginated = PaginatedList::create($results, ['start' => $this->start]);
 
         $resultsPaginated->setPageLength($this->numberOfResultsPerPage);
@@ -539,6 +552,7 @@ class SearchEngineBasicForm extends Form
             if (! $provider instanceof SearchEngineSortByDescriptor) {
                 user_error($provider->ClassName . 'should extend SearchEngineSortByDescriptor - like so: class <u>' . $provider->ClassName . ' extends SearchEngineSortByDescriptor</u>');
             }
+
             $array[$className] = $provider->getShortTitle();
         }
 
@@ -546,7 +560,8 @@ class SearchEngineBasicForm extends Form
     }
 
     /**
-     * returns a list of searchable objects
+     * returns a list of searchable objects.
+     *
      * @return array
      */
     protected function FilterForProvider()
@@ -563,11 +578,13 @@ class SearchEngineBasicForm extends Form
                     ' extends SearchEngineFilterForDescriptor</u>'
                 );
             }
+
             $optionsToAdd = $provider->getFilterList();
             foreach ($optionsToAdd as $optionKey => $optionValue) {
                 $array[$className . '.' . $optionKey] = $optionValue;
             }
         }
+
         return $array;
     }
 }

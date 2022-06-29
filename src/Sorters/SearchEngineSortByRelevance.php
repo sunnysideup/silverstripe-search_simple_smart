@@ -13,9 +13,8 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 /**
- * default sort option
+ * default sort option.
  */
-
 class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
 {
     /**
@@ -27,7 +26,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     }
 
     /**
-     * returns the description - e.g. "sort by the last Edited date"
+     * returns the description - e.g. "sort by the last Edited date".
+     *
      * @return string
      */
     public function getDescription()
@@ -37,7 +37,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
 
     /**
      * returns the sort statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     Date => ASC
@@ -53,7 +53,9 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     }
 
     /**
-     * @return boolean
+     * @param null|mixed $sortProviderValues
+     *
+     * @return bool
      */
     public function hasCustomSort($sortProviderValues = null)
     {
@@ -61,9 +63,9 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     }
 
     /**
-     * Do any custom sorting
+     * Do any custom sorting.
      *
-     * @param SS_List $objects
+     * @param SS_List                  $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
      * @return DataList
@@ -108,6 +110,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                     }
                 }
             }
+
             //fulltext using relevance, level 1 first.
             $sql = '
                 SELECT
@@ -126,6 +129,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                     $array[$id] = $row['RELEVANCE'];
                 }
             }
+
             $ids = array_keys($array);
 
             //retrieve objects

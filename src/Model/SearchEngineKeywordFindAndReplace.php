@@ -7,13 +7,20 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 
 /**
- * keyword replace engine
+ * keyword replace engine.
  */
-
 class SearchEngineKeywordFindAndReplace extends DataObject
 {
     /**
-     * Defines the database table name
+     * making sure that we do not have infinite loops...
+     *
+     * @var int
+     */
+    protected static $_words_used = [];
+
+    /**
+     * Defines the database table name.
+     *
      * @var string
      */
     private static $table_name = 'SearchEngineKeywordFindAndReplace';
@@ -80,12 +87,6 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         'Custom' => 'Manually Entered',
     ];
 
-    /**
-     * making sure that we do not have infinite loops...
-     * @var int
-     */
-    protected static $_words_used = [];
-
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
@@ -98,8 +99,9 @@ class SearchEngineKeywordFindAndReplace extends DataObject
 
     /**
      * @param Member $member
+     * @param mixed  $context
      *
-     * @return boolean
+     * @return bool
      */
     public function canCreate($member = null, $context = [])
     {
@@ -109,7 +111,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canEdit($member = null)
     {
@@ -119,7 +121,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canDelete($member = null)
     {
@@ -129,7 +131,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canView($member = null)
     {
@@ -141,41 +143,28 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         $fields = parent::getCMSFields();
         $keywordField = $fields->fieldByName('Root.Main')->fieldByName('Keyword');
         $keywordField->setTitle('Original Keyword');
+
         $replaceWithField = $fields->fieldByName('Root.Main')->fieldByName('ReplaceWith');
         $replaceWithField->setRightTitle(
             'Enter all the keywords (separated by a comma) you need to be included when a user searches for the original keyword.<br>
                 If you need the original keyword to be included in the search it should also be included <br>'
         );
+
         return $fields;
     }
 
     /**
-     * clean up entries
-     */
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-        $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
-        $replaceWithArray = $this->multiExplode([',', ' '], $this->ReplaceWith);
-        $finalArray = [];
-        foreach ($replaceWithArray as $keyword) {
-            $keyword = SearchEngineKeyword::clean_keyword($keyword);
-            if (strlen($keyword) > 1) {
-                $finalArray[] = $keyword;
-            }
-        }
-        $this->ReplaceWith = implode(',', $finalArray);
-    }
-
-    /**
      * this method is recursive...
+     *
      * @param string $keyword
+     *
      * @return string
      */
     public static function find_replacements($keyword)
     {
         $objects = self::get()
-            ->filter(['Keyword' => $keyword]);
+            ->filter(['Keyword' => $keyword])
+        ;
         self::$_words_used[$keyword] = $keyword;
         foreach ($objects as $object) {
             $newEntries = explode(',', $object->ReplaceWith);
@@ -188,19 +177,42 @@ class SearchEngineKeywordFindAndReplace extends DataObject
                     $newerEntries[] = $newEntryKeyword;
                 }
             }
+
             return implode(' ', $newerEntries);
         }
+
         return $keyword;
     }
 
     /**
-     * @param array $delimiters
+     * clean up entries.
+     */
+    protected function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
+        $replaceWithArray = $this->multiExplode([',', ' '], $this->ReplaceWith);
+        $finalArray = [];
+        foreach ($replaceWithArray as $keyword) {
+            $keyword = SearchEngineKeyword::clean_keyword($keyword);
+            if (strlen($keyword) > 1) {
+                $finalArray[] = $keyword;
+            }
+        }
+
+        $this->ReplaceWith = implode(',', $finalArray);
+    }
+
+    /**
+     * @param array  $delimiters
      * @param string $string
+     *
      * @return array
      */
     private function multiExplode($delimiters, $string)
     {
         $ready = str_replace($delimiters, $delimiters[0], $string);
+
         return explode($delimiters[0], $ready);
     }
 }

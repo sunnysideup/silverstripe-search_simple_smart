@@ -31,15 +31,14 @@ class SearchEngineContentControllerExtension extends Extension
         'SearchEngineCustomForm',
     ];
 
-    private $_mySearchEngineBasicForm = null;
+    private $_mySearchEngineBasicForm;
 
-    private $_mySearchEngineSuperBasicForm = null;
+    private $_mySearchEngineSuperBasicForm;
 
-    private $_mySearchEngineCustomForm = null;
+    private $_mySearchEngineCustomForm;
 
     /**
-     * this function returns a new Search Engine Form
-     * @return SearchEngineBasicForm
+     * this function returns a new Search Engine Form.
      */
     public function SearchEngineBasicForm(): SearchEngineBasicForm
     {
@@ -52,14 +51,15 @@ class SearchEngineContentControllerExtension extends Extension
                 ->setIncludeSort(true)
                 ->setUseAutoComplete(true)
                 ->setUseInfiniteScroll(true)
-                ->setUpdateBrowserHistory(true);
+                ->setUpdateBrowserHistory(true)
+            ;
         }
+
         return $this->_mySearchEngineBasicForm;
     }
 
     /**
-     * this function returns a new Search Engine Form
-     * @return SearchEngineBasicForm
+     * this function returns a new Search Engine Form.
      */
     public function SearchEngineSuperBasicForm(): SearchEngineBasicForm
     {
@@ -67,20 +67,22 @@ class SearchEngineContentControllerExtension extends Extension
         if (! $this->_mySearchEngineSuperBasicForm) {
             $this->_mySearchEngineSuperBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineSuperBasicForm');
         }
+
         return $this->_mySearchEngineSuperBasicForm;
     }
 
     /**
-     * this function returns a new Search Engine Form
-     * @return SearchEngineBasicForm
+     * this function returns a new Search Engine Form.
      */
     public function SearchEngineCustomForm(): SearchEngineBasicForm
     {
         $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineCustomForm) {
             $this->_mySearchEngineCustomForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineCustomForm')
-                ->setOutputAsJSON(true);
+                ->setOutputAsJSON(true)
+            ;
         }
+
         return $this->_mySearchEngineCustomForm;
     }
 

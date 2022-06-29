@@ -18,7 +18,8 @@ class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
     }
 
     /**
-     * returns the description - e.g. "sort by the last Edited date"
+     * returns the description - e.g. "sort by the last Edited date".
+     *
      * @return string
      */
     public function getDescription()
@@ -28,7 +29,7 @@ class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
 
     /**
      * returns the sort statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     Date => ASC
@@ -36,7 +37,7 @@ class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
      *
      * @param mixed $sortProviderValues
      *
-     * @return array|null
+     * @return null|array
      */
     public function getSqlSortArray($sortProviderValues = null)
     {
@@ -44,7 +45,9 @@ class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
     }
 
     /**
-     * @return boolean
+     * @param null|mixed $sortProviderValues
+     *
+     * @return bool
      */
     public function hasCustomSort($sortProviderValues = null)
     {
@@ -52,8 +55,9 @@ class SearchEngineSortByLastEdited extends SearchEngineSortByDescriptor
     }
 
     /**
-     * Does any custom filtering
-     * @param SS_List $objects
+     * Does any custom filtering.
+     *
+     * @param SS_List                  $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
      * @return SS_List

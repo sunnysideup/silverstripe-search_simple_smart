@@ -12,7 +12,6 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
-
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
@@ -27,6 +26,7 @@ class SearchEngineCoreSearchMachine
 
     /**
      * ClassNameForFilter => ValuesToFilterFor...
+     *
      * @var array
      */
     protected $filterProviders = [];
@@ -39,7 +39,7 @@ class SearchEngineCoreSearchMachine
     /**
      * @var mixed
      */
-    protected $sortProviderValues = null;
+    protected $sortProviderValues;
 
     /**
      * @var array
@@ -104,7 +104,7 @@ class SearchEngineCoreSearchMachine
     /**
      * @var SearchEngineSearchRecord
      */
-    protected $searchRecord = null;
+    protected $searchRecord;
 
     /**
      * @var string
@@ -149,7 +149,7 @@ class SearchEngineCoreSearchMachine
     /**
      * @var null
      */
-    protected $sortProviderObject = null;
+    protected $sortProviderObject;
 
     /**
      * @var array
@@ -174,12 +174,12 @@ class SearchEngineCoreSearchMachine
     /**
      * @var null|DataList
      */
-    protected $dataList = null;
+    protected $dataList;
 
     /**
      * @var null|DataList
      */
-    protected $filter = null;
+    protected $filter;
 
     /**
      * @var array
@@ -196,9 +196,18 @@ class SearchEngineCoreSearchMachine
      */
     protected $customSortTime = '';
 
-    protected $filter1, $filter2, $filter3 = '';
+    protected $filter1;
 
-    protected $matches1, $matches2, $matches3 = '';
+    protected $filter2;
+
+    protected $filter3 = '';
+
+    protected $matches1;
+
+    protected $matches2;
+
+    protected $matches3 = '';
+
     /**
      * class used to provide the raw results
      * raw results are the SearchEngineDataObject matches for a particular keyword
@@ -211,7 +220,7 @@ class SearchEngineCoreSearchMachine
 
     /**
      * @param string $filterClassName
-     * @param array $filterValues
+     * @param array  $filterValues
      *
      * @return $this
      */
@@ -223,8 +232,8 @@ class SearchEngineCoreSearchMachine
     }
 
     /**
-     * @param string $sortProvider classname of a sort provider
-     * @param mixed|null $sortProviderValues    values for the sorting - if any
+     * @param string     $sortProvider       classname of a sort provider
+     * @param null|mixed $sortProviderValues values for the sorting - if any
      *
      * @return $this
      */
@@ -249,9 +258,10 @@ class SearchEngineCoreSearchMachine
     }
 
     /**
-     * this function runs the Core Search Machine
+     * this function runs the Core Search Machine.
+     *
      * @param string $searchPhrase
-     * @param array $filterProviders
+     * @param array  $filterProviders
      * @param string $sortProvider
      * @param object $sortProviderValues
      *
@@ -276,7 +286,6 @@ class SearchEngineCoreSearchMachine
         $this->runSortUsingSQL();
 
         $this->runFilterUsingCustom();
-
 
         $this->runSortUsingCustom();
 
@@ -304,7 +313,8 @@ class SearchEngineCoreSearchMachine
     }
 
     /**
-     * returns HTML for Debug
+     * returns HTML for Debug.
+     *
      * @return string
      */
     public function getDebugString()
@@ -312,6 +322,7 @@ class SearchEngineCoreSearchMachine
         if ($this->debug) {
             return '<h3>Debug Info</h3><ul><li>' . implode('</li><li>', $this->debugArray) . '</li></ul>';
         }
+
         return '';
     }
 
@@ -322,9 +333,11 @@ class SearchEngineCoreSearchMachine
         if ($test1 && $test2) {
             $this->debug = true;
         }
+
         if (isset($_GET['flush'])) {
             $this->bypassCaching = true;
         }
+
         if ($this->debug) {
             $this->startTimeForRun = microtime(true);
         }
@@ -338,9 +351,11 @@ class SearchEngineCoreSearchMachine
         if (! empty($filterProviders)) {
             $this->filterProviders += $filterProviders;
         }
+
         if (! empty($sortProvider)) {
             $this->sortProvider = $sortProvider;
         }
+
         if (! empty($sortProviderValues)) {
             $this->sortProviderValues = $sortProviderValues;
         }
@@ -348,7 +363,6 @@ class SearchEngineCoreSearchMachine
 
     protected function runGetSearchRecord()
     {
-
         //add record
         $this->searchRecord = SearchEngineSearchRecord::add_search($this->searchPhrase, $this->filterProviders, $this->bypassCaching);
         if (! $this->searchRecord->FinalPhrase) {
@@ -369,7 +383,8 @@ class SearchEngineCoreSearchMachine
             foreach ($this->filterProviders as $filterClassName => $filterValues) {
                 $filterClassName = (string) $filterClassName;
                 $this->filterObjects[$filterClassName] = $filterClassName::create($this->debug)
-                    ->setFilterValues($filterValues);
+                    ->setFilterValues($filterValues)
+                ;
             }
         }
     }
@@ -380,6 +395,7 @@ class SearchEngineCoreSearchMachine
             //skip
             return;
         }
+
         $this->searchProviderName = 'not set';
         if (is_array($this->listOfIDsAsArray) && count($this->listOfIDsAsArray)) {
             $this->dataList = Injector::inst()->create(
@@ -396,6 +412,7 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $this->filterExecutedRAW = true;
             }
+
             //run search to search engine specific engine
             $this->searchProviderName = Config::inst()->get(self::class, 'class_name_for_search_provision');
             $this->searchProvider = Injector::inst()->get($this->searchProviderName);
@@ -412,6 +429,7 @@ class SearchEngineCoreSearchMachine
             //skip
             return;
         }
+
         if (is_array($this->listOfIDsSQLAsArray) && count($this->listOfIDsSQLAsArray)) {
             $this->dataList = Injector::inst()->create(
                 FasterIDLists::class,
@@ -420,7 +438,8 @@ class SearchEngineCoreSearchMachine
             )->filteredDatalist();
 
             $this->dataList = $this->dataList
-                ->sort('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')');
+                ->sort('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')')
+            ;
 
         // $this->dataList = SearchEngineDataObject::get()
                 //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
@@ -429,12 +448,13 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $this->filterExecutedSQL = true;
             }
+
             foreach ($this->filterProviders as $filterClassName => $filterValues) {
                 // print_r($this->dataList->sql());
                 $this->filter = $this->filterObjects[$filterClassName]->getSqlFilterArray($filterValues);
                 if ($this->filter) {
                     foreach ($this->filter as $field => $idList) {
-                        if($field === 'ID') {
+                        if ('ID' === $field) {
                             $where = Injector::inst()->create(
                                 FasterIDLists::class,
                                 SearchEngineDataObject::class,
@@ -446,11 +466,13 @@ class SearchEngineCoreSearchMachine
                             $this->dataList = $this->dataList->filter([$field => $idList]);
                         }
                     }
+
                     if ($this->debug) {
                         $this->filterStringForDebug .= $this->fancyPrintR($this->filter);
                     }
                 }
             }
+
             $this->listOfIDsSQLAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'SQL'));
         }
     }
@@ -489,17 +511,20 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $this->filterExecutedCustom = true;
             }
+
             foreach ($this->filterProviders as $filterClassName => $filterValues) {
                 if ($this->filterObjects[$filterClassName]->hasCustomFilter($filterValues)) {
                     if ($this->debug) {
                         $this->startTimeForCustomFilter = microtime(true);
                     }
+
                     $this->dataList = $this->filterObjects[$filterClassName]->doCustomFilter($this->dataList, $this->searchRecord, $filterValues);
                     if ($this->debug) {
                         $this->endTimeForCustomFilter = microtime(true);
                     }
                 }
             }
+
             $this->listOfIDsCustomAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM'));
         }
     }
@@ -510,9 +535,11 @@ class SearchEngineCoreSearchMachine
             if ($this->debug) {
                 $this->startTimeForCustomSort = microtime(true);
             }
+
             if ($this->sortProviderObject) {
                 $this->dataList = $this->sortProviderObject->doCustomSort($this->dataList, $this->searchRecord);
             }
+
             if ($this->debug) {
                 $this->endTimeForCustomSort = microtime(true);
             }
@@ -527,19 +554,22 @@ class SearchEngineCoreSearchMachine
             if (! isset($this->keywordArray[$keyword->KeywordPosition])) {
                 $this->keywordArray[$keyword->KeywordPosition] = [];
             }
+
             $this->keywordArray[$keyword->KeywordPosition][] = $keyword->Keyword;
         }
+
         foreach ($this->keywordArray as $position => $keywords) {
             $this->keywordArray[$position] = implode(' OR ', $keywords);
         }
-        $this->customFilterTime = (! empty($this->startTimeForCustomFilter) ?
-            'YES - seconds taken: ' . round($this->endTimeForCustomFilter - $this->startTimeForCustomSort, 5)
+
+        $this->customFilterTime = (empty($this->startTimeForCustomFilter) ?
+            'NO'
             :
-            'NO') . '';
-        $this->customSortTime = (! empty($this->startTimeForCustomSort) ?
-            'YES - seconds taken: ' . round($this->endTimeForCustomSort - $this->startTimeForCustomSort, 5)
+            'YES - seconds taken: ' . round($this->endTimeForCustomFilter - $this->startTimeForCustomSort, 5)) . '';
+        $this->customSortTime = (empty($this->startTimeForCustomSort) ?
+            'NO'
             :
-            'NO') . '</pre>';
+            'YES - seconds taken: ' . round($this->endTimeForCustomSort - $this->startTimeForCustomSort, 5)) . '</pre>';
     }
 
     protected function runDebugPrep2()
@@ -593,11 +623,7 @@ class SearchEngineCoreSearchMachine
         $newArray = [];
         foreach ($array as $key => $id) {
             $obj = SearchEngineDataObject::get()->byID($id);
-            if ($obj) {
-                $newArray[$key] = $obj->getTitle();
-            } else {
-                $newArray[$key] = 'ERROR - could not find SearchEngineDataObject with ID: ' . $id;
-            }
+            $newArray[$key] = $obj ? $obj->getTitle() : 'ERROR - could not find SearchEngineDataObject with ID: ' . $id;
         }
 
         return $this->fancyPrintR($newArray, 10000);
@@ -612,13 +638,17 @@ class SearchEngineCoreSearchMachine
                         return '
                         <br />' . $key . ': ' . $this->fancyPrintR($values);
                     }
+
                     $this->fancyPrintR($key);
                 }
+
                 return print_r($array, 1);
             }
+
             return print_r(array_splice($array, 0, $limit), 1) . '
                 <br />... AND MORE';
         }
+
         return print_r($array, 1);
     }
 }

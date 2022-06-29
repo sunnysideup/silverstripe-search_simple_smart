@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
-
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -11,28 +10,32 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
 {
     /**
-     * title of the task
+     * title of the task.
+     *
      * @var string
      */
     protected $title = 'Update Search Index';
 
     /**
-     * title of the task
+     * title of the task.
+     *
      * @var string
      */
     protected $description = 'Updates all the search indexes. Boolean GET parameter available: ?oldonesonly';
 
     /**
-     * Set a custom url segment (to follow dev/tasks/)
+     * Set a custom url segment (to follow dev/tasks/).
      *
      * @config
+     *
      * @var string
      */
     private static $segment = 'searchengineupdatesearchindex';
 
     /**
-     * this function runs the SearchEngineUpdateSearchIndex task
-     * @param HTTPRequest | null $request
+     * this function runs the SearchEngineUpdateSearchIndex task.
+     *
+     * @param null|HTTPRequest $request
      */
     public function run($request)
     {
@@ -45,15 +48,18 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
             $count = $this->limit;
             $sort = DB::get_conn()->random() . ' ASC';
         }
+
         for ($i = 0; $i <= $count; $i += $this->step) {
             $timeStart = microtime(true);
             $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, $this->step);
             if ($sort) {
                 $searchEngineDataObjectsToBeIndexed = $searchEngineDataObjectsToBeIndexed->sort($sort);
             }
-            if ($searchEngineDataObjectsToBeIndexed->count() === 0) {
+
+            if (0 === $searchEngineDataObjectsToBeIndexed->count()) {
                 break;
             }
+
             $this->flushNow('Running ' . $this->step . ' records of ' . $count . ', starting from position ' . $i);
             foreach ($searchEngineDataObjectsToBeIndexed as $searchEngineDataObjectToBeIndexed) {
                 $searchEngineDataObject = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
@@ -76,12 +82,15 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
                 } else {
                     $this->flushNow('Could not find item for: ' . $searchEngineDataObjectToBeIndexed->ID, 'deleted');
                 }
+
                 $searchEngineDataObjectToBeIndexed->Completed = 1;
                 $searchEngineDataObjectToBeIndexed->write();
             }
+
             $timeEnd = microtime(true);
             $this->flushNow('Time taken: ' . round(($timeEnd - $timeStart), 2));
         }
+
         SearchEngineDataObjectApi::end_indexing_mode();
 
         $this->runEnd($request);

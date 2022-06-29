@@ -16,7 +16,8 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
     }
 
     /**
-     * returns the description - e.g. "sort by the last Edited date"
+     * returns the description - e.g. "sort by the last Edited date".
+     *
      * @return string
      */
     public function getDescription()
@@ -29,7 +30,8 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      * e.g.
      *    LARGE => Large Pages
      *    SMALL => Small Pages
-     *    RED => Red Pages
+     *    RED => Red Pages.
+     *
      * @return array
      */
     public function getFilterList()
@@ -39,14 +41,12 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
 
     /**
      * returns the filter statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
      *
-     * @param array|SS_List|null $filterArray
-     *
-     * @return array| null
+     * @param null|array|SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
@@ -56,10 +56,13 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
     /**
      * do we need to do custom filtering
      * the filter array are the items selected by the
-     * user, based on the filter options listed above
+     * user, based on the filter options listed above.
+     *
      * @see: getFilterList
-     * @param array|SS_List|null $filterArray
-     * @return boolean
+     *
+     * @param null|array|SS_List $filterArray
+     *
+     * @return bool
      */
     public function hasCustomFilter($filterArray)
     {

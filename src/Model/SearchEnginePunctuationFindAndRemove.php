@@ -16,7 +16,8 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     private static $add_defaults = true;
 
     /**
-     * Defines the database table name
+     * Defines the database table name.
+     *
      * @var string
      */
     private static $table_name = 'SearchEnginePunctuationFindAndRemove';
@@ -83,8 +84,9 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param Member $member
+     * @param mixed  $context
      *
-     * @return boolean
+     * @return bool
      */
     public function canCreate($member = null, $context = [])
     {
@@ -94,7 +96,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canEdit($member = null)
     {
@@ -104,7 +106,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canDelete($member = null)
     {
@@ -114,7 +116,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canView($member = null)
     {
@@ -123,18 +125,17 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
 
     /**
      * @param string $character
-     * @return bool
      */
     public static function is_listed($character): bool
     {
-        return self::get()
-            ->filter(['Character' => $character])->count() ? true : false;
+        return (bool) self::get()
+            ->filter(['Character' => $character])->count();
     }
 
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        if (Config::inst()->get(self::class, 'add_defaults') === true) {
+        if (true === Config::inst()->get(self::class, 'add_defaults')) {
             $defaults = Config::inst()->get(self::class, 'defaults');
             foreach ($defaults as $default) {
                 if (! self::is_listed($default)) {

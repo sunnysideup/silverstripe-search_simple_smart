@@ -7,12 +7,11 @@ use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 
-use Match\App\Dev\Console;
-
 class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
 {
     /**
-     * list of classes that should be included if no values are set
+     * list of classes that should be included if no values are set.
+     *
      * @var array
      */
     private static $classes_to_include = [];
@@ -26,7 +25,8 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
     }
 
     /**
-     * returns the description - e.g. "sort by the last Edited date"
+     * returns the description - e.g. "sort by the last Edited date".
+     *
      * @return string
      */
     public function getDescription()
@@ -39,7 +39,8 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      * e.g.
      *    LARGE => Large Pages
      *    SMALL => Small Pages
-     *    RED => Red Pages
+     *    RED => Red Pages.
+     *
      * @return array
      */
     public function getFilterList()
@@ -51,13 +52,16 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         if (is_array($myInclusions) && count($myInclusions)) {
             $checkInclusion = true;
         }
-        if(! empty($this->filterValues)) {
-            if(! is_array($this->filterValues)) {
+
+        if (! empty($this->filterValues)) {
+            if (! is_array($this->filterValues)) {
                 $this->filterValues = [$this->filterValues => $this->filterValues];
             }
+
             $myInclusions = $this->filterValues;
             $checkInclusion = true;
         }
+
         foreach ($filterArray as $className => $title) {
             if ($checkInclusion) {
                 if (in_array($className, $myInclusions, true)) {
@@ -70,20 +74,17 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
             }
         }
 
-
         return $array;
     }
 
     /**
      * returns the filter statement that is addeded to search
-     * query prior to searching the SearchEngineDataObjects
+     * query prior to searching the SearchEngineDataObjects.
      *
      * return an array like
      *     "DataObjectClassName" => array("A", "B", "C"),
      *
-     * @param array|SS_List|null $filterArray
-     *
-     * @return array|null
+     * @param null|array|SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
@@ -99,16 +100,20 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
         foreach ($filterArray as $className) {
             $array += ClassInfo::subclassesFor($className);
         }
+
         return ['DataObjectClassName' => $array];
     }
 
     /**
      * do we need to do custom filtering
      * the filter array are the items selected by the
-     * user, based on the filter options listed above
+     * user, based on the filter options listed above.
+     *
      * @see: getFilterList
-     * @param array|SS_List|null $filterArray
-     * @return boolean
+     *
+     * @param null|array|SS_List $filterArray
+     *
+     * @return bool
      */
     public function hasCustomFilter($filterArray)
     {

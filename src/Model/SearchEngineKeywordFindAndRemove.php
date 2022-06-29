@@ -11,76 +11,60 @@ use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStopWords;
 
 class SearchEngineKeywordFindAndRemove extends DataObject
 {
+    protected static $_is_listed = [];
+
     /**
-     * Defines the database table name
+     * Defines the database table name.
+     *
      * @var string
      */
     private static $table_name = 'SearchEngineKeywordFindAndRemove';
 
-    /*
-     * @var string
-     */
+    // @var string
     private static $singular_name = 'Keyword Remove';
 
-    /*
-     * @var string
-     */
+    // @var string
     private static $plural_name = 'Keywords Remove';
 
-    /*
-     * @var array
-     */
+    // @var array
     private static $db = [
         'Keyword' => 'Varchar(150)',
         'Custom' => 'Boolean(1)',
     ];
 
-    /*
-     * @var bool
-     */
+    // @var bool
     private static $add_stop_words = true;
 
     /**
-     * options are: short, medium, long, extra_long
+     * options are: short, medium, long, extra_long.
+     *
      * @var string
      */
     private static $add_stop_words_length = 'short';
 
-    /*
-     * @var array
-     */
+    // @var array
     private static $indexes = [
         'Keyword' => true,
     ];
 
-    /*
-     * @var string
-     */
+    // @var string
     private static $default_sort = '"Custom" DESC, "Keyword" ASC';
 
-    /*
-     * @var array
-     */
+    // @var array
     private static $required_fields = [
         'Keyword',
     ];
 
-    /*
-     * @var array
-     */
+    // @var array
     private static $summary_fields = [
         'Keyword' => 'Keyword',
         'Custom.Nice' => 'Manually Entered',
     ];
 
-    /*
-     * @var array
-     */
+    // @var array
     private static $field_labels = [
         'Custom' => 'Manually Entered',
     ];
-
-    protected static $_is_listed = [];
 
     public function i18n_singular_name()
     {
@@ -94,8 +78,9 @@ class SearchEngineKeywordFindAndRemove extends DataObject
 
     /**
      * @param Member $member
+     * @param mixed  $context
      *
-     * @return boolean
+     * @return bool
      */
     public function canCreate($member = null, $context = [])
     {
@@ -105,7 +90,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canEdit($member = null)
     {
@@ -115,7 +100,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canDelete($member = null)
     {
@@ -125,28 +110,24 @@ class SearchEngineKeywordFindAndRemove extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-        $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
-    }
-
     /**
+     * @param mixed $keyword
+     *
      * @return SearchEngineKeywordFindAndRemove
      */
     public static function is_listed($keyword)
     {
         if (! isset(self::$_is_listed[$keyword])) {
             self::$_is_listed[$keyword] =
-            self::get()
-                ->filter(['Keyword' => $keyword])->count() ? true : false;
+            (bool) self::get()
+                ->filter(['Keyword' => $keyword])->count();
         }
 
         return self::$_is_listed[$keyword];
@@ -156,12 +137,12 @@ class SearchEngineKeywordFindAndRemove extends DataObject
     {
         parent::requireDefaultRecords();
         //see: http://xpo6.com/download-stop-word-list/
-        if (Config::inst()->get(self::class, 'add_stop_words') === true) {
+        if (true === Config::inst()->get(self::class, 'add_stop_words')) {
             $size = Config::inst()->get(self::class, 'add_stop_words_length');
             $stopwords = SearchEngineStopWords::get_list($size);
             foreach ($stopwords as $stopword) {
                 if (! self::is_listed($stopword)) {
-                    DB::alteration_message("Creating stop word: ${stopword}", 'created');
+                    DB::alteration_message("Creating stop word: {$stopword}", 'created');
                     $obj = self::create();
                     $obj->Keyword = $stopword;
                     $obj->Custom = false;
@@ -169,5 +150,11 @@ class SearchEngineKeywordFindAndRemove extends DataObject
                 }
             }
         }
+    }
+
+    protected function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
     }
 }

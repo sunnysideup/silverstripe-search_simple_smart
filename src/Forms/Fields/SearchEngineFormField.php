@@ -8,19 +8,22 @@ use SilverStripe\ORM\DB;
 class SearchEngineFormField extends LiteralField
 {
     /**
-     * total number days to search back
+     * total number days to search back.
+     *
      * @var int
      */
     protected $numberOfDays = 100;
 
     /**
-     * how many days ago the data-analysis should end
+     * how many days ago the data-analysis should end.
+     *
      * @var int
      */
     protected $endingDaysBack = 0;
 
     /**
-     * minimum number of searches for the data to show up
+     * minimum number of searches for the data to show up.
+     *
      * @var int
      */
     protected $minimumCount = 1;
@@ -38,9 +41,7 @@ class SearchEngineFormField extends LiteralField
     public function Field($properties = [])
     {
         $totalNumberOfDaysBack = $this->numberOfDays + $this->endingDaysBack;
-        /**
-         * INNER JOIN SearchEngineSearchRecord ON SearchEngineSearchRecord.ID = SearchEngineSearchRecordHistory.SearchEngineSearchRecordID
-         */
+        // INNER JOIN SearchEngineSearchRecord ON SearchEngineSearchRecord.ID = SearchEngineSearchRecordHistory.SearchEngineSearchRecordID
         if (! $this->minimumCount < 2) {
             $sql = '
                 SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount
@@ -52,6 +53,7 @@ class SearchEngineFormField extends LiteralField
             $totalCount = DB::query($sql)->value();
             $this->minimumCount = round($totalCount / 1000);
         }
+
         $sql = '
             SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
                 FROM "SearchEngineSearchRecordHistory"
@@ -64,12 +66,14 @@ class SearchEngineFormField extends LiteralField
         ';
         $data = DB::query($sql);
         if (! $this->minimumCount) {
-            $this->minimumCount++;
+            ++$this->minimumCount;
         }
+
         $content = '';
         if ($this->title) {
             $content .= '<h2>' . $this->title . '</h2>';
         }
+
         $content .= '
         <div id="SearchHistoryTableForCMS">
             <h3>Search Phrases entered at least ' . $this->minimumCount . ' times between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) . ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) . '</h3>
@@ -78,9 +82,10 @@ class SearchEngineFormField extends LiteralField
         $maxwidth = -1;
         foreach ($data as $key => $row) {
             //for the highest count, we work out a max-width
-            if ($maxwidth === -1) {
+            if (-1 === $maxwidth) {
                 $maxwidth = $row['myCount'];
             }
+
             $multipliedWidthInPercentage = floor(($row['myCount'] / $maxwidth) * 100);
             $list[$row['myCount'] . '-' . $key] = $row['Title'];
             $content .= '
@@ -91,6 +96,7 @@ class SearchEngineFormField extends LiteralField
                     </td>
                 </tr>';
         }
+
         $content .= '
             </table>';
         asort($list);
@@ -108,40 +114,39 @@ class SearchEngineFormField extends LiteralField
                     </td>
                 </tr>';
         }
-        $content .= '
+
+        return $content . '
             </table>
         </div>';
-
-        return $content;
     }
 
     /**
      * @param int $days
-     * @return self
      */
     public function setNumberOfDays($days): self
     {
-        $this->numberOfDays = intval($days);
+        $this->numberOfDays = (int) $days;
+
         return $this;
     }
 
     /**
      * @param int $count
-     * @return self
      */
     public function setMinimumCount($count): self
     {
-        $this->minimumCount = intval($count);
+        $this->minimumCount = (int) $count;
+
         return $this;
     }
 
     /**
      * @param int $count
-     * @return self
      */
     public function setEndingDaysBack($count): self
     {
-        $this->endingDaysBack = intval($count);
+        $this->endingDaysBack = (int) $count;
+
         return $this;
     }
 }

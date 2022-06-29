@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
-/**
+/*
  * 1. finds DataObjects with the keywords listed.
  *
  * 2. mysql methods:
@@ -34,10 +34,8 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
-
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
-
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
@@ -48,14 +46,9 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
     use Injectable;
     use Configurable;
 
-    /*
-    * @var ?SearchEngineSearchRecord
-    */
-    protected $searchRecord = null;
+    // @var ?SearchEngineSearchRecord
+    protected $searchRecord;
 
-    /**
-     * @param SearchEngineSearchRecord $searchRecord
-     */
     public function setSearchRecord(SearchEngineSearchRecord $searchRecord)
     {
         $this->searchRecord = $searchRecord;
@@ -63,25 +56,25 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
 
     public function getRawResultsAsArray()
     {
-
         //1. find keywords
         // $filterArray = [];
         // $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('" . $this->searchRecord->FinalPhrase . "')");
         $dataObjectArray = [];
         $max = substr_count($this->searchRecord->FinalPhrase, ' ') + 2;
-        for ($i = 1; $i < $max; $i++) {
+        for ($i = 1; $i < $max; ++$i) {
             $keywordIDArray = [0 => 0];
             $rows = DB::query(
                 "
                 SELECT \"SearchEngineKeywordID\"
                 FROM \"SearchEngineSearchRecord_SearchEngineKeywords\"
                 WHERE
-                \"KeywordPosition\" = ${i}
+                \"KeywordPosition\" = {$i}
                 AND \"SearchEngineSearchRecordID\" = " . $this->searchRecord->ID
             );
             foreach ($rows as $row) {
                 $keywordIDArray[$row['SearchEngineKeywordID']] = $row['SearchEngineKeywordID'];
             }
+
             $rowsLevel1 = DB::query('
                 SELECT "SearchEngineDataObjectID"
                 FROM SearchEngineKeyword_SearchEngineDataObjects_Level1
@@ -92,6 +85,7 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
             foreach ($rowsLevel1 as $row) {
                 $rowsLevel1Array[$row['SearchEngineDataObjectID']] = $row['SearchEngineDataObjectID'];
             }
+
             $rowsLevel2 = DB::query('
                 SELECT "SearchEngineDataObjectID"
                 FROM SearchEngineDataObject_SearchEngineKeywords_Level2
@@ -104,13 +98,12 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
             foreach ($rowsLevel2 as $row) {
                 $rowsLevel2Array[$row['SearchEngineDataObjectID']] = $row['SearchEngineDataObjectID'];
             }
+
             $dataObjectArray[$i] = array_merge($rowsLevel1Array, $rowsLevel2Array);
         }
-        if (count($dataObjectArray) > 1) {
-            $finalArray = call_user_func_array('array_intersect', $dataObjectArray);
-        } else {
-            $finalArray = $dataObjectArray[1];
-        }
+
+        $finalArray = count($dataObjectArray) > 1 ? array_intersect(...$dataObjectArray) : $dataObjectArray[1];
+
         return ['ID' => $finalArray];
     }
 

@@ -2,8 +2,6 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
-use Wamania\Snowball\StemmerFactory;
-
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Flushable;
@@ -14,6 +12,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use Wamania\Snowball\StemmerFactory;
 
 class SearchEngineSearchRecord extends DataObject implements Flushable
 {
@@ -23,13 +22,15 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     protected $listOfIDsUpdateOnly = false;
 
     /**
-     * defaults to three months
+     * defaults to three months.
+     *
      * @var int
      */
     private static $max_cache_age_in_minutes = 129600;
 
     /**
-     * Defines the database table name
+     * Defines the database table name.
+     *
      * @var string
      */
     private static $table_name = 'SearchEngineSearchRecord';
@@ -107,7 +108,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     ];
 
     /**
-     * clears all records
+     * clears all records.
      */
     public static function flush()
     {
@@ -124,6 +125,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                         \"FinalPhrase\" = ''
                 ");
             }
+
             $query = "SHOW TABLES LIKE 'SearchEngineSearchRecord_SearchEngineKeywords'";
             $tableExists = DB::query($query)->value();
             if ($tableExists) {
@@ -166,8 +168,8 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     /**
      * @param string $searchPhrase
-     * @param array $filterProviders
-     * @param bool $clear
+     * @param array  $filterProviders
+     * @param bool   $clear
      *
      * @return SearchEngineSearchRecord
      */
@@ -179,6 +181,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             $filterProvidersEncoded = Convert::raw2sql(serialize($filterProviders));
             $filterProvidersHashed = md5($filterProvidersEncoded);
         }
+
         $fieldArray = [
             'Phrase' => $searchPhrase,
             'FilterHash' => $filterProvidersHashed,
@@ -189,6 +192,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             if ($filterProvidersEncoded) {
                 $obj->FilterString = $filterProvidersEncoded;
             }
+
             $obj->write();
         } else {
             $maxAge = Config::inst()->get(self::class, 'max_cache_age_in_minutes');
@@ -200,6 +204,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 $obj->write();
             }
         }
+
         SearchEngineSearchRecordHistory::add_entry($obj);
 
         return $obj;
@@ -233,10 +238,58 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 new ReadonlyField('FinalPhrase', 'Cleaned Phrase'),
             ]
         );
+
         return $fields;
     }
 
-    public function onBeforeWrite()
+    /**
+     * saves the IDs of the DataList.
+     *
+     * note that it returns the list as an array
+     * to match getListOfIDs
+     *
+     * @param mixed  $list
+     * @param string $filterStep ("RAW", "SQL", "CUSTOM")
+     */
+    public function setListOfIDs($list, string $filterStep): string
+    {
+        $field = $this->getListIDField($filterStep);
+        //default to nothing
+        $this->{$field} = -1;
+        if ($list) {
+            if ($list instanceof SS_List && $list->count()) {
+                return $this->setListOfIDs($list->column('ID'), $filterStep);
+            }
+
+            if (is_string($list)) {
+                return $this->setListOfIDs(explode(',', $list), $filterStep);
+            }
+
+            if (is_array($list)) {
+                $this->{$field} = implode(',', array_unique($list));
+            }
+        }
+
+        $this->listOfIDsUpdateOnly = true;
+        $this->write();
+
+        return $this->{$field};
+    }
+
+    /**
+     * saves the IDs of the DataList.
+     */
+    public function getListOfIDs(string $filterStep): ?array
+    {
+        $field = $this->getListIDField($filterStep);
+        if ($this->{$field}) {
+            return explode(',', $this->{$field});
+        }
+
+        return null;
+    }
+
+    protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
         if ($this->listOfIDsUpdateOnly) {
@@ -246,16 +299,18 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             $keywords = explode(' ', $cleanedPhrase);
             $finalKeyWordArray = [];
             foreach ($keywords as $keyword) {
-                if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || strlen($keyword) === 1) {
+                if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || 1 === strlen($keyword)) {
                     continue;
                 }
+
                 $finalKeyWordArray[$keyword] = $keyword;
             }
+
             $this->FinalPhrase = implode(' ', $finalKeyWordArray);
         }
     }
 
-    public function onAfterWrite()
+    protected function onAfterWrite()
     {
         parent::onAfterWrite();
         $this->SearchEngineKeywords()->removeAll();
@@ -274,22 +329,25 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 if ($length < 2) {
                     //do nothing
                 } elseif ($length < 4) {
-                    $whereArray[] = '"Keyword" = \'' . $innerKeyword . '\'';
+                    $whereArray[] = '"Keyword" = \'' . $innerKeyword . "'";
                 } else {
                     if ($stem && $stem !== $keyword) {
                         $whereArray[] = "\"Keyword\" LIKE '" . $stem . "%'";
                     }
+
                     $whereArray[] = "\"Keyword\" LIKE '" . $innerKeyword . "%'";
                 }
             }
-            if (count($whereArray)) {
+
+            if ([] !== $whereArray) {
                 $where = '(' .
                     implode(') OR (', $whereArray) .
                     ')';
                 $keywords = SearchEngineKeyword::get()
                     ->where($where)
                     ->exclude(['ID' => $selectArray])
-                    ->limit(999);
+                    ->limit(999)
+                ;
                 $selectArray += $keywords->map('ID', 'ID')->toArray();
                 foreach ($selectArray as $id) {
                     if ($id) {
@@ -300,62 +358,12 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         }
     }
 
-    /**
-     * saves the IDs of the DataList
-     *
-     * note that it returns the list as an array
-     * to match getListOfIDs
-     *
-     * @param mixed   $list
-     * @param string  $filterStep ("RAW", "SQL", "CUSTOM")
-     *
-     * @return string
-     */
-    public function setListOfIDs($list, string $filterStep): string
-    {
-        $field = $this->getListIDField($filterStep);
-        //default to nothing
-        $this->{$field} = -1;
-        if ($list) {
-            if ($list instanceof SS_List && $list->count()) {
-                return $this->setListOfIDs($list->column('ID'), $filterStep);
-            } elseif (is_string($list)) {
-                return $this->setListOfIDs(explode(',', $list), $filterStep);
-            } elseif (is_array($list)) {
-                $this->{$field} = implode(',', array_unique($list));
-            }
-        }
-        $this->listOfIDsUpdateOnly = true;
-        $this->write();
-
-        return $this->{$field};
-    }
-
-    /**
-     * saves the IDs of the DataList
-     * @param string $filterStep
-     *
-     * @return array|null
-     */
-    public function getListOfIDs(string $filterStep): ?array
-    {
-        $field = $this->getListIDField($filterStep);
-        if ($this->{$field}) {
-            return explode(',', $this->{$field});
-        }
-        return null;
-    }
-
-    /**
-     * @param string $filterStep
-     *
-     * @return string
-     */
     protected function getListIDField(string $filterStep): string
     {
         if (! in_array($filterStep, ['RAW', 'SQL', 'CUSTOM'], true)) {
-            user_error("${filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
+            user_error("{$filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
         }
+
         return 'ListOfIDs' . $filterStep;
     }
 }

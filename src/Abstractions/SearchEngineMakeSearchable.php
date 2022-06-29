@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
-/***
+/*
  * This is an interface that can be added
  * to any DataObject that is
  *
@@ -28,24 +28,30 @@ interface SearchEngineMakeSearchable
      *   - MyHasOne.MySecondLevelHasOne.DBField.Nice / MyHasOne.MySecondLevelHasOne.DBField.Long / MyHasOne.MySecondLevelHasOne.DBField.Raw / etc...
      *
      * @var array
+     *
+     * @param mixed $action
      */
     // private static $search_engine_full_contents_fields_array;
 
     /**
      * The Silvestripe Template used to show the result.
+     *
      * @var string
      */
     // private static $search_engine_results_templates;
 
     /**
-     * Should this object type be excluded
+     * Should this object type be excluded.
+     *
      * @var bool
      */
     // private static $search_engine_exclude_from_index;
 
     /**
-     * returns a URL link to the object
+     * returns a URL link to the object.
+     *
      * @param string $action
+     *
      * @return string
      */
     public function Link($action = '');
@@ -59,6 +65,7 @@ interface SearchEngineMakeSearchable
      * );
      * where 1/2/3 are the levels of importance of each string.
      * You dont need to have 1,2, 3, you can also just return 1, 2 or just 1.
+     *
      * @return array
      */
     public function SearchEngineFullContentForIndexingProvider();
@@ -72,6 +79,7 @@ interface SearchEngineMakeSearchable
      * );
      * where 1/2/3 are the levels of importance of each string.
      * You dont need to have 1,2, 3, you can also just return 1, 2 or just 1.
+     *
      * @return array
      */
     public function SearchEngineFullContentWeigthingProvider();
@@ -79,20 +87,24 @@ interface SearchEngineMakeSearchable
     /**
      * returns templates for formatting the object
      * in the search results.
-     * @param boolean $moreDetails
+     *
+     * @param bool $moreDetails
+     *
      * @return string
      */
     public function SearchEngineResultsTemplatesProvider($moreDetails = false);
 
     /**
      * @see: MakeSearchable::search_engine_also_trigger
+     *
      * @return array
      */
     public function SearchEngineAlsoTriggerProvider();
 
     /**
-     * return true if the object should not be indexed
-     * @return boolean
+     * return true if the object should not be indexed.
+     *
+     * @return bool
      */
     public function SearchEngineExcludeFromIndexProvider();
 }

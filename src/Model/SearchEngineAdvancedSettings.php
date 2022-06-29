@@ -4,17 +4,16 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
-
 use SilverStripe\Security\Permission;
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
- **/
-
+ */
 class SearchEngineAdvancedSettings extends DataObject
 {
     /**
-     * Defines the database table name
+     * Defines the database table name.
+     *
      * @var string
      */
     private static $table_name = 'SearchEngineAdvancedSettings';
@@ -41,8 +40,9 @@ class SearchEngineAdvancedSettings extends DataObject
 
     /**
      * @param Member $member
+     * @param mixed  $context
      *
-     * @return boolean
+     * @return bool
      */
     public function canCreate($member = null, $context = [])
     {
@@ -52,7 +52,7 @@ class SearchEngineAdvancedSettings extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canEdit($member = null)
     {
@@ -62,7 +62,7 @@ class SearchEngineAdvancedSettings extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canDelete($member = null)
     {
@@ -72,7 +72,7 @@ class SearchEngineAdvancedSettings extends DataObject
     /**
      * @param Member $member
      *
-     * @return boolean
+     * @return bool
      */
     public function canView($member = null)
     {

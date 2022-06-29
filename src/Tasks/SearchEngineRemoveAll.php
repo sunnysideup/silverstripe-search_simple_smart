@@ -4,33 +4,36 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
-
 use SilverStripe\ORM\DB;
 
 class SearchEngineRemoveAll extends SearchEngineBaseTask
 {
     /**
-     * Title of the task
+     * Title of the task.
+     *
      * @var string
      */
     protected $title = 'Remove All Search Engine Index Data';
 
     /**
-     * Description of the task
+     * Description of the task.
+     *
      * @var string
      */
     protected $description = 'Careful - remove all the search engine index data.';
 
     /**
-     * Set a custom url segment (to follow dev/tasks/)
+     * Set a custom url segment (to follow dev/tasks/).
      *
      * @config
+     *
      * @var string
      */
     private static $segment = 'searchengineremoveall';
 
     /**
-     * list of all model tables
+     * list of all model tables.
+     *
      * @var array
      */
     private static $index_tables = [
@@ -49,36 +52,39 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
     ];
 
     /**
-     * this function runs the SearchEngineRemoveAll task
+     * this function runs the SearchEngineRemoveAll task.
+     *
      * @param HTTPRequest $request
      */
     public function run($request)
     {
         $this->runStart($request);
 
-        $iAmSure = $request->getVar('i-am-sure') ? true : false;
+        $iAmSure = (bool) $request->getVar('i-am-sure');
         if (! $iAmSure) {
             die('please add the i-am-sure get variable to this task');
         }
-        if ($this->type === 'all') {
+
+        if ('all' === $this->type) {
             $allTables = array_merge(
                 Config::inst()->get(self::class, 'search_history_tables'),
                 Config::inst()->get(self::class, 'index_tables')
             );
-        } elseif ($this->type === 'history') {
+        } elseif ('history' === $this->type) {
             $allTables = Config::inst()->get(self::class, 'search_history_tables');
-        } elseif ($this->type === 'indexes') {
+        } elseif ('indexes' === $this->type) {
             $allTables = Config::inst()->get(self::class, 'index_tables');
         } else {
             die('Please set type: all|history|indexes');
         }
+
         foreach ($allTables as $table) {
-            DB::alteration_message("Drop \"${table}\"", 'deleted');
+            DB::alteration_message("Drop \"{$table}\"", 'deleted');
             if (method_exists(DB::get_conn(), 'clearTable')) {
                 // @DB::query("DROP \"$table\"");
                 DB::get_conn()->clearTable($table);
             } else {
-                DB::query("TRUNCATE \"${table}\"");
+                DB::query("TRUNCATE \"{$table}\"");
             }
         }
 

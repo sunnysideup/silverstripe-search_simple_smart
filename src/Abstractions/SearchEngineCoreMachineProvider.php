@@ -4,7 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
 use SilverStripe\ORM\DataList;
 
-/***
+/*
  * Interface for the class that returns
  * the sorted and filtered SearchEngineDataObjects
  *
@@ -19,13 +19,18 @@ interface SearchEngineCoreMachineProvider
      * This is the base collection.
      *
      * @var string
+     *
+     * @param mixed $searchPhrase
+     * @param mixed $filterProviders
+     * @param mixed $sortProvider
      */
     // private static $class_name_for_search_provision;
 
     /**
-     * this function runs the Core Search Machine
+     * this function runs the Core Search Machine.
+     *
      * @param string $searchPhrase
-     * @param array $filterProviders
+     * @param array  $filterProviders
      * @param string $sortProvider
      *
      * @return DataList
@@ -33,7 +38,8 @@ interface SearchEngineCoreMachineProvider
     public function run($searchPhrase, $filterProviders = [], $sortProvider = '');
 
     /**
-     * returns HTML for Debug
+     * returns HTML for Debug.
+     *
      * @return string
      */
     public function getDebugString();

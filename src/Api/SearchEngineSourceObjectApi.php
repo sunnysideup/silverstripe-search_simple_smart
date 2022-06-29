@@ -11,12 +11,11 @@ use SilverStripe\ORM\FieldType\DBString;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
-use Sunnysideup\Vardump\Vardump;
-
 class SearchEngineSourceObjectApi
 {
     /**
      * used for caching...
+     *
      * @var array
      */
     protected static $_search_engine_fields_for_indexing = [];
@@ -27,6 +26,7 @@ class SearchEngineSourceObjectApi
             if ($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
                 return $sourceObject->SearchEngineSourceObjectSortDate();
             }
+
             $fieldsToCheck = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_date_fields_for_sorting');
             foreach ($fieldsToCheck as $field) {
                 if (! empty($sourceObject->{$field})) {
@@ -36,10 +36,6 @@ class SearchEngineSourceObjectApi
         }
     }
 
-    /**
-     * @param  DataObject $sourceObject
-     * @return array
-     */
     public function FieldsForIndexing(DataObject $sourceObject): array
     {
         $className = $sourceObject->getSearchEngineKey(true);
@@ -54,9 +50,10 @@ class SearchEngineSourceObjectApi
                 $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
                 foreach ($dbArray as $field => $type) {
                     //get without brackets ...
-                    if (preg_match('/^(\w+)\(/', $type, $match)) {
+                    if (preg_match('#^(\w+)\(#', $type, $match)) {
                         $type = $match[1];
                     }
+
                     if (is_subclass_of($type, DBString::class)) {
                         if (in_array($field, $excludedFieldArray, true)) {
                             //do nothing
@@ -65,11 +62,13 @@ class SearchEngineSourceObjectApi
                             if (in_array($field, $levelOneFieldArray, true)) {
                                 $level = 1;
                             }
+
                             $levelFields[$level][] = $field;
                         }
                     }
                 }
             }
+
             self::$_search_engine_fields_for_indexing[$className] = $levelFields;
         }
 
@@ -88,6 +87,7 @@ class SearchEngineSourceObjectApi
             } else {
                 $levels = $sourceObject->SearchEngineFieldsForIndexing();
             }
+
             if (is_array($levels) && count($levels)) {
                 foreach ($levels as $level => $fieldArray) {
                     $level = SearchEngineKeyword::level_sanitizer($level);
@@ -109,7 +109,8 @@ class SearchEngineSourceObjectApi
      * returns a template for formatting the object
      * in the search results.
      *
-     * @return array
+     * @param null|mixed $sourceObject
+     * @param mixed      $moreDetails
      */
     public function SearchEngineResultsTemplates($sourceObject = null, $moreDetails = false): array
     {
@@ -118,34 +119,38 @@ class SearchEngineSourceObjectApi
             if ($sourceObject->hasMethod('SearchEngineResultsTemplatesProvider')) {
                 return $sourceObject->SearchEngineResultsTemplatesProvider($moreDetails);
             }
+
             $template = Config::inst()->get($sourceObject->ClassName, 'search_engine_results_templates');
             if ($template) {
                 if ($moreDetails) {
                     return [$template . '_MoreDetails', $template];
                 }
+
                 return [$template];
             }
+
             $parentClasses = class_parents($sourceObject);
             $firstTemplate = 'SearchEngineResultItem_' . $sourceObject->ClassName;
-            if ($moreDetails) {
-                $arrayOfTemplates = [$firstTemplate . '_MoreDetails', $firstTemplate];
-            } else {
-                $arrayOfTemplates = [$firstTemplate];
-            }
+            $arrayOfTemplates = $moreDetails ? [$firstTemplate . '_MoreDetails', $firstTemplate] : [$firstTemplate];
             foreach ($parentClasses as $parent) {
-                if ($parent === DataObject::class) {
+                if (DataObject::class === $parent) {
                     break;
                 }
+
                 if ($moreDetails) {
                     $arrayOfTemplates[] = 'SearchEngineResultItem_' . $parent . '_MoreDetails';
                 }
+
                 $arrayOfTemplates[] = 'SearchEngineResultItem_' . $parent;
             }
+
             if ($moreDetails) {
                 $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject_MoreDetails';
             }
+
             $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject';
         }
+
         return $arrayOfTemplates;
     }
 
@@ -161,11 +166,7 @@ class SearchEngineSourceObjectApi
                 foreach ($levels as $level => $fieldArray) {
                     $str .= '<li><strong>' . $level . '</strong><ul>';
                     foreach ($fieldArray as $field) {
-                        if (isset($fieldLabels[$field])) {
-                            $title = $fieldLabels[$field] . ' [' . $field . ']';
-                        } else {
-                            $title = $field;
-                        }
+                        $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
                         if ($includeExample) {
                             $fields = explode('.', $field);
                             $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
@@ -174,8 +175,10 @@ class SearchEngineSourceObjectApi
                             $str .= '<li> - ' . $title . '</li>';
                         }
                     }
+
                     $str .= '</ul></li>';
                 }
+
                 $str .= '</ul>';
             } else {
                 $str = _t('SearchEngineDataObject.NO_FIELDS', '<p>No fields are listed for indexing.</p>');
@@ -186,13 +189,14 @@ class SearchEngineSourceObjectApi
     }
 
     /**
-     * @param bool $moreDetails
+     * @param bool  $moreDetails
+     * @param mixed $sourceObject
      */
     public function getHTMLOutput($sourceObject, $moreDetails = false): DBField
     {
         if ($sourceObject) {
             $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
-            $cacheKey = 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
+            $cacheKey = 'SearchEngine_' . $sourceObject->ClassName . \_::class . abs($sourceObject->ID) . \_::class . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
 
             $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
 
@@ -200,12 +204,14 @@ class SearchEngineSourceObjectApi
             if ($cache->has($cacheKey)) {
                 $templateRender = $cache->get($cacheKey);
             }
+
             if ($templateRender) {
                 $templateRender = unserialize($templateRender);
             } else {
                 $templateRender = $sourceObject->renderWith($arrayOfTemplates);
                 $cache->set($cacheKey, serialize($templateRender));
             }
+
             return $templateRender;
         }
 
