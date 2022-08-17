@@ -8,13 +8,13 @@ use Page;
 
 class TestKeywordSearch extends Controller
 {
-    private static $url_segment = 'admin/tests/search';
+    private static $url_segment = 'tests/testkeywordsearch';
 
     private static $allowed_actions = [
-        'test' => 'ADMIN',
+        'index' => 'ADMIN',
     ];
 
-    public function test()
+    public function index()
     {
         $page = Page::get()->first();
         $keywords = strtok($page->Title, ' ');
@@ -26,10 +26,12 @@ class TestKeywordSearch extends Controller
         ;
         print_r($obj->getDebugString());
         echo '---------';
+        echo '<h2>Result Count</h2>';
         // var_dump($keywords);
         var_dump($searchList->Count());
+        echo '<h2>Results</h2>';
         foreach ($searchList as $item) {
-            print_r($item);
+            echo '<li>'.$item->title.'</li>';
         }
     }
 }
