@@ -5,3 +5,4 @@ SilverStripe\Control\Director:
   rules:
     searchenginerecordclick//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\SearchEngineRecordClick
     admin/searchenginemanifest//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\SearchEngineManifest
+    admin/testkeywordsearch//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\TestKeywordSearch
