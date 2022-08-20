@@ -174,8 +174,6 @@ class SearchEngineBasicForm extends Form
         $this->setAttribute('autocomplete', 'false');
         $this->disableSecurityToken();
         $this->customScript[] = "SearchEngineInitFunctions.formSelector = '#" . $this->FormName() . "';";
-
-        return $this;
     }
 
     public function forTemplate()
@@ -455,7 +453,8 @@ class SearchEngineBasicForm extends Form
         // After dealing with the data you can redirect the user back.
         $link = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
         $fullResultsLink = '';
-        if ($fullResultsClassName = Config::inst()->get(self::class, 'full_results_page_type')) {
+        $fullResultsClassName = (string) Config::inst()->get(self::class, 'full_results_page_type');
+        if ($fullResultsClassName) {
             if ($this->Controller()->dataRecord->ClassName !== $fullResultsClassName) {
                 if (is_subclass_of($fullResultsClassName, SiteTree::class)) {
                     $obj = DataObject::get_one($fullResultsClassName);

@@ -176,6 +176,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
             return $obj;
         }
+        return null;
     }
 
     /**
@@ -195,6 +196,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
             return $obj;
         }
+        return null;
     }
 
     /**

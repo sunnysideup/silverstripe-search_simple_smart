@@ -196,7 +196,7 @@ class SearchEngineSourceObjectApi
     {
         if ($sourceObject) {
             $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
-            $cacheKey = 'SearchEngine_' . $sourceObject->ClassName . \_::class . abs($sourceObject->ID) . \_::class . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
+            $cacheKey = 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
 
             $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
 

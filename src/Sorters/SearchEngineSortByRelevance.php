@@ -65,10 +65,10 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     /**
      * Do any custom sorting.
      *
-     * @param SS_List                  $objects
+     * @param SS_List|DataList         $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
-     * @return DataList
+     * @return SS_List|DataList
      */
     public function doCustomSort($objects, $searchRecord)
     {

@@ -24,7 +24,7 @@ class SearchEngineFormField extends LiteralField
     /**
      * minimum number of searches for the data to show up.
      *
-     * @var int
+     * @var float
      */
     protected $minimumCount = 1;
 
@@ -50,8 +50,8 @@ class SearchEngineFormField extends LiteralField
                     AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )
                     AND MemberID = 0
             ';
-            $totalCount = DB::query($sql)->value();
-            $this->minimumCount = round($totalCount / 1000);
+            $totalCount = (int) DB::query($sql)->value();
+            $this->minimumCount = (int) round($totalCount / 1000);
         }
 
         $sql = '

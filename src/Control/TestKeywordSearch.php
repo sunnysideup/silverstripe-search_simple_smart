@@ -2,9 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Control;
 
+use Page;
 use SilverStripe\Control\Controller;
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
-use Page;
 
 class TestKeywordSearch extends Controller
 {
@@ -31,7 +31,7 @@ class TestKeywordSearch extends Controller
         var_dump($searchList->Count());
         echo '<h2>Results</h2>';
         foreach ($searchList as $item) {
-            echo '<li>'.$item->title.'</li>';
+            echo '<li>' . $item->title . '</li>';
         }
     }
 }

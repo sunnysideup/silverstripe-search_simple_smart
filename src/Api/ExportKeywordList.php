@@ -43,7 +43,8 @@ class ExportKeywordList
                 }
 
                 $written = 0;
-                if ($fh = fopen($fileName, 'w')) {
+                $fh = fopen($fileName, 'w');
+                if ($fh) {
                     $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = ['" . implode("','", $array) . "'];");
                     fclose($fh);
                 }
@@ -64,9 +65,9 @@ class ExportKeywordList
      *
      * @param bool $includeBase
      *
-     * @return null|string
+     * @return string|null
      */
-    public static function get_js_keyword_file_name($includeBase = false)
+    public static function get_js_keyword_file_name($includeBase = false) : ?string
     {
         $myFolderName = Config::inst()->get(self::class, 'keyword_list_folder_name');
         //without folder name we return null!
@@ -86,5 +87,6 @@ class ExportKeywordList
 
             return rtrim(str_replace('//', '/', $str), '/') . '/' . $fileName;
         }
+        return null;
     }
 }

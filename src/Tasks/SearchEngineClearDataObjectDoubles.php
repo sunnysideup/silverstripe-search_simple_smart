@@ -62,7 +62,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         $test = [];
         $pos = 0;
         foreach ($ids as $id => $className) {
-            $key = $className . \_::class . $id;
+            $key = $className . '_' . $id;
             if (isset($test[$key])) {
                 $objects = Injector::inst()->create(
                     FasterIDLists::class,

@@ -192,7 +192,7 @@ class SearchEngineFullContent extends DataObject
      * @param int                    $level
      * @param string                 $content
      *
-     * @return object
+     * @return SearchEngineFullContent
      */
     public static function add_one($item, $level, $content)
     {
@@ -200,6 +200,7 @@ class SearchEngineFullContent extends DataObject
         //you dont want to clean keywords now as this will remove all the spaces!
         //$content = SearchEngineKeyword::clean_keyword($content);
         $fieldArray = ['SearchEngineDataObjectID' => $item->ID, 'Level' => $level];
+        /** @var SearchEngineFullContent $obj */
         $obj = DataObject::get_one(self::class, $fieldArray);
         if (! $obj) {
             $obj = self::create($fieldArray);
@@ -207,6 +208,7 @@ class SearchEngineFullContent extends DataObject
 
         $obj->Content = $content;
         $obj->write();
+        return $obj;
     }
 
     /**
@@ -294,7 +296,8 @@ class SearchEngineFullContent extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        if ($obj = $this->SearchEngineDataObject()) {
+        $obj = $this->SearchEngineDataObject();
+        if ($obj) {
             $fields->replaceField(
                 'SearchEngineDataObjectID',
                 ReadonlyField::create(

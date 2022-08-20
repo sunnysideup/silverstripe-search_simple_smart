@@ -175,7 +175,8 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     public function getTitle()
     {
         if ($this->SearchEngineDataObjectID) {
-            if ($obj = $this->SearchEngineDataObject()) {
+            $obj = $this->SearchEngineDataObject();
+            if ($obj) {
                 return $obj->getTitle();
             }
         }
@@ -278,7 +279,8 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        if ($obj = $this->SearchEngineDataObject()) {
+        $obj = $this->SearchEngineDataObject();
+        if ($obj) {
             $fields->replaceField(
                 'SearchEngineDataObjectID',
                 ReadonlyField::create(
