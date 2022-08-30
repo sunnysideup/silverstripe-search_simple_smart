@@ -134,6 +134,27 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 }
             }
 
+            // TO TEST!
+            // $sql = '
+            //     SELECT
+            //         "SearchEngineDataObject"."ID" AS MyID,
+            //         MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\'  WITH QUERY EXPANSION) AS RELEVANCE
+            //     ' . $fromSQL . '
+            //     WHERE
+            //         "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+            //         AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
+            //     HAVING
+            //         RELEVANCE > 0
+            //     ' . $sortSQL . '
+            //     ;';
+            // $rows = DB::query($sql);
+            // foreach ($rows as $row) {
+            //     $id = $row['MyID'];
+            //     if (! isset($array[$id])) {
+            //         $array[$id] = $row['RELEVANCE'];
+            //     }
+            // }
+
             $ids = array_keys($array);
 
             //retrieve objects
