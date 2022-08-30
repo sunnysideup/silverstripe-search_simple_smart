@@ -104,7 +104,6 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         AND "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
                     HAVING
                         RELEVANCE > 0
-
                     ' . $sortSQL . '
                 ;';
                 $rows = DB::query($sql);
@@ -127,7 +126,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                     AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
                 HAVING
                     RELEVANCE > 0
-                    ' . $sortSQL . '
+                ' . $sortSQL . '
                 ;';
             $rows = DB::query($sql);
             foreach ($rows as $row) {
