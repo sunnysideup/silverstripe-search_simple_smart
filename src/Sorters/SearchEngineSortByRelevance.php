@@ -12,6 +12,8 @@ use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
+use Match\App\Dev\Console;
+
 /**
  * default sort option.
  */
@@ -90,7 +92,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //look for complete phrase if there is more than one word.
             //exact full match of search phrase using relevance, level 1 first
             //and further upfront in text as second sort by.
-            $phrase = (string) Convert::raw2sql($searchRecord->Phrase);
+            $phrase = (string) Convert::raw2sql($searchRecord->FinalPhrase);
             if (strpos(trim($phrase), ' ')) {
                 $sql = '
                     SELECT
@@ -100,6 +102,9 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                     WHERE
                         "Content" LIKE \'%' . $phrase . '%\'
                         AND "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+                    HAVING
+                        RELEVANCE > 0
+
                     ' . $sortSQL . '
                 ;';
                 $rows = DB::query($sql);
@@ -120,6 +125,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 WHERE
                     "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
                     AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
+                HAVING
+                    RELEVANCE > 0
                     ' . $sortSQL . '
                 ;';
             $rows = DB::query($sql);
@@ -138,7 +145,6 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 SearchEngineDataObject::class,
                 $ids
             )->filteredDatalist();
-
             $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 
             // $objects = SearchEngineDataObject::get()
