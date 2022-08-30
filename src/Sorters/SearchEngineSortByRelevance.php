@@ -12,8 +12,6 @@ use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
-use Match\App\Dev\Console;
-
 /**
  * default sort option.
  */
