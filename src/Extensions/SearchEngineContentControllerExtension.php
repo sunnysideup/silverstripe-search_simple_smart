@@ -87,7 +87,7 @@ class SearchEngineContentControllerExtension extends Extension
     }
 
     /**
-     * @return DBVarchar
+     * @return DBField (DBVarchar)
      */
     public function SearchEngineKeywordsPhrase()
     {

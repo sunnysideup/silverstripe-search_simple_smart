@@ -39,7 +39,7 @@ class SearchEngineMakeSearchable extends DataExtension
     protected static $_search_engine_exclude_from_index_per_class = [];
 
     /**
-     * @var int
+     * @var array
      */
     private $_onAfterWriteCount = [];
 
@@ -51,13 +51,11 @@ class SearchEngineMakeSearchable extends DataExtension
      * deletes cached search results
      * sets stage to LIVE
      * indexes the current object.
+     *  Setting $withModeChange to false means the stage will not be set
+     *  and the cache will not be cleared.
      *
-     * @param SearchEngineDataObject $searchEngineDataObject
-     * @param bool                   $withModeChange         everything necessary for indexings.
-     *                                                       Setting this to false means the stage will not be set
-     *                                                       and the cache will not be cleared.
      */
-    public function doSearchEngineIndex($searchEngineDataObject = null, $withModeChange = true)
+    public function doSearchEngineIndex(?SearchEngineDataObject $searchEngineDataObject = null, ?bool $withModeChange = true)
     {
         //last check...
         if (! $searchEngineDataObject) {
@@ -430,7 +428,7 @@ class SearchEngineMakeSearchable extends DataExtension
             return true;
         }
 
-        $key = $this->getOwner()->ClassName . \_::class . $this->getOwner()->ID;
+        $key = $this->getOwner()->ClassName . '_' . $this->getOwner()->ID;
         if (! isset(self::$_search_engine_exclude_from_index[$key])) {
             if (! isset(self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName])) {
                 $classNameList = SearchEngineDataObjectApi::searchable_class_names();
@@ -488,6 +486,6 @@ class SearchEngineMakeSearchable extends DataExtension
             return $this->getOwner()->ClassName . '';
         }
 
-        return $this->getOwner()->ID . \_::class . $this->getOwner()->ClassName;
+        return $this->getOwner()->ID . '_' . $this->getOwner()->ClassName;
     }
 }

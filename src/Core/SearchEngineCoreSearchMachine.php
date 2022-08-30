@@ -112,7 +112,7 @@ class SearchEngineCoreSearchMachine
     protected $searchProviderName = '';
 
     /**
-     * @var object
+     * @var string
      */
     protected $searchProvider = '';
 

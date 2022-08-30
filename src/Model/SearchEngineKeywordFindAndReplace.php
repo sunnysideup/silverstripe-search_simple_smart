@@ -14,7 +14,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     /**
      * making sure that we do not have infinite loops...
      *
-     * @var int
+     * @var array
      */
     protected static $_words_used = [];
 

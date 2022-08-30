@@ -99,10 +99,10 @@ abstract class SearchEngineSortByDescriptor
     /**
      * Do any custom sorting.
      *
-     * @param array $objects      - id => ClassName
+     * @param SS_List $objects      - id => ClassName
      * @param mixed $searchRecord
      *
-     * @return SS_List
+     * @return DataList|SS_List
      */
     abstract public function doCustomSort($objects, $searchRecord);
 

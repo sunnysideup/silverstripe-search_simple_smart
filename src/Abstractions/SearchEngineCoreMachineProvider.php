@@ -18,11 +18,6 @@ interface SearchEngineCoreMachineProvider
      * phrase, without any filters or sort.
      * This is the base collection.
      *
-     * @var string
-     *
-     * @param mixed $searchPhrase
-     * @param mixed $filterProviders
-     * @param mixed $sortProvider
      */
     // private static $class_name_for_search_provision;
 

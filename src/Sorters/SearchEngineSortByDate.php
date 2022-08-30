@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataList;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
@@ -62,10 +63,10 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
     /**
      * Do any custom sorting.
      *
-     * @param SS_List                  $objects
+     * @param SS_List|DataList         $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
-     * @return SS_List
+     * @return SS_List|DataList
      */
     public function doCustomSort($objects, $searchRecord)
     {

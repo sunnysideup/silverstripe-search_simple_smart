@@ -77,7 +77,7 @@ You do this as follows:
 
     File:
       extensions:
-        - SearchEngineMakeSearchable
+        - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable
       search_engine_full_contents_fields_array:
         level1:
           - Title

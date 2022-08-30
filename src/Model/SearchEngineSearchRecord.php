@@ -186,6 +186,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             'Phrase' => $searchPhrase,
             'FilterHash' => $filterProvidersHashed,
         ];
+        /** @var SearchEngineSearchRecord $obj */
         $obj = DataObject::get_one(self::class, $fieldArray);
         if (! $obj) {
             $obj = self::create($fieldArray);

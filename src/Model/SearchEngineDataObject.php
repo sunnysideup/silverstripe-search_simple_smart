@@ -641,7 +641,7 @@ class SearchEngineDataObject extends DataObject
             return $this->DataObjectClassName . '';
         }
 
-        return $this->DataObjectID . \_::class . $this->DataObjectClassName;
+        return $this->DataObjectID . '_' . $this->DataObjectClassName;
     }
 
     /**
