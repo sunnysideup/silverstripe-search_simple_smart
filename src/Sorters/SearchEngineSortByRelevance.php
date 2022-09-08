@@ -87,9 +87,9 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                     RELEVANCE DESC
             ';
 
-            //look for complete phrase if there is more than one word.
-            //exact full match of search phrase using relevance, level 1 first
-            //and further upfront in text as second sort by.
+            // look for complete phrase if there is more than one word.
+            // exact full match of search phrase becomes relevance, level 1 first
+            // and further upfront in text increases relevance.
             $phrase = (string) Convert::raw2sql($searchRecord->FinalPhrase);
             if (strpos(trim($phrase), ' ')) {
                 $sql = '
@@ -113,7 +113,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 }
             }
 
-            //fulltext using relevance, level 1 first.
+            // for the ones not found yet, we do a Mysql "Match" query with higher relevance first.
             $sql = '
                 SELECT
                     "SearchEngineDataObject"."ID" AS MyID,
@@ -134,27 +134,6 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 }
             }
 
-            // TO TEST!
-            // $sql = '
-            //     SELECT
-            //         "SearchEngineDataObject"."ID" AS MyID,
-            //         MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\'  WITH QUERY EXPANSION) AS RELEVANCE
-            //     ' . $fromSQL . '
-            //     WHERE
-            //         "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
-            //         AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
-            //     HAVING
-            //         RELEVANCE > 0
-            //     ' . $sortSQL . '
-            //     ;';
-            // $rows = DB::query($sql);
-            // foreach ($rows as $row) {
-            //     $id = $row['MyID'];
-            //     if (! isset($array[$id])) {
-            //         $array[$id] = $row['RELEVANCE'];
-            //     }
-            // }
-
             $ids = array_keys($array);
 
             //retrieve objects
@@ -165,14 +144,36 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             )->filteredDatalist();
             $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 
-            // $objects = SearchEngineDataObject::get()
-            //     ->filter(['ID' => $ids])
-            //     ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
-
             //group results!
             $objects = $this->makeClassGroups($objects);
         }
 
         return $objects;
     }
+
+
+                // $objects = SearchEngineDataObject::get()
+                //     ->filter(['ID' => $ids])
+                //     ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
+                //
+                // TO TEST!
+                // $sql = '
+                //     SELECT
+                //         "SearchEngineDataObject"."ID" AS MyID,
+                //         MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\'  WITH QUERY EXPANSION) AS RELEVANCE
+                //     ' . $fromSQL . '
+                //     WHERE
+                //         "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+                //         AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
+                //     HAVING
+                //         RELEVANCE > 0
+                //     ' . $sortSQL . '
+                //     ;';
+                // $rows = DB::query($sql);
+                // foreach ($rows as $row) {
+                //     $id = $row['MyID'];
+                //     if (! isset($array[$id])) {
+                //         $array[$id] = $row['RELEVANCE'];
+                //     }
+                // }
 }
