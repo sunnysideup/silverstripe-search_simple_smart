@@ -62,7 +62,7 @@ Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor:
     2: 20
 
 Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm:
-  jquery_source: "foo/bar/jquery.js"
+  jquery_source: "foo/bar/jquery.js" # or block or none !
   full_results_page_type: "MySearchResultsPage"
   sort_by_options:
     - Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance

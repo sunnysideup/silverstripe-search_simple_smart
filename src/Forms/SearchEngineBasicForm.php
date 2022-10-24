@@ -108,7 +108,7 @@ class SearchEngineBasicForm extends Form
     /**
      * @var string
      */
-    private static $jquery_source = 'framework/thirdparty/jquery/jquery.js';
+    private static $jquery_source = 'none';
 
     /**
      * classnames of sort classes to be used
@@ -158,8 +158,8 @@ class SearchEngineBasicForm extends Form
         }
 
         $fields = new FieldList(
-            TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', 'Search for ...'), $this->keywords)
-                ->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'What are you looking for ...'))
+            TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', ' '), $this->keywords)
+                ->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'Search phrase ...'))
                 ->addExtraClass('awesomplete')
                 ->setAttribute('autocomplete', 'off')
         );
@@ -397,17 +397,21 @@ class SearchEngineBasicForm extends Form
 
     protected function workOutRequirements()
     {
-        if ($this->Config()->jquery_source) {
+        if($this->Config()->jquery_source ==='none') {
+            //do nothing
+        } elseif($this->Config()->jquery_source ==='block') {
+            Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
+        } elseif ($this->Config()->jquery_source) {
             Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
             Requirements::javascript($this->Config()->jquery_source);
         } else {
             Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
         }
 
-        Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/SearchEngineInitFunctions.js');
+        Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/SearchEngineInitFunctions.js');
 
         if ($this->useInfiniteScroll) {
-            Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/jquery.infinitescroll.min.js');
+            Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/jquery.infinitescroll.min.js');
             $this->customScript[] = 'SearchEngineInitFunctions.useInfiniteScroll = true;';
         }
 
@@ -416,7 +420,8 @@ class SearchEngineBasicForm extends Form
         }
 
         if ($this->useAutoComplete) {
-            Requirements::javascript('sunnysideup/search_simple_smart: searchengine/javascript/awesomplete.min.js');
+            Requirements::javascript('https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js');
+            Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/awesomplete.min.js');
             $this->customScript[] = 'SearchEngineInitFunctions.useAutoComplete = true;';
             $hasKeywordFile = ExportKeywordList::get_js_keyword_file_name($includeBase = false);
             if ($hasKeywordFile) {
@@ -431,8 +436,8 @@ class SearchEngineBasicForm extends Form
         Requirements::customScript(implode("\n", $this->customScript), 'SearchEngineInitFunctions');
 
         //css settings
-        Requirements::themedCSS('sunnysideup/search_simple_smart: awesomplete', 'searchengine');
-        Requirements::themedCSS('sunnysideup/search_simple_smart: SearchEngine', 'searchengine');
+        Requirements::themedCSS('client/css/awesomplete', 'searchengine');
+        Requirements::themedCSS('client/css/SearchEngine', 'searchengine');
     }
 
     /**
@@ -481,10 +486,10 @@ class SearchEngineBasicForm extends Form
         );
         $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups');
         if (is_array($classGroups) && count($classGroups)) {
-            return $arrayData->renderWith('SearchEngineSearchResultsOuterWithSpecialSortGrouping');
+            return $arrayData->renderWith('Sunnysideup\SearchSimpleSmart\Includes\SearchEngineSearchResultsOuterWithSpecialSortGrouping');
         }
 
-        return $arrayData->renderWith('SearchEngineSearchResultsOuter');
+        return $arrayData->renderWith('Sunnysideup\SearchSimpleSmart\Includes\SearchEngineSearchResultsOuter');
     }
 
     protected function workOutResultsFilterAndSort($data)

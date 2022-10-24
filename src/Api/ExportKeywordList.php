@@ -23,7 +23,7 @@ class ExportKeywordList
      *
      * @var string
      */
-    private static $keyword_list_folder_name = '';
+    private static $keyword_list_folder_name = 'searchkeywords';
 
     public static function export_keyword_list()
     {
@@ -69,7 +69,10 @@ class ExportKeywordList
      */
     public static function get_js_keyword_file_name($includeBase = false) : ?string
     {
-        $myFolderName = Config::inst()->get(self::class, 'keyword_list_folder_name');
+        $myFolderName = Config::inst()->get(static::class, 'keyword_list_folder_name');
+        if(!$myFolderName) {
+            $myFolderName = 'searchkeywords';
+        }
         //without folder name we return null!
         if ($myFolderName) {
             $myFolderName = 'public/assets/' . $myFolderName;

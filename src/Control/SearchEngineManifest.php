@@ -23,7 +23,7 @@ class SearchEngineManifest extends Controller
         Requirements::themedCSS('client/css/CMS');
         Requirements::customScript('SearchEngineManifest();', 'SearchEngineManifest');
 
-        return $this->renderWith('SearchEngineManifest', ['Content' => $this->getContent()]);
+        return $this->renderWith('Sunnysideup\SearchSimpleSmart\Includes\SearchEngineManifest', ['Content' => $this->getContent()]);
     }
 
     /**

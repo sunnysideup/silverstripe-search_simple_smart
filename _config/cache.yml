@@ -2,7 +2,7 @@
 Name: search_simple_smart_cache
 ---
 SilverStripe\Core\Injector\Injector:
-  Psr\SimpleCache\CacheInterface.myCache:
+  Psr\SimpleCache\CacheInterface.SearchEngine:
     factory: SilverStripe\Core\Cache\CacheFactory
     constructor:
       namespace: 'SearchEngine'

@@ -49,7 +49,7 @@ class SearchEngineContentControllerExtension extends Extension
                 ->setNumberOfResultsPerPage(20)
                 ->setIncludeFilter(true)
                 ->setIncludeSort(true)
-                ->setUseAutoComplete(true)
+                ->setUseAutoComplete(false)
                 ->setUseInfiniteScroll(true)
                 ->setUpdateBrowserHistory(true)
             ;
@@ -103,9 +103,12 @@ class SearchEngineContentControllerExtension extends Extension
             //do nothing
         } else {
             $request = $this->getOwner()->getRequest();
-            $request->getSession()->clear('SearchEngineSearchRecordHistoryID');
-            $request->getSession()->set('SearchEngineSearchRecordHistoryID', 0);
-            $request->getSession()->save($request);
+            if($request) {
+                $session = $request->getSession();
+                $session->clear('SearchEngineSearchRecordHistoryID');
+                $session->set('SearchEngineSearchRecordHistoryID', 0);
+                $session->save($request);
+            }
         }
     }
 }

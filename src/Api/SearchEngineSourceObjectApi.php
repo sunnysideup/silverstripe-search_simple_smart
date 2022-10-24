@@ -5,14 +5,24 @@ namespace Sunnysideup\SearchSimpleSmart\Api;
 use Psr\SimpleCache\CacheInterface;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
+
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Flushable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
-class SearchEngineSourceObjectApi
+class SearchEngineSourceObjectApi implements Flushable
 {
+
+
+    public static function flush()
+    {
+        Injector::inst()->get(CacheInterface::class . '.SearchEngine')->clear();
+    }
+
     /**
      * used for caching...
      *
@@ -130,25 +140,25 @@ class SearchEngineSourceObjectApi
             }
 
             $parentClasses = class_parents($sourceObject);
-            $firstTemplate = 'SearchEngineResultItem_' . $sourceObject->ClassName;
+            $firstTemplate = 'Sunnysideup\SearchSimpleSmart\Includes\SearchEngineResultItem_' . ClassInfo::shortName($sourceObject->ClassName);
             $arrayOfTemplates = $moreDetails ? [$firstTemplate . '_MoreDetails', $firstTemplate] : [$firstTemplate];
             foreach ($parentClasses as $parent) {
                 if (DataObject::class === $parent) {
                     break;
                 }
-
+                $parentShort = ClassInfo::shortName($parent);
                 if ($moreDetails) {
-                    $arrayOfTemplates[] = 'SearchEngineResultItem_' . $parent . '_MoreDetails';
+                    $arrayOfTemplates[] = 'Sunnysideup\SearchSimpleSmart\Includes\SearchEngineResultItem_' . $parentShort . '_MoreDetails';
                 }
 
-                $arrayOfTemplates[] = 'SearchEngineResultItem_' . $parent;
+                $arrayOfTemplates[] = 'Sunnysideup\SearchSimpleSmart\Includes\SearchEngineResultItem_' . $parentShort;
             }
 
             if ($moreDetails) {
-                $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject_MoreDetails';
+                $arrayOfTemplates[] = 'Sunnysideup\SearchSimpleSmart\Includes\SearchEngineResultItem_DataObject_MoreDetails';
             }
 
-            $arrayOfTemplates[] = 'SearchEngineResultItem_DataObject';
+            $arrayOfTemplates[] = 'Sunnysideup\SearchSimpleSmart\Includes\SearchEngineResultItem_DataObject';
         }
 
         return $arrayOfTemplates;
@@ -201,7 +211,8 @@ class SearchEngineSourceObjectApi
             $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
 
             $templateRender = null;
-            if ($cache->has($cacheKey)) {
+            if ($cache->has($cacheKey) && 1 === 2) {
+                die('ddda');
                 $templateRender = $cache->get($cacheKey);
             }
 

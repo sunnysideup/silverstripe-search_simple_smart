@@ -157,7 +157,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $item = SearchEngineDataObjectApi::find_or_make($this->owner);
         if ($item) {
-            $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
+            return $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
         }
 
         return [];
