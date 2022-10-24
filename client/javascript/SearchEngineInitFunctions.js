@@ -1,3 +1,4 @@
+var jQuery = window.jQuery
 /**
  * You can set the following settings (main ones!):
  *  * SearchEngineInitFunctions.delay
@@ -399,7 +400,6 @@ var SearchEngineInitFunctions = {
       if (SearchEngineInitFunctions.displayedFormInputSelector) {
         inputFieldSelector = SearchEngineInitFunctions.displayedFormInputSelector
       }
-      console.log(inputFieldSelector)
       var domElement = jQuery(inputFieldSelector)[0]
       // set delay to 30 seconds, as we want people to use dropdown to select
       this.delay = 30000
