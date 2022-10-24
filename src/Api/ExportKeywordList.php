@@ -84,10 +84,6 @@ class ExportKeywordList
                 $str = $myFolder->getFilename();
             }
 
-            if (! file_exists($str)) {
-                mkdir($str);
-            }
-
             return rtrim(str_replace('//', '/', $str), '/') . '/' . $fileName;
         }
         return null;

@@ -64,7 +64,7 @@ class SearchEngineBasicForm extends Form
     /**
      * @var bool
      */
-    protected $useAutoComplete = false;
+    protected $useAutoComplete = true;
 
     /**
      * @var bool
@@ -408,19 +408,17 @@ class SearchEngineBasicForm extends Form
             Requirements::javascript('silverstripe/admin: thirdparty/jquery/jquery.js');
         }
 
-        Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/SearchEngineInitFunctions.js');
-
+        $hasScript = false;
         if ($this->useInfiniteScroll) {
+            $hasScript = true;
             Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/jquery.infinitescroll.min.js');
             $this->customScript[] = 'SearchEngineInitFunctions.useInfiniteScroll = true;';
         }
 
-        if ($this->displayedFormInputSelector) {
-            $this->customScript[] = 'SearchEngineInitFunctions.displayedFormInputSelector = "' . $this->displayedFormInputSelector . '";';
-        }
-
         if ($this->useAutoComplete) {
-            Requirements::javascript('https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js');
+            $hasScript = true;
+            Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/SearchEngineInitFunctions.js');
+            Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/jquery.form.min.js');
             Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/awesomplete.min.js');
             $this->customScript[] = 'SearchEngineInitFunctions.useAutoComplete = true;';
             $hasKeywordFile = ExportKeywordList::get_js_keyword_file_name($includeBase = false);
@@ -428,16 +426,21 @@ class SearchEngineBasicForm extends Form
                 Requirements::javascript(ExportKeywordList::get_js_keyword_file_name($includeBase = false));
             }
         }
+        if($hasScript) {
+            if ($this->displayedFormInputSelector) {
+                $this->customScript[] = 'SearchEngineInitFunctions.displayedFormInputSelector = "' . $this->displayedFormInputSelector . '";';
+            }
+            Requirements::themedCSS('client/css/SearchEngine', 'searchengine');
+            Requirements::themedCSS('client/css/awesomplete', 'searchengine');
+            if ($this->updateBrowserHistory) {
+                $this->customScript[] = 'SearchEngineInitFunctions.updateBrowserHistory = true;';
+            }
 
-        if ($this->updateBrowserHistory) {
-            $this->customScript[] = 'SearchEngineInitFunctions.updateBrowserHistory = true;';
+            Requirements::javascript('sunnysideup/search_simple_smart: client/javascript/SearchEngineInitFunctions.js');
+            Requirements::customScript(implode("\n", $this->customScript), 'SearchEngineInitFunctions');
         }
 
-        Requirements::customScript(implode("\n", $this->customScript), 'SearchEngineInitFunctions');
-
         //css settings
-        Requirements::themedCSS('client/css/awesomplete', 'searchengine');
-        Requirements::themedCSS('client/css/SearchEngine', 'searchengine');
     }
 
     /**

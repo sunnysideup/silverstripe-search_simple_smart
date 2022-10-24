@@ -44,12 +44,12 @@ class SearchEngineContentControllerExtension extends Extension
     {
         $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineBasicForm) {
-            $this->_mySearchEngineBasicForm = SearchEngineBasicForm::create($this->owner, SearchEngineBasicForm::class)
+            $this->_mySearchEngineBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineBasicForm')
                 ->setIsMoreDetailsResult(true)
                 ->setNumberOfResultsPerPage(20)
                 ->setIncludeFilter(true)
                 ->setIncludeSort(true)
-                ->setUseAutoComplete(false)
+                ->setUseAutoComplete(true)
                 ->setUseInfiniteScroll(true)
                 ->setUpdateBrowserHistory(true)
             ;
