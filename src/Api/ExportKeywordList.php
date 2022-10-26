@@ -25,38 +25,42 @@ class ExportKeywordList
      */
     private static $keyword_list_folder_name = 'searchkeywords';
 
+    private static $export_keyword_list = false;
+
     public static function export_keyword_list()
     {
-        $fileName = self::get_js_keyword_file_name(true);
-        if ($fileName) {
-            //only write once a minute
-            if (file_exists($fileName) && (time() - filemtime($fileName) < 120)) {
-                return 'no new file created as the current one is less than 120 seconds old: ' . $fileName;
-                //do nothing
+        if(Config::inst()->get(static::class, 'export_keyword_list')) {
+            $fileName = self::get_js_keyword_file_name(true);
+            if ($fileName) {
+                //only write once a minute
+                if (file_exists($fileName) && (time() - filemtime($fileName) < 120)) {
+                    return 'no new file created as the current one is less than 120 seconds old: ' . $fileName;
+                    //do nothing
+                }
+
+                if (Security::database_is_ready()) {
+                    $rows = DB::query('SELECT "Keyword" FROM "SearchEngineKeyword" ORDER BY "Keyword";');
+                    $array = [];
+                    foreach ($rows as $row) {
+                        $array[] = str_replace("'", '', Convert::raw2js($row['Keyword']));
+                    }
+
+                    $written = 0;
+                    $fh = fopen($fileName, 'w');
+                    if ($fh) {
+                        $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = ['" . implode("','", $array) . "'];");
+                        fclose($fh);
+                    }
+
+                    if (0 === (int) $written) {
+                        user_error('Could not write keyword list to $fileName', E_USER_NOTICE);
+                    }
+
+                    return 'Writing: <br />' . implode('<br />', $array);
+                }
+            } else {
+                return 'no file name specified';
             }
-
-            if (Security::database_is_ready()) {
-                $rows = DB::query('SELECT "Keyword" FROM "SearchEngineKeyword" ORDER BY "Keyword";');
-                $array = [];
-                foreach ($rows as $row) {
-                    $array[] = str_replace("'", '', Convert::raw2js($row['Keyword']));
-                }
-
-                $written = 0;
-                $fh = fopen($fileName, 'w');
-                if ($fh) {
-                    $written = fwrite($fh, "SearchEngineInitFunctions.keywordList = ['" . implode("','", $array) . "'];");
-                    fclose($fh);
-                }
-
-                if (0 === (int) $written) {
-                    user_error('Could not write keyword list to $fileName', E_USER_NOTICE);
-                }
-
-                return 'Writing: <br />' . implode('<br />', $array);
-            }
-        } else {
-            return 'no file name specified';
         }
     }
 
