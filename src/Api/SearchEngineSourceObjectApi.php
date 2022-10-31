@@ -206,13 +206,12 @@ class SearchEngineSourceObjectApi implements Flushable
     {
         if ($sourceObject) {
             $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
-            $cacheKey = 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS');
+            $cacheKey = preg_replace("/[^A-Za-z0-9 ]/", '', 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS'));
 
             $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
 
             $templateRender = null;
-            if ($cache->has($cacheKey) && 1 === 2) {
-                die('ddda');
+            if ($cache->has($cacheKey)) {
                 $templateRender = $cache->get($cacheKey);
             }
 
