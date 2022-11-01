@@ -140,7 +140,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             $objects = Injector::inst()->create(
                 FasterIDLists::class,
                 SearchEngineDataObject::class,
-                $ids
+                $objects->columnUnique()
             )->filteredDatalist();
             $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 
