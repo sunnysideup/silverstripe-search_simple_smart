@@ -14,21 +14,21 @@
     <p class="searchEnginePageInfo">
     <% if $Results.MoreThanOnePage %>
         <% if $Results.NotFirstPage %>
-            <a class="prev" href="/$Results.PrevLink">Prev</a>
+            <a class="prev" href="$Results.PrevLink">‹</a>
         <% end_if %>
-        <% loop $Results.Pages %>
+        <% loop $Results.Pages(7) %>
             <% if $CurrentBool %>
-                $PageNum
+                <a class="current">$PageNum</a>
             <% else %>
                 <% if $Link %>
-                    <a href="/$Link">$PageNum</a>
+                    <a href="$Link">$PageNum</a>
                 <% else %>
                     ...
                 <% end_if %>
             <% end_if %>
         <% end_loop %>
         <% if $Results.NotLastPage %>
-            <a class="next" href="/$Results.NextLink">Next</a>
+            <a class="next" href="$Results.NextLink">›</a>
         <% end_if %>
     <% end_if %>
     </p>
