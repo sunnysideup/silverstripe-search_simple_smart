@@ -313,7 +313,7 @@ class SearchEngineMakeSearchable extends DataExtension
 
                 $obj = $className::get()->byID($id);
                 if ($obj->hasExtension(Versioned::class)) {
-                    $doPublish = $obj->isPublished();
+                    $doPublish = $obj->isPublished() && ! $obj->isModifiedOnDraft();
                     $obj->writeToStage(Versioned::DRAFT);
                     if ($doPublish) {
                         $obj->publish(Versioned::DRAFT, Versioned::LIVE);
