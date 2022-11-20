@@ -232,8 +232,8 @@ class SearchEngineCoreSearchMachine
     }
 
     /**
-     * @param string     $sortProvider       classname of a sort provider
-     * @param null|mixed $sortProviderValues values for the sorting - if any
+     * @param string|null     $sortProvider       classname of a sort provider
+     * @param null|mixed      $sortProviderValues values for the sorting - if any
      *
      * @return $this
      */
