@@ -14,14 +14,14 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Add All Pages and Objects to be Indexed';
+    protected $title = 'Add All Pages and Objects to the Queue to be Indexed';
 
     /**
      * description of the task.
      *
      * @var string
      */
-    protected $description = 'Add all pages and other objects to be indexed in the future.';
+    protected $description = 'Add all pages and other objects to be indexed in the future. You need to run the update tasks after this to actually index them.';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).

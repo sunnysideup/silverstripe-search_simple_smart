@@ -14,7 +14,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Update Search Index';
+    protected $title = 'Update Search Index. Takes all queued objects and indexes them.';
 
     /**
      * title of the task.

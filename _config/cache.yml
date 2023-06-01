@@ -6,3 +6,7 @@ SilverStripe\Core\Injector\Injector:
     factory: SilverStripe\Core\Cache\CacheFactory
     constructor:
       namespace: 'SearchEngine'
+  Psr\SimpleCache\CacheInterface.checkFieldsCache:
+    factory: SilverStripe\Core\Cache\CacheFactory
+    constructor:
+      namespace: "checkFieldsCache"
