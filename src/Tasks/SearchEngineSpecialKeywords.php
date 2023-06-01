@@ -57,8 +57,8 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
             $this->flushNow('.', '', true);
             $keywords = SearchEngineKeyword::get()->limit($this->step, $i)->column('Keyword');
             foreach ($keywords as $keyword) {
-                $newKeyword = preg_replace($this->regex1, '', $keyword);
-                $newKeyword = preg_replace($this->regex2, '', $newKeyword);
+                $newKeyword = preg_replace($this->regex1, '', (string) $keyword);
+                $newKeyword = preg_replace($this->regex2, '', (string) $newKeyword);
                 if ($newKeyword !== $keyword) {
                     $this->flushNow('x', '', false);
                     $array = str_split($keyword);

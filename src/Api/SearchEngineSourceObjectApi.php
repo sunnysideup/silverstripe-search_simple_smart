@@ -16,8 +16,6 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
 class SearchEngineSourceObjectApi implements Flushable
 {
-
-
     public static function flush()
     {
         Injector::inst()->get(CacheInterface::class . '.SearchEngine')->clear();
@@ -206,7 +204,11 @@ class SearchEngineSourceObjectApi implements Flushable
     {
         if ($sourceObject) {
             $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
-            $cacheKey = preg_replace("/[^A-Za-z0-9 ]/", '', 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS'));
+            $cacheKey = preg_replace(
+                "/[^A-Za-z0-9 ]/",
+                '',
+                'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS')
+            );
 
             $cache = Injector::inst()->get(CacheInterface::class . '.SearchEngine');
 
