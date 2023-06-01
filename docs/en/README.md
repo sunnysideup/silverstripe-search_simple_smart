@@ -86,6 +86,8 @@ CUSTOMISATION OF INDEXING
 First of all you need to decide what DataObjects are going to be indexed.
 You do this as follows:
 ```yml
+    Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed:
+      cron_job_running: true
 
     File:
       extensions:
@@ -106,8 +108,7 @@ You do this as follows:
         level2:
           - Content
           - MyThirdDataObject.Title
-    Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed:
-      cron_job_running: true
+    
 
 ```
 
