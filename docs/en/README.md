@@ -10,6 +10,18 @@ almost straight out of the box.
 
 The search engine module does the following:
 
+INDEXING IDEAS
+--------------
+
+To get some ideas of what you can index, go here:
+`/dev/tasks/checkfields/?flush=all`
+
+This is a default template for your setup.  Please carefully review! 
+
+Below we will take you through how to set this up manually.
+
+For a DataObject to be included, it needs to have a `getLink` or `Link` method. 
+
 BACK-END PREPARATION
 --------------------
  - Identify what objects and what fields in those objects need to be indexed.
