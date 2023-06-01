@@ -49,24 +49,46 @@ class SearchEngineCheckFields extends BuildTask
     {
         //set basics
         $this->runStart($request);
+        $end = '';
+        $start = '';
+        $start .= 'Sunnysideup\SearchSimpleSmart\Api\CheckFieldsApi:';
+        $start .= PHP_EOL.'  default_exclude_classes:';
+        $start .= PHP_EOL.'    - SilverStripe\RedirectedURLs\Model\RedirectedURL';
+        $start .= PHP_EOL.'  default_exclude_fields:';
+        $start .= PHP_EOL.'    - ExtraClass';
+        $start .= PHP_EOL.'  default_exclude_class_field_combos:';
+        $start .= PHP_EOL.'    SilverStripe\Assets\File: priority';
+        $start .= PHP_EOL;
+        $start .= PHP_EOL.'Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject:';
+        $start .= PHP_EOL.'  classes_to_include:';
         $array = (new CheckFieldsApi())->getList();
         foreach($array['AllValidFields'] as $className => $classData) {
-            echo PHP_EOL.$className.':';
-            if(! empty($classData['IsBaseClass'])) {
-                echo PHP_EOL.'  extensions:';
-                echo PHP_EOL.'    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable';
+            $hasFields = count($classData['Level1'])+ count($classData['Level2']) > 0;
+            if($classData['IsBaseClass'] === false && $hasFields === false) {
+                continue;
             }
-            for($i = 1; $i < 3; $i++) {
-                $level = 'Level'.$i;
-                if(! empty($classData[$level])) {
-                    echo PHP_EOL.'  '.strtolower($level).':';
-                    foreach($classData[$level] as $fieldName) {
-                        echo PHP_EOL.'    - '.$fieldName;
+            $end .= PHP_EOL.$className.':';
+            if($classData['IsBaseClass'] === true) {
+                $start .= PHP_EOL.'    - '.$className;
+                $end .= PHP_EOL.'  extensions:';
+                $end .= PHP_EOL.'    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable';
+            }
+            if($hasFields) {
+                $end .= PHP_EOL.'  search_engine_full_contents_fields_array:';
+                for($i = 1; $i < 3; $i++) {
+                    $level = 'Level'.$i;
+                    if(count($classData[$level])) {
+                        $end .= PHP_EOL.'    '.strtolower($level).':';
+                        foreach($classData[$level] as $fieldName) {
+                            $end .= PHP_EOL.'      - '.$fieldName;
+                        }
                     }
                 }
             }
+            $end .= PHP_EOL;
 
         }
+        echo $start.PHP_EOL.PHP_EOL.$end;
 
         $this->runEnd($request);
     }
@@ -91,7 +113,7 @@ class SearchEngineCheckFields extends BuildTask
             if ($bullet) {
                 DB::alteration_message($message, $type);
             } else {
-                echo $message;
+                echo  $message;
             }
         }
     }

@@ -2,30 +2,24 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
-use SilverStripe\Core\Environment;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Security\LoginAttempt;
 use SilverStripe\Security\MemberPassword;
 use SilverStripe\Security\RememberLoginHash;
 use SilverStripe\Versioned\ChangeSet;
-use SilverStripe\Versioned\Versioned;
-use SilverStripe\Versioned\ReadingMode;
 use SilverStripe\Versioned\ChangeSetItem;
-use SilverStripe\View\ArrayData;
 
 use SilverStripe\SessionManager\Models\LoginSession;
 use Sunnysideup\SiteWideSearch\Helpers\Cache;
-use Sunnysideup\SiteWideSearch\Helpers\FindEditableObjects;
 
 class CheckFieldsApi
 {
@@ -46,41 +40,8 @@ class CheckFieldsApi
 
     protected $excludedFields = [];
 
-    /**
-     * format is as follows:
-     * ```php
-     *      [
-     *          'AllDataObjects' => [
-     *              'BaseClassUsed' => [
-     *                  0 => ClassNameA,
-     *                  1 => ClassNameB,
-     *              ],
-     *          ],
-     *          'AllValidFields' => [
-     *              'ClassNameA' => [
-     *                  'FieldA' => 'FieldA'
-     *              ],
-     *          ],
-     *          'IndexedFields' => [
-     *              'ClassNameA' => [
-     *                  0 => ClassNameA,
-     *                  1 => ClassNameB,
-     *              ],
-     *          ],
-     *          'ListOfTextClasses' => [
-     *              0 => ClassNameA,
-     *              1 => ClassNameB,
-     *          ],
-     *          'ValidFieldTypes' => [
-     *              'Varchar(30)' => true,
-     *              'Boolean' => false,
-     *          ],
-     *     ],
-     * ```
-     * we use true rather than false to be able to use empty to work out if it has been tested before.
-     *
-     * @var array
-     */
+    protected $excludedClassFieldCombos = [];
+
     protected $cache = [];
 
     private static $default_exclude_classes = [
@@ -97,7 +58,6 @@ class CheckFieldsApi
         'ClassName',
         'Created',
         'LastEdited',
-        'Owner',
         'LinkTracking',
         'FileTracking',
         'Style',
@@ -105,15 +65,33 @@ class CheckFieldsApi
         'CanEditType',
         'ViewerGroups',
         'EditorGroups',
-        'BackLinks',
         'EmptyString',
         'QueryString',
-        'ElementalArea',
         'SpamFieldSettings',
         'Autocomplete',
         'UploadedFile',
         'CopyContentFrom',
         'RedirectionType',
+        'ExtraClass',
+    ];
+
+
+    private static $default_exclude_class_field_combos = [
+        Member::class => [
+            'ID',
+        ]
+    ];
+
+    private static $default_level1_words = [
+        'Title',
+        'Name',
+        'Summary',
+        'Heading',
+        'Intro',
+        'URLSegment',
+        'MenuTitle',
+        'FirstName',
+        'Surname',
     ];
 
     public function setDebug(bool $b): CheckFieldsApi
@@ -137,6 +115,7 @@ class CheckFieldsApi
         return $this;
     }
 
+
     public function setExcludedFields(array $a): CheckFieldsApi
     {
         $this->excludedFields = $a;
@@ -144,6 +123,12 @@ class CheckFieldsApi
         return $this;
     }
 
+    public function setExcludedClassFieldCombos(array $a): CheckFieldsApi
+    {
+        $this->excludedClassFieldCombos = $a;
+
+        return $this;
+    }
 
 
     protected function getFileCache()
@@ -210,6 +195,11 @@ class CheckFieldsApi
                 $this->excludedFields
             )
         );
+        $this->excludedClassFieldCombos =
+            (array) array_merge_recursive(
+                (array) $this->Config()->get('default_exclude_class_field_combos'),
+                (array) $this->excludedClassFieldCombos
+            );
     }
 
 
@@ -230,45 +220,56 @@ class CheckFieldsApi
 
     protected function getAllValidFields(string $className): array
     {
-        if (! isset($this->cache['AllValidFields'][$className])) {
-            $this->cache['AllValidFields'][$className]['IsBaseClass'] = $this->isBaseClass($className);
-            $array = [];
-            $arrayIndexed = [];
-            $fullList = Config::inst()->get($className, 'db');
-            if (is_array($fullList)) {
-                foreach ($fullList as $name => $type) {
-                    if (in_array($name, $this->excludedFields, true)) {
-                        continue;
-                    }
-                    if (!$this->isValidFieldType($className, $name, $type)) {
-                        continue;
-                    }
-                    $array[] = $name;
-                }
 
-                $arrayIndexed = $this->getIndexedFields(
-                    $className,
-                    $array,
-                );
-            }
-            $array = array_diff($array, $arrayIndexed);
-            $rels = (array)
-                (array)Config::inst()->get($className, 'belongs') +
-                (array)Config::inst()->get($className, 'has_one') +
-                (array)Config::inst()->get($className, 'has_many') +
-                (array)Config::inst()->get($className, 'many_many') +
-                (array)Config::inst()->get($className, 'belongs_many_many');
-            foreach($rels as $relName => $relType) {
-                if (in_array($relName, $this->excludedFields, true)) {
-                    continue;
+        if (! isset($this->cache['AllValidFields'][$className])) {
+            $singleton = Injector::inst()->get($className);
+            if($singleton->hasMethod('Link') || $singleton->hasMethod('getLink')) {
+                $this->cache['AllValidFields'][$className]['IsBaseClass'] = $this->isBaseClass($className);
+                $array = [];
+                $arrayIndexed = [];
+                $fullList = Config::inst()->get($className, 'db');
+                if (is_array($fullList)) {
+                    foreach ($fullList as $name => $type) {
+                        if (in_array($name, $this->excludedFields, true)) {
+                            continue;
+                        }
+                        if (!$this->isValidFieldType($className, $name, $type)) {
+                            continue;
+                        }
+                        if(in_array($name, $this->excludedClassFieldCombos[$className]?? [])) {
+                            continue;
+                        }
+
+                        $array[] = $name;
+                    }
+
+                    $arrayIndexed = $this->getIndexedFields(
+                        $className,
+                        $array,
+                    );
                 }
-                if(in_array($relType, $this->excludedClasses)) {
-                    continue;
+                $array = array_diff($array, $arrayIndexed);
+                $rels = (array)
+                    (array)Config::inst()->get($className, 'belongs') +
+                    (array)Config::inst()->get($className, 'has_one') +
+                    (array)Config::inst()->get($className, 'has_many') +
+                    (array)Config::inst()->get($className, 'many_many') +
+                    (array)Config::inst()->get($className, 'belongs_many_many');
+                foreach($rels as $relName => $relType) {
+                    if (in_array($relName, $this->excludedFields, true)) {
+                        continue;
+                    }
+                    if(in_array($relType, $this->excludedClasses)) {
+                        continue;
+                    }
+                    if(in_array($relType, $this->excludedClassFieldCombos[$className]?? [])) {
+                        continue;
+                    }
+                    $array[] = $relName.'.Title';
                 }
-                $array[] = $relName.'.Title';
+                $this->cache['AllValidFields'][$className]['Level1'] = $arrayIndexed;
+                $this->cache['AllValidFields'][$className]['Level2'] = $array;
             }
-            $this->cache['AllValidFields'][$className]['Level1'] = $arrayIndexed;
-            $this->cache['AllValidFields'][$className]['Level2'] = $array;
         }
 
         return $this->cache;
@@ -308,6 +309,9 @@ class CheckFieldsApi
         if (! isset($this->cache['IndexedFields'][$className])) {
             $this->cache['IndexedFields'][$className] = [];
             $indexes = Config::inst()->get($className, 'indexes');
+            foreach($this->Config()->get('default_level1_words') as $field) {
+                $indexes[$field] = true;
+            }
             if (is_array($indexes)) {
                 foreach ($indexes as $key => $field) {
                     if (in_array($key, $possibleFields)) {
