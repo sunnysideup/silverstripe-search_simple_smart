@@ -122,7 +122,13 @@ class SearchEngineDataObjectApi
             foreach ($testArray as $className) {
                 //does it have the extension?
                 if ($className::has_extension(SearchEngineMakeSearchable::class)) {
-                    $finalClasses[$className] = Injector::inst()->get($className)->i18n_singular_name();
+                    $singleton = Injector::inst()->get($className);
+                    $dbFields = Config::inst()->get($className, 'db');
+                    $hasTitleField = isset($dbFields['Title']) || isset($dbFields['Name']) ;
+                    $hasLinkField = $singleton->hasMethod('Link') || $singleton->hasMethod('getLink');
+                    $finalClasses[$className] = $singleton->i18n_singular_name() .
+                        ($hasLinkField ? '' : ' - ERROR: no link field') .
+                        ($hasTitleField ? '' : ' - ERROR: no title field');
                 }
             }
 

@@ -31,7 +31,7 @@ class SearchEngineMakeSearchableApi
         if (is_array($fields) && count($fields)) {
             $fieldCount = count($fields);
             $possibleMethod = $fields[0];
-            if ('get' === substr($possibleMethod, 0, 3) && $object->hasMethod($possibleMethod) && 1 === $fieldCount) {
+            if ('get' === substr((string) $possibleMethod, 0, 3) && $object->hasMethod($possibleMethod) && 1 === $fieldCount) {
                 $str .= ' ' . $object->{$possibleMethod}() . ' ';
             } else {
                 $dbArray = self::search_engine_rel_fields($object, 'db');

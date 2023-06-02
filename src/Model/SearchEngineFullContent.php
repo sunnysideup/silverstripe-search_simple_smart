@@ -89,6 +89,7 @@ class SearchEngineFullContent extends DataObject
      */
     private static $searchable_fields = [
         'Level' => 'ExactMatchFilter',
+        'Content' => 'PartialMatchFilter',
     ];
 
     // @var array
@@ -218,7 +219,7 @@ class SearchEngineFullContent extends DataObject
      */
     public function getShortContent()
     {
-        return substr($this->Content, 0, 50);
+        return substr((string) $this->Content, 0, 50);
     }
 
     /**

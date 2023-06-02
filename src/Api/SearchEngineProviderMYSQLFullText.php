@@ -60,7 +60,7 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
         // $filterArray = [];
         // $keywordObjects = SearchEngineKeyword::get()->where("MATCH(\"Keyword\") AGAINST('" . $this->searchRecord->FinalPhrase . "')");
         $dataObjectArray = [];
-        $max = substr_count($this->searchRecord->FinalPhrase, ' ') + 2;
+        $max = substr_count((string) $this->searchRecord->FinalPhrase, ' ') + 2;
         for ($i = 1; $i < $max; ++$i) {
             $keywordIDArray = [0 => 0];
             $rows = DB::query(
