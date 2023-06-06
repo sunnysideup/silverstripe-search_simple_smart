@@ -101,6 +101,7 @@ class SearchEngineDataObjectApi
             //if we have inclusions then this is the final list
             if ([] !== $includeClassNames) {
                 $testArray = $includeClassNames;
+                $excludeClassNames = Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude');
             } else {
                 //lets see which ones are excluded from full list.
                 $testArray = $allClasses;
@@ -111,11 +112,11 @@ class SearchEngineDataObjectApi
                     }
                 }
 
-                $excludeClassNames = array_unique($excludeClassNames);
-                if ([] !== $excludeClassNames) {
-                    foreach ($excludeClassNames as $excludeOne) {
-                        unset($testArray[$excludeOne]);
-                    }
+            }
+            $excludeClassNames = array_unique($excludeClassNames);
+            if ([] !== $excludeClassNames) {
+                foreach ($excludeClassNames as $excludeOne) {
+                    unset($testArray[$excludeOne]);
                 }
             }
 

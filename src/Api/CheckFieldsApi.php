@@ -227,9 +227,9 @@ class CheckFieldsApi
                 $this->cache['AllValidFields'][$className]['IsBaseClass'] = $this->isBaseClass($className);
                 $array = [];
                 $arrayIndexed = [];
-                $fullList = Config::inst()->get($className, 'db');
-                if (is_array($fullList)) {
-                    foreach ($fullList as $name => $type) {
+                $dbFields = Config::inst()->get($className, 'db');
+                if (is_array($dbFields)) {
+                    foreach ($dbFields as $name => $type) {
                         if (in_array($name, $this->excludedFields, true)) {
                             continue;
                         }
@@ -255,6 +255,7 @@ class CheckFieldsApi
                     (array)Config::inst()->get($className, 'has_many') +
                     (array)Config::inst()->get($className, 'many_many') +
                     (array)Config::inst()->get($className, 'belongs_many_many');
+
                 foreach($rels as $relName => $relType) {
                     if (in_array($relName, $this->excludedFields, true)) {
                         continue;
@@ -265,7 +266,9 @@ class CheckFieldsApi
                     if(in_array($relType, $this->excludedClassFieldCombos[$className]?? [])) {
                         continue;
                     }
-                    $array[] = $relName.'.Title';
+                    $hasTitleField = isset($dbFields['Title']) || isset($dbFields['Name']) ;
+                    $msg = ($hasTitleField ? '' : '# no title field present in '.$relType .' please add one');
+                    $array[] = $relName .'.Title' . $msg;
                 }
                 $this->cache['AllValidFields'][$className]['Level1'] = $arrayIndexed;
                 $this->cache['AllValidFields'][$className]['Level2'] = $array;
