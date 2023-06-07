@@ -12,7 +12,7 @@ class PagesNotIncludedInSearch extends Report
 {
     public function title()
     {
-        return 'Pages not included in seearch';
+        return 'Pages not included in search';
     }
 
     public function group()
@@ -34,7 +34,7 @@ class PagesNotIncludedInSearch extends Report
     public function sourceRecords($params = null)
     {
         return SiteTree::get()
-            ->exclude(['ClassName' => RedirectorPage::class, VirtualPage::class])
+            ->exclude(['ClassName' => [RedirectorPage::class, VirtualPage::class]])
             ->filter(['ShowInSearch' => false])
             ->sort('Title');
     }
