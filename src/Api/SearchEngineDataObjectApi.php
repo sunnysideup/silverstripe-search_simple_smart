@@ -116,7 +116,10 @@ class SearchEngineDataObjectApi
             $excludeClassNames = array_unique($excludeClassNames);
             if ([] !== $excludeClassNames) {
                 foreach ($excludeClassNames as $excludeOne) {
-                    unset($testArray[$excludeOne]);
+                    $key = array_search($excludeOne, $testArray);
+                    if ($key !== false) {
+                        unset($testArray[$key]);
+                    }
                 }
             }
 
