@@ -41,7 +41,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         'ClickedOnDataObjectClassName' => 'Varchar(150)',
         'ClickedOnDataObjectID' => 'Int',
         'NumberOfResults' => 'Int',
-        'Session' => 'Varchar(7)',
+        'Session' => 'Int',
     ];
 
     /**
@@ -77,19 +77,17 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     private static $indexes = [
         'Phrase' => true,
+        'Session' => true,
         'ClickedOnDataObjectClassName' => true,
         'ClickedOnDataObjectID' => true,
     ];
 
-    public function i18n_singular_name()
-    {
-        return $this->Config()->get('singular_name');
-    }
-
-    public function i18n_plural_name()
-    {
-        return $this->Config()->get('plural_name');
-    }
+    /**
+     * @var array
+     */
+    private static $searchable_fields = [
+        'Phrase' => true,
+    ];
 
     /**
      * @param Member $member
@@ -132,6 +130,13 @@ class SearchEngineSearchRecordHistory extends DataObject
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        $fields->removeByName('ClickedDataObjectClassName');
+        $fields->removeByName('ClickedDataObjectID');
+    }
+
     /**
      * add an entry SearchEngineSearchRecordHistory entry.
      *
@@ -147,25 +152,14 @@ class SearchEngineSearchRecordHistory extends DataObject
         }
 
         $fieldArray = [
-            'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
             'Phrase' => $searchEngineSearchRecord->Phrase,
             'MemberID' => $currentUserID - 0,
-            'Session' => session_id(),
+            'Session' => self::get_session_id(),
         ];
         //update latest search
-        $obj = self::get_latest_search();
-        if ($obj) {
-            foreach ($fieldArray as $field => $value) {
-                $obj->{$field} = $value;
-            }
-        } else {
-            $obj = DataObject::get_one(self::class, $fieldArray);
-            if (! $obj) {
-                $obj = self::create($fieldArray);
-            }
-        }
+        $obj = self::get_latest_search($fieldArray);
 
-        Controller::curr()->getRequest()->getSession()->set('SearchEngineSearchRecordHistoryID', $obj->write());
+        $obj->write();
 
         return $obj;
     }
@@ -209,24 +203,79 @@ class SearchEngineSearchRecordHistory extends DataObject
         return null;
     }
 
-    public function set_latest_search(SearchEngineSearchRecord $item)
-    {
-        self::$_latest_search_cache = self::get()->byID($id);
-    }
-
     /**
      * @return null|SearchEngineSearchRecordHistory
      */
-    public static function get_latest_search()
+    public static function get_latest_search(?array $fieldArray = [])
     {
         if (null === self::$_latest_search_cache) {
-            self::$_latest_search_cache = false;
-            $id = (int) Controller::curr()->getRequest()->getSession()->get('SearchEngineSearchRecordHistoryID') - 0;
-            if ($id) {
-                self::$_latest_search_cache = self::get()->byID($id);
+            if(empty($fieldArray)) {
+                $fieldArray = [
+                    'Session' => self::get_session_id(),
+                ];
+            };
+            self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()
+                ->filter($fieldArray)
+                ->sort(['ID' => 'DESC'])
+                ->first();
+            if(! self::$_latest_search_cache) {
+                self::$_latest_search_cache = SearchEngineSearchRecordHistory::create($fieldArray);
             }
         }
 
         return self::$_latest_search_cache;
+    }
+
+
+    public static function set_session_id_if_not_set(?int $number = 0): int
+    {
+        $curr = self::get_session_id();
+        if(!$curr || ($number && $number !== $curr)) {
+            $curr = self::set_session_id($number);
+        }
+        return $curr;
+    }
+
+    public static function set_session_id(?int $number = 0): int
+    {
+        $session = self::get_session();
+        if($session) {
+            if(! $number) {
+                $number = mt_rand(1, 931415926536);
+            }
+            $session->set('SearchEngineSearchRecordHistorySessionID', $number);
+        } else {
+            $number = 0;
+        }
+        return $number;
+    }
+
+    public static function get_session_id(): int
+    {
+        $session = self::get_session();
+        if($session) {
+            $val = (int) $session->get('SearchEngineSearchRecordHistorySessionID');
+            if(! $val) {
+                $val = self::set_session_id();
+            }
+            return $val;
+        }
+        return 0;
+    }
+
+    protected static $_session_cache = null;
+
+    protected static function get_session()
+    {
+        if(! self::$_session_cache) {
+            $controller = Controller::curr();
+            if($controller) {
+                $request = $controller->getRequest();
+                if($request) {
+                    self::$_session_cache = $request->getSession();
+                }
+            }
+        }
+        return self::$_session_cache;
     }
 }

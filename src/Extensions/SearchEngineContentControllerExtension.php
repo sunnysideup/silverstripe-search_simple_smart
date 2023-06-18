@@ -42,7 +42,6 @@ class SearchEngineContentControllerExtension extends Extension
      */
     public function SearchEngineBasicForm(): SearchEngineBasicForm
     {
-        $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineBasicForm) {
             $this->_mySearchEngineBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineBasicForm')
                 ->setIsMoreDetailsResult(true)
@@ -63,7 +62,6 @@ class SearchEngineContentControllerExtension extends Extension
      */
     public function SearchEngineSuperBasicForm(): SearchEngineBasicForm
     {
-        $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineSuperBasicForm) {
             $this->_mySearchEngineSuperBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineSuperBasicForm');
         }
@@ -76,7 +74,6 @@ class SearchEngineContentControllerExtension extends Extension
      */
     public function SearchEngineCustomForm(): SearchEngineBasicForm
     {
-        $this->SearchEngineClearHistoryID();
         if (! $this->_mySearchEngineCustomForm) {
             $this->_mySearchEngineCustomForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineCustomForm')
                 ->setOutputAsJSON(true)
@@ -96,19 +93,4 @@ class SearchEngineContentControllerExtension extends Extension
         return DBField::create_field('Varchar', $val);
     }
 
-    protected function SearchEngineClearHistoryID()
-    {
-        //clear old history
-        if (Director::is_ajax()) {
-            //do nothing
-        } else {
-            $request = $this->getOwner()->getRequest();
-            if($request) {
-                $session = $request->getSession();
-                $session->clear('SearchEngineSearchRecordHistoryID');
-                $session->set('SearchEngineSearchRecordHistoryID', 0);
-                $session->save($request);
-            }
-        }
-    }
 }
