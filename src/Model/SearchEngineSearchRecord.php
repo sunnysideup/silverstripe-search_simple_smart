@@ -7,6 +7,7 @@ use SilverStripe\Core\Convert;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\Tab;
+use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
@@ -317,7 +318,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $this->SearchEngineKeywords()->removeAll();
         $keywordArray = explode(' ', $this->FinalPhrase);
         foreach ($keywordArray as $position => $keyword) {
-            $stemmer = StemmerFactory::create('en');
+            $language = substr(i18n::get_locale(), 0, 2);
+            if(! strlen($language) === 2) {
+                $language = 'en';
+            }
+            $stemmer = StemmerFactory::create($language);
             $stem = $stemmer->stem($keyword);
             $realPosition = $position + 1;
             $selectArray = [0 => 0];

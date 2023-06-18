@@ -5,6 +5,8 @@ namespace Sunnysideup\SearchSimpleSmart\Admin;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\HTMLReadonlyField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
@@ -33,13 +35,10 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     private static $managed_models = [
         SearchEngineDataObject::class,
         SearchEngineDataObjectToBeIndexed::class,
-        SearchEngineFullContent::class,
         SearchEngineKeyword::class,
         SearchEngineKeywordFindAndRemove::class,
         SearchEngineKeywordFindAndReplace::class,
-        SearchEnginePunctuationFindAndRemove::class,
-        SearchEngineSearchRecord::class,
-        SearchEngineSearchRecordHistory::class,
+        SearchEnginePunctuationFindAndRemove::class,        SearchEngineSearchRecordHistory::class,
         SearchEngineAdvancedSettings::class,
     ];
 
@@ -98,103 +97,124 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 [
                     new TabSet(
                         'Root',
-                        new Tab(
-                            'Settings',
-                            HTMLReadonlyField::create(
-                                'searchable_class_names',
-                                'Searchable Class Names',
-                                self::print_nice(SearchEngineDataObjectApi::searchable_class_names())
+                        new TabSet(
+                            'TabSet',
+                            new Tab(
+                                'Manifesto',
+                                HTMLReadonlyField::create(
+                                    'searchable_class_names',
+                                    'Searchable Class Names',
+                                    self::print_nice(SearchEngineDataObjectApi::searchable_class_names())
+                                ),
+                                HTMLReadonlyField::create(
+                                    'classes_to_exclude',
+                                    'Data Object - Classes To Exclude',
+                                    self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude'))
+                                )
+                                    ->setDescription('All classes are included, except these ones'),
+                                HTMLReadonlyField::create(
+                                    'classes_to_include',
+                                    'Data Object - Classes To Include',
+                                    self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include'))
+                                )
+                                    ->setDescription('Only these classes are included'),
+                                HTMLReadonlyField::create(
+                                    'search_engine_default_level_one_fields',
+                                    'Make Searchable - Default Level 1 Fields',
+                                    self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields'))
+                                ),
+                                HTMLReadonlyField::create(
+                                    'search_engine_default_excluded_db_fields',
+                                    'Make Searchable - Fields Excluded by Default',
+                                    self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields'))
+                                ),
                             ),
-                            HTMLReadonlyField::create(
-                                'classes_to_exclude',
-                                'Data Object - Classes To Exclude',
-                                self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude'))
-                            )
-                                ->setDescription('All classes are included, except these ones'),
-                            HTMLReadonlyField::create(
-                                'classes_to_include',
-                                'Data Object - Classes To Include',
-                                self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include'))
-                            )
-                                ->setDescription('Only these classes are included'),
-                            HTMLReadonlyField::create(
-                                'class_name_for_search_provision',
-                                'Class or Search Provision',
-                                Config::inst()->get(SearchEngineCoreSearchMachine::class, 'class_name_for_search_provision')
+                            new Tab(
+                                'Settings',
+                                HTMLReadonlyField::create(
+                                    'class_name_for_search_provision',
+                                    'Class or Search Provision',
+                                    Config::inst()->get(SearchEngineCoreSearchMachine::class, 'class_name_for_search_provision')
+                                ),
+                                HTMLReadonlyField::create(
+                                    'add_stop_words',
+                                    'Add Default Stop Words',
+                                    Config::inst()->get(SearchEngineKeywordFindAndRemove::class, 'add_stop_words') ? 'True' : 'False'
+                                ),
+                                HTMLReadonlyField::create(
+                                    'add_stop_words_length',
+                                    'Length of Default Stop Words List',
+                                    Config::inst()->get(SearchEngineKeywordFindAndRemove::class, 'add_stop_words_length')
+                                ),
+                                HTMLReadonlyField::create(
+                                    'remove_all_non_alpha_numeric_full_content',
+                                    'Full Content - Remove Non Alpha Numeric Keywords',
+                                    Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_alpha_numeric') ? 'True' : 'False'
+                                ),
+                                HTMLReadonlyField::create(
+                                    'remove_all_non_letters',
+                                    'Keywords - Remove Non Letter Characters',
+                                    Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_letters') ? 'True' : 'False'
+                                ),
+                                HTMLReadonlyField::create(
+                                    SearchEngineDataObjectToBeIndexed::class,
+                                    '
+                                        Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
+                                        If set to FALSE, the index will update immediately (pages will take longer to save).
+                                        On DEV Environments, it always runs immediately (you never need to run the cron job)
+                                    ',
+                                    Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, 'cron_job_running') ? 'True' : 'False'
+                                ),
                             ),
-                            HTMLReadonlyField::create(
-                                'add_stop_words',
-                                'Add Default Stop Words',
-                                Config::inst()->get(SearchEngineKeywordFindAndRemove::class, 'add_stop_words') ? 'True' : 'False'
+                            new Tab(
+                                'Filter',
+                                HTMLReadonlyField::create(
+                                    'classes_to_include_for_filter',
+                                    'Filter for class names list - OPTIONAL',
+                                    self::print_nice(Config::inst()->get(SearchEngineFilterForClassName::class, 'classes_to_include'))
+                                ),
+                                HTMLReadonlyField::create(
+                                    'get_js_keyword_file_name',
+                                    'Location for saving Keywords as JSON for autocomplete',
+                                    self::print_nice((ExportKeywordList::get_js_keyword_file_name(true) ?: '--- not set ---'))
+                                ),
+                                HTMLReadonlyField::create(
+                                    'get_js_keyword_file_last_changed',
+                                    'Keyword autocomplete last updated ... (see tasks to update keyword list) ',
+                                    $jsLastChanged
+                                )
                             ),
-                            HTMLReadonlyField::create(
-                                'add_stop_words_length',
-                                'Length of Default Stop Words List',
-                                Config::inst()->get(SearchEngineKeywordFindAndRemove::class, 'add_stop_words_length')
+                            new Tab(
+                                'Sort',
+                                HTMLReadonlyField::create(
+                                    'class_groups',
+                                    'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL',
+                                    self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups'))
+                                ),
+                                HTMLReadonlyField::create(
+                                    'class_group_limits',
+                                    'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL',
+                                    self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_group_limits'))
+                                ),
                             ),
-                            HTMLReadonlyField::create(
-                                'remove_all_non_alpha_numeric_full_content',
-                                'Full Content - Remove Non Alpha Numeric Keywords',
-                                Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_alpha_numeric') ? 'True' : 'False'
+                            new Tab(
+                                'Cached',
+                                GridField::create(
+                                    'SearchEngineSearchRecord',
+                                    'Recent Searches',
+                                    SearchEngineSearchRecord::get(),
+                                    GridFieldConfig_RecordViewer::create()
+                                ),
                             ),
-                            HTMLReadonlyField::create(
-                                'remove_all_non_letters',
-                                'Keywords - Remove Non Letter Characters',
-                                Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_letters') ? 'True' : 'False'
-                            ),
-                            HTMLReadonlyField::create(
-                                SearchEngineDataObjectToBeIndexed::class,
-                                '
-                                    Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
-                                    If set to FALSE, the index will update immediately (pages will take longer to save).
-                                    On DEV Environments, it always runs immediately (you never need to run the cron job)
-                                ',
-                                Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, 'cron_job_running') ? 'True' : 'False'
-                            ),
-                            HTMLReadonlyField::create(
-                                'search_engine_default_level_one_fields',
-                                'Make Searchable - Default Level 1 Fields',
-                                self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields'))
-                            ),
-                            HTMLReadonlyField::create(
-                                'search_engine_default_excluded_db_fields',
-                                'Make Searchable - Fields Excluded by Default',
-                                self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields'))
-                            ),
-                            HTMLReadonlyField::create(
-                                'class_groups',
-                                'Sort By Descriptor - Class Groups - what classes are always shown on top OPTIONAL',
-                                self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups'))
-                            ),
-                            HTMLReadonlyField::create(
-                                'class_group_limits',
-                                'Sort By Descriptor - Class Groups Limits - how many of the on entries are shown - OPTIONAL',
-                                self::print_nice(Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_group_limits'))
-                            ),
-                            HTMLReadonlyField::create(
-                                'classes_to_include_for_filter',
-                                'Filter for class names list - OPTIONAL',
-                                self::print_nice(Config::inst()->get(SearchEngineFilterForClassName::class, 'classes_to_include'))
-                            ),
-                            HTMLReadonlyField::create(
-                                'get_js_keyword_file_name',
-                                'Location for saving Keywords as JSON for autocomplete',
-                                self::print_nice((ExportKeywordList::get_js_keyword_file_name(true) ?: '--- not set ---'))
-                            ),
-                            HTMLReadonlyField::create(
-                                'get_js_keyword_file_last_changed',
-                                'Keyword autocomplete last updated ... (see tasks to update keyword list) ',
-                                $jsLastChanged
+                            new Tab(
+                                'Links',
+                                ...$linkFields
                             )
                         )
                     )
                 ]
             );
             $form->setFields($field);
-            $form->Fields()->addFieldsToTab(
-                'Root.Links',
-                $linkFields
-            );
         } elseif (SearchEngineSearchRecordHistory::class === $this->modelClass) {
             // $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
             // $field = new FieldList(

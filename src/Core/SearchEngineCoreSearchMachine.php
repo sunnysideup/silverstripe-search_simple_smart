@@ -405,7 +405,7 @@ class SearchEngineCoreSearchMachine
             )->filteredDatalist();
 
             $this->dataList = $this->dataList->sort('FIELD("ID", ' . implode(',', $this->listOfIDsAsArray) . ')');
-        // $this->dataList = SearchEngineDataObject::get()
+            // $this->dataList = SearchEngineDataObject::get()
             //     ->filter(['ID' => $this->listOfIDsAsArray])
             //     ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
         } else {
@@ -441,9 +441,9 @@ class SearchEngineCoreSearchMachine
                 ->sort('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')')
             ;
 
-        // $this->dataList = SearchEngineDataObject::get()
-                //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
-                //     ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
+            // $this->dataList = SearchEngineDataObject::get()
+            //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
+            //     ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
         } else {
             if ($this->debug) {
                 $this->filterExecutedSQL = true;
@@ -504,7 +504,7 @@ class SearchEngineCoreSearchMachine
             )->filteredDatalist();
 
             $this->dataList = $this->dataList->sort($this->nonCustomSort);
-        // $this->dataList = SearchEngineDataObject::get()
+            // $this->dataList = SearchEngineDataObject::get()
             // ->filter(['ID' => $this->listOfIDsCustomAsArray])
             // ->sort($this->nonCustomSort);
         } else {

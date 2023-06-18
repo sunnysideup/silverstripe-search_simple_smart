@@ -16,9 +16,13 @@ class TestKeywordSearch extends Controller
 
     public function index()
     {
-        $page = Page::get()->first();
-        $keywords = strtok($page->Title, ' ');
-        echo '<h2>search for: ' . $keywords . '</h2>';
+        if(! empty($_GET['q'])) {
+            $keywords = $_GET['q'];
+        } else {
+            $page = Page::get()->sort('RAND()')->first();
+            $keywords = strtok($page->Title, ' ');
+        }
+        echo '<h2>search for (?q=...): ' . $keywords . '</h2>';
         $obj = (new SearchEngineCoreSearchMachine());
         $searchList = $obj
             ->setDebug(true)
@@ -31,7 +35,7 @@ class TestKeywordSearch extends Controller
         var_dump($searchList->Count());
         echo '<h2>Results</h2>';
         foreach ($searchList as $item) {
-            echo '<li>' . $item->title . '</li>';
+            echo '<li>' . $item->title . ' - '.$item->ID.'</li>';
         }
     }
 }

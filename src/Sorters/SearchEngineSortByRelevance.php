@@ -75,73 +75,82 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
         if ($objects->count() < 2) {
             //do nothing
         } else {
-            $array = [0 => -1];
-            $fromSQL = '
-                FROM "SearchEngineFullContent"
-                    INNER JOIN "SearchEngineDataObject"
-                        ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
-            ';
-            $sortSQL = '
-                ORDER BY
-                    "Level",
-                    RELEVANCE DESC
-            ';
+            for($i = 1; $i < 3; $i++) {
+                $array = [];
+                $fromSQL = '
+                    FROM "SearchEngineFullContent"
+                        INNER JOIN "SearchEngineDataObject"
+                            ON "SearchEngineDataObject"."ID" = "SearchEngineFullContent"."SearchEngineDataObjectID"
+                ';
+                $sortSQL = '
+                    ORDER BY
+                        "Level",
+                        RELEVANCE DESC
+                ';
+                $listOfIds = explode(',', $searchRecord->ListOfIDsCUSTOM);
+                $listOfIds = array_combine($listOfIds, $listOfIds);
+                // look for complete phrase if there is more than one word.
+                // exact full match of search phrase becomes relevance, level 1 first
+                // and further upfront in text increases relevance.
+                $phrase = (string) Convert::raw2sql($searchRecord->FinalPhrase);
+                if (strpos(trim($phrase), ' ')) {
+                    $sql = '
+                        SELECT
+                            "SearchEngineDataObject"."ID" AS MyID,
+                            (9999999 - LOCATE(\'' . $phrase . '\',"Content")) AS RELEVANCE
+                        ' . $fromSQL . '
+                        WHERE
+                            "Content" LIKE \'%' . $phrase . '%\'
+                            AND "SearchEngineDataObject"."ID" IN (' .implode(', ', $listOfIds) . ')
+                            AND Level = '.$i.'
+                        HAVING
+                            RELEVANCE > 0
+                        ' . $sortSQL . '
+                    ;';
+                    $rows = DB::query($sql);
+                    foreach ($rows as $row) {
+                        $id = $row['MyID'];
+                        if (! isset($array[$id])) {
+                            $array[$id] = $row['RELEVANCE'];
+                            unset($listOfIds[$id]);
+                        }
+                    }
+                }
 
-            // look for complete phrase if there is more than one word.
-            // exact full match of search phrase becomes relevance, level 1 first
-            // and further upfront in text increases relevance.
-            $phrase = (string) Convert::raw2sql($searchRecord->FinalPhrase);
-            if (strpos(trim($phrase), ' ')) {
+                // for the ones not found yet, we do a Mysql "Match" query with higher relevance first.
                 $sql = '
                     SELECT
                         "SearchEngineDataObject"."ID" AS MyID,
-                        (9999999 - LOCATE(\'' . $phrase . '\',"Content")) AS RELEVANCE
+                        MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\') AS RELEVANCE
                     ' . $fromSQL . '
                     WHERE
-                        "Content" LIKE \'%' . $phrase . '%\'
-                        AND "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+                        "SearchEngineDataObject"."ID" IN (' .implode(', ', $listOfIds) .  ')
+                        AND Level = '.$i.'
                     HAVING
                         RELEVANCE > 0
                     ' . $sortSQL . '
-                ;';
+                    ;';
                 $rows = DB::query($sql);
                 foreach ($rows as $row) {
                     $id = $row['MyID'];
                     if (! isset($array[$id])) {
                         $array[$id] = $row['RELEVANCE'];
+                        unset($listOfIds[$id]);
                     }
                 }
             }
 
-            // for the ones not found yet, we do a Mysql "Match" query with higher relevance first.
-            $sql = '
-                SELECT
-                    "SearchEngineDataObject"."ID" AS MyID,
-                    MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\') AS RELEVANCE
-                ' . $fromSQL . '
-                WHERE
-                    "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
-                    AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
-                HAVING
-                    RELEVANCE > 0
-                ' . $sortSQL . '
-                ;';
-            $rows = DB::query($sql);
-            foreach ($rows as $row) {
-                $id = $row['MyID'];
-                if (! isset($array[$id])) {
-                    $array[$id] = $row['RELEVANCE'];
-                }
+            $ids = array_keys($array);
+            foreach($listOfIds as $lastId) {
+                $ids[] = $lastId;
             }
 
-            $ids = array_keys($array);
-
-            //retrieve objects
-            $objects = Injector::inst()->create(
-                FasterIDLists::class,
-                SearchEngineDataObject::class,
-                $objects->columnUnique()
-            )->filteredDatalist();
+            //retrieve objects --- why do we need this?
+            // $objects = Injector::inst()->create(
+            //     FasterIDLists::class,
+            //     SearchEngineDataObject::class,
+            //     $objects->columnUnique()
+            // )->filteredDatalist();
             $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
 
             //group results!

@@ -46,7 +46,17 @@ class SearchEngineDataObject extends DataObject
      *
      * @var array
      */
-    private static $search_engine_default_level_one_fields = [];
+    private static $search_engine_default_level_one_fields = [
+        'Title',
+        'Name',
+        'Summary',
+        'Heading',
+        'Intro',
+        'URLSegment',
+        'MenuTitle',
+        'FirstName',
+        'Surname',
+    ];
 
     /**
      * List of fields that should not be included by default.
@@ -54,11 +64,28 @@ class SearchEngineDataObject extends DataObject
      * @var array
      */
     private static $search_engine_default_excluded_db_fields = [
-        'ReportClass',
-        'CanViewType',
-        'ExtraMeta',
+        'Autocomplete',
         'CanEditType',
+        'CanEditType',
+        'CanViewType',
+        'ClassName',
+        'CopyContentFrom',
+        'Created',
+        'EditorGroups',
+        'EmptyString',
+        'ExtraClass',
+        'ExtraMeta',
+        'FileTracking',
+        'ID',
+        'LastEdited',
+        'LinkTracking',
         'Password',
+        'QueryString',
+        'RedirectionType',
+        'SpamFieldSettings',
+        'Style',
+        'UploadedFile',
+        'ViewerGroups',
     ];
 
     /**

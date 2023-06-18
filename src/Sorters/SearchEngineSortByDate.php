@@ -74,11 +74,11 @@ class SearchEngineSortByDate extends SearchEngineSortByDescriptor
             //do nothing
         } else {
             //retrieve objects
-            $objects = Injector::inst()->create(
-                FasterIDLists::class,
-                SearchEngineDataObject::class,
-                explode(',', $searchRecord->ListOfIDsCUSTOM)
-            )->filteredDatalist();
+            // $objects = Injector::inst()->create(
+            //     FasterIDLists::class,
+            //     SearchEngineDataObject::class,
+            //     explode(',', $searchRecord->ListOfIDsCUSTOM)
+            // )->filteredDatalist();
 
             $objects = $objects
                 ->sort(['DataObjectDate' => 'DESC'])

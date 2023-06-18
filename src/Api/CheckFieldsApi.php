@@ -19,6 +19,7 @@ use SilverStripe\Versioned\ChangeSet;
 use SilverStripe\Versioned\ChangeSetItem;
 
 use SilverStripe\SessionManager\Models\LoginSession;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SiteWideSearch\Helpers\Cache;
 
 class CheckFieldsApi
@@ -54,25 +55,7 @@ class CheckFieldsApi
     ];
 
     private static $default_exclude_fields = [
-        'ID',
-        'ClassName',
-        'Created',
-        'LastEdited',
-        'LinkTracking',
-        'FileTracking',
-        'Style',
-        'CanViewType',
-        'CanEditType',
-        'ViewerGroups',
-        'EditorGroups',
-        'EmptyString',
-        'QueryString',
-        'SpamFieldSettings',
-        'Autocomplete',
-        'UploadedFile',
-        'CopyContentFrom',
-        'RedirectionType',
-        'ExtraClass',
+
     ];
 
 
@@ -80,18 +63,6 @@ class CheckFieldsApi
         Member::class => [
             'ID',
         ]
-    ];
-
-    private static $default_level1_words = [
-        'Title',
-        'Name',
-        'Summary',
-        'Heading',
-        'Intro',
-        'URLSegment',
-        'MenuTitle',
-        'FirstName',
-        'Surname',
     ];
 
     public function setDebug(bool $b): CheckFieldsApi
@@ -191,7 +162,7 @@ class CheckFieldsApi
         );
         $this->excludedFields = array_unique(
             array_merge(
-                $this->Config()->get('default_exclude_fields'),
+                Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields'),
                 $this->excludedFields
             )
         );
@@ -312,7 +283,7 @@ class CheckFieldsApi
         if (! isset($this->cache['IndexedFields'][$className])) {
             $this->cache['IndexedFields'][$className] = [];
             $indexes = Config::inst()->get($className, 'indexes');
-            foreach($this->Config()->get('default_level1_words') as $field) {
+            foreach(Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields') as $field) {
                 $indexes[$field] = true;
             }
             if (is_array($indexes)) {
