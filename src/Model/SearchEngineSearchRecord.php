@@ -39,12 +39,12 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     /**
      * @var string
      */
-    private static $singular_name = 'Search Record';
+    private static $singular_name = 'Keywords Searched Entry';
 
     /**
      * @var string
      */
-    private static $plural_name = 'Search Records';
+    private static $plural_name = 'Keywords Searched Entries';
 
     /**
      * @var array
@@ -185,8 +185,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
         $fieldArray = [
             'Phrase' => $searchPhrase,
-            'FilterHash' => $filterProvidersHashed,
         ];
+        if($filterProvidersHashed) {
+            $fieldArray['FilterHash'] = $filterProvidersHashed;
+
+        }
         /** @var SearchEngineSearchRecord $obj */
         $obj = DataObject::get_one(self::class, $fieldArray);
         if (! $obj) {
@@ -197,8 +200,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
             $obj->write();
         } else {
-            $maxAge = Config::inst()->get(self::class, 'max_cache_age_in_minutes');
-            if ($clear || strtotime($obj->LastEdited) < strtotime('-' . $maxAge . ' minutes')) {
+            if ($clear || self::cachedValuesAreExpired($obj)) {
                 $obj->ListOfIDsRAW = '';
                 $obj->ListOfIDsSQL = '';
                 $obj->ListOfIDsCUSTOM = '';
@@ -212,32 +214,37 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return $obj;
     }
 
+    protected static function cachedValuesAreExpired(SearchEngineSearchRecord $obj): bool
+    {
+        $maxAge = Config::inst()->get(static::class, 'max_cache_age_in_minutes');
+        return strtotime($obj->LastEdited) < strtotime('-' . $maxAge . ' minutes');
+    }
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->addFieldsToTab(
+            'Root.Main',
+            [
+                new ReadonlyField('Phrase', 'Phrase'),
+                new ReadonlyField('FinalPhrase', 'Cleaned Phrase'),
+            ]
+        );
+
         $fields->removeFieldFromTab('Root.Main', 'FilterHash');
         $fields->removeFieldFromTab('Root.Main', 'FilterString');
         $fields->removeFieldFromTab('Root.Main', 'ListOfIDsRAW');
         $fields->removeFieldFromTab('Root.Main', 'ListOfIDsSQL');
         $fields->removeFieldFromTab('Root.Main', 'ListOfIDsCUSTOM');
         $fields->addFieldsToTab(
-            'Root',
+            'Root.CacheDetails',
             [
-                new Tab(
-                    'TempCache',
-                    new ReadonlyField('FilterHash', 'Filter Hash'),
-                    new ReadonlyField('FilterString', 'Filter String'),
-                    new ReadonlyField('ListOfIDsRAW', 'Step 1 IDs'),
-                    new ReadonlyField('ListOfIDsSQL', 'Step 2 IDs'),
-                    new ReadonlyField('ListOfIDsCUSTOM', 'Step 3 IDs')
-                ),
-            ]
-        );
-        $fields->addFieldsToTab(
-            'Root.Main',
-            [
-                new ReadonlyField('Phrase', 'Phrase'),
-                new ReadonlyField('FinalPhrase', 'Cleaned Phrase'),
+                new ReadonlyField('FilterHash', 'Filter Hash'),
+                new ReadonlyField('FilterString', 'Filter String'),
+                new ReadonlyField('ListOfIDsRAW', 'Step 1 IDs'),
+                new ReadonlyField('ListOfIDsSQL', 'Step 2 IDs'),
+                new ReadonlyField('ListOfIDsCUSTOM', 'Step 3 IDs'),
+                new ReadonlyField('cachedValuesAreExpiredNice', 'Cache valid?', self::cachedValuesAreExpired($this) ? 'NO' : 'YES')
             ]
         );
 

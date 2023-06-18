@@ -18,6 +18,7 @@ use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
 use Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName;
+use Sunnysideup\SearchSimpleSmart\Forms\Fields\SearchEngineFormField;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineAdvancedSettings;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -38,7 +39,9 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         SearchEngineKeyword::class,
         SearchEngineKeywordFindAndRemove::class,
         SearchEngineKeywordFindAndReplace::class,
-        SearchEnginePunctuationFindAndRemove::class,        SearchEngineSearchRecordHistory::class,
+        SearchEnginePunctuationFindAndRemove::class,
+        SearchEngineSearchRecord::class,
+        SearchEngineSearchRecordHistory::class,
         SearchEngineAdvancedSettings::class,
     ];
 
@@ -216,21 +219,23 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
             );
             $form->setFields($field);
         } elseif (SearchEngineSearchRecordHistory::class === $this->modelClass) {
-            // $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
-            // $field = new FieldList(
-            //     new TabSet(
-            //         'Root',
-            //         new Tab(
-            //             'Graph',
-            //             SearchEngineSearchHistoryFormField::create("SearchHistoryTable")
-            //         ),
-            //         new Tab(
-            //             'Log',
-            //             $gridField
-            //         )
-            //     )
-            // );
-            // $form->setFields($field);
+            $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
+            $field = new FieldList(
+                [
+                    new TabSet(
+                        'Root',
+                        new Tab(
+                            'Graph',
+                            SearchEngineFormField::create("SearchHistoryTable")
+                        ),
+                        new Tab(
+                            'Log',
+                            $gridField
+                        )
+                    )
+                ]
+            );
+            $form->setFields($field);
         }
 
         return $form;

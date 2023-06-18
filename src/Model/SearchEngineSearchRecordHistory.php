@@ -38,10 +38,10 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     private static $db = [
         'Phrase' => 'Varchar(150)',
-        'DataObjectClassName' => 'Varchar(150)',
-        'DataObjectID' => 'Int',
+        'ClickedOnDataObjectClassName' => 'Varchar(150)',
+        'ClickedOnDataObjectID' => 'Int',
         'NumberOfResults' => 'Int',
-        'Session' => 'Varchar(32)',
+        'Session' => 'Varchar(7)',
     ];
 
     /**
@@ -55,12 +55,21 @@ class SearchEngineSearchRecordHistory extends DataObject
     /**
      * @var array
      */
+    private static $field_labels = [
+        'Created' => 'When',
+        'Phrase' => 'Searched for',
+        'NumberOfResults' => 'Results offered',
+        'Session' => 'User code',
+    ];
+
+    /**
+     * @var array
+     */
     private static $summary_fields = [
-        'Created' => 'Created',
-        'Phrase' => 'Phrase',
-        'DataObjectClassName' => 'Class',
-        'DataObjectID' => 'ID',
-        'NumberOfResults' => 'Result Count',
+        'Created' => 'When',
+        'Phrase' => 'Searched for',
+        'NumberOfResults' => 'Results offered',
+        'Session' => 'User code',
     ];
 
     /**
@@ -68,8 +77,8 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     private static $indexes = [
         'Phrase' => true,
-        'DataObjectClassName' => true,
-        'DataObjectID' => true,
+        'ClickedOnDataObjectClassName' => true,
+        'ClickedOnDataObjectID' => true,
     ];
 
     public function i18n_singular_name()
@@ -139,6 +148,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
         $fieldArray = [
             'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
+            'Phrase' => $searchEngineSearchRecord->Phrase,
             'MemberID' => $currentUserID - 0,
             'Session' => session_id(),
         ];
@@ -190,13 +200,18 @@ class SearchEngineSearchRecordHistory extends DataObject
     {
         $obj = self::get_latest_search();
         if ($obj && ($item instanceof SearchEngineDataObject)) {
-            $obj->DataObjectClassName = $item->DataObjectClassName;
-            $obj->DataObjectID = $item->DataObjectID;
+            $obj->ClickedOnDataObjectClassName = $item->DataObjectClassName;
+            $obj->ClickedOnDataObjectID = $item->DataObjectID;
             $obj->write();
 
             return $obj;
         }
         return null;
+    }
+
+    public function set_latest_search(SearchEngineSearchRecord $item)
+    {
+        self::$_latest_search_cache = self::get()->byID($id);
     }
 
     /**
