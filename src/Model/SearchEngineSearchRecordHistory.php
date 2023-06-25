@@ -87,7 +87,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         'ClickedOnDataObjectID' => true,
     ];
 
-    private static $minutes_to_keep_search_as_one_search_for_user = 120;
+    private static $minutes_to_keep_search_as_one_search_for_user = 20;
 
     /**
      * @param Member $member
@@ -144,20 +144,9 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     public static function add_entry($searchEngineSearchRecord)
     {
-        //a real request - lets start a new search record history ...
-        $currentUserID = 0;
-        $currentUser = Security::getCurrentUser();
-        if ($currentUser) {
-            $currentUserID = $currentUser->ID;
-        }
 
-        $fieldArray = [
-            'Phrase' => $searchEngineSearchRecord->Phrase,
-            'MemberID' => $currentUserID - 0,
-            'Session' => self::get_session_id(),
-        ];
         //update latest search
-        $obj = self::get_latest_search($fieldArray);
+        $obj = self::get_latest_search($searchEngineSearchRecord);
 
         $obj->write();
 
@@ -173,7 +162,7 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     public static function add_number_of_results($count)
     {
-        $obj = self::get_latest_search();
+        $obj = self::get_latest_search_based_on_session_only();
         if ($obj) {
             $obj->NumberOfResults = $count;
             $obj->write();
@@ -192,7 +181,7 @@ class SearchEngineSearchRecordHistory extends DataObject
      */
     public static function register_click($item)
     {
-        $obj = self::get_latest_search();
+        $obj = self::get_latest_search_based_on_session_only();
         if ($obj && ($item instanceof SearchEngineDataObject)) {
             $obj->ClickedOnDataObjectClassName = $item->DataObjectClassName;
             $obj->ClickedOnDataObjectID = $item->DataObjectID;
@@ -206,20 +195,40 @@ class SearchEngineSearchRecordHistory extends DataObject
     /**
      * @return null|SearchEngineSearchRecordHistory
      */
-    public static function get_latest_search(?array $fieldArray = [])
+    public static function get_latest_search_based_on_session_only(): ?SearchEngineSearchRecordHistory
+    {
+        return self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()
+                ->filter(['Session' => self::get_timestamp_based_session_id(),])
+                ->sort(['ID' => 'DESC'])
+                ->first();
+
+    }
+
+    /**
+     * @return null|SearchEngineSearchRecordHistory
+     */
+    public static function get_latest_search($searchEngineSearchRecord): SearchEngineSearchRecordHistory
     {
         if (null === self::$_latest_search_cache) {
-            if(empty($fieldArray)) {
-                $fieldArray = [
-                    'Session' => self::get_session_id(),
-                ];
-            };
+            //a real request - lets start a new search record history ...
+            $currentUserID = 0;
+            $currentUser = Security::getCurrentUser();
+            if ($currentUser) {
+                $currentUserID = $currentUser->ID;
+            }
+            $fieldArray = [
+                'Phrase' => $searchEngineSearchRecord->Phrase,
+                'MemberID' => $currentUserID,
+                'Session' => self::get_timestamp_based_session_id(),
+                'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
+            ];
             self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()
                 ->filter($fieldArray)
                 ->sort(['ID' => 'DESC'])
                 ->first();
             if(! self::$_latest_search_cache) {
                 self::$_latest_search_cache = SearchEngineSearchRecordHistory::create($fieldArray);
+                self::$_latest_search_cache->write();
             }
         }
 
@@ -227,16 +236,16 @@ class SearchEngineSearchRecordHistory extends DataObject
     }
 
 
-    public static function set_session_id_if_not_set(?int $number = 0): int
+    public static function set_timestamp_based_session_id_if_not_set(?int $number = 0): float
     {
-        $curr = self::get_session_id();
+        $curr = self::get_timestamp_based_session_id();
         if(!$curr || ($number && $number !== $curr)) {
-            $curr = self::set_session_id($number);
+            $curr = self::set_timestamp_based_session_id($number);
         }
         return $curr;
     }
 
-    public static function set_session_id(?int $number = 0): int
+    public static function set_timestamp_based_session_id(?int $number = 0): float
     {
         $session = self::get_session();
         if($session) {
@@ -250,13 +259,14 @@ class SearchEngineSearchRecordHistory extends DataObject
         return $number;
     }
 
-    public static function get_session_id(): int
+    public static function get_timestamp_based_session_id(): float
     {
         $session = self::get_session();
         if($session) {
-            $val = (int) $session->get('SearchEngineSearchRecordHistorySessionID');
+            $val = (float) $session->get('SearchEngineSearchRecordHistorySessionID');
+            // check for expiry
             if(! $val || $val < self::get_session_expiry_time()) {
-                $val = self::set_session_id();
+                $val = self::set_timestamp_based_session_id();
             }
             return $val;
         }
@@ -265,7 +275,8 @@ class SearchEngineSearchRecordHistory extends DataObject
 
     private static function get_session_expiry_time(): int
     {
-        $minus = (Config::inst()->get(static::class, 'minutes_to_keep_search_as_one_search_for_user') * 60) + 10;
+        $minutes = Config::inst()->get(static::class, 'minutes_to_keep_search_as_one_search_for_user') ?: 10;
+        $minus = $minutes * 60;
         return time() - $minus;
     }
 
