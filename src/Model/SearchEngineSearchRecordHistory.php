@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Control\Controller;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -72,6 +73,10 @@ class SearchEngineSearchRecordHistory extends DataObject
         'Session' => 'User code',
     ];
 
+    private static $searchable_fields = [
+        'Phrase' => 'PartialMatchFilter',
+    ];
+
     /**
      * @var array
      */
@@ -82,12 +87,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         'ClickedOnDataObjectID' => true,
     ];
 
-    /**
-     * @var array
-     */
-    private static $searchable_fields = [
-        'Phrase' => true,
-    ];
+    private static $minutes_to_keep_search_as_one_search_for_user = 120;
 
     /**
      * @param Member $member
@@ -241,7 +241,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         $session = self::get_session();
         if($session) {
             if(! $number) {
-                $number = mt_rand(1, 931415926536);
+                $number = time() + (1/rand(0, 9999));
             }
             $session->set('SearchEngineSearchRecordHistorySessionID', $number);
         } else {
@@ -255,12 +255,18 @@ class SearchEngineSearchRecordHistory extends DataObject
         $session = self::get_session();
         if($session) {
             $val = (int) $session->get('SearchEngineSearchRecordHistorySessionID');
-            if(! $val) {
+            if(! $val || $val < self::get_session_expiry_time()) {
                 $val = self::set_session_id();
             }
             return $val;
         }
         return 0;
+    }
+
+    private static function get_session_expiry_time(): int
+    {
+        $minus = (Config::inst()->get(static::class, 'minutes_to_keep_search_as_one_search_for_user') * 60) + 10;
+        return time() - $minus;
     }
 
     protected static $_session_cache = null;

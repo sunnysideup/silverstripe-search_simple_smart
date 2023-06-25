@@ -57,6 +57,9 @@ class SearchEngineDataObjectApi
         return null;
     }
 
+    /**
+     * cleans any cached entries.
+     */
     public static function start_indexing_mode()
     {
         SearchEngineSearchRecord::flush();
