@@ -146,8 +146,8 @@ class SearchEngineKeywordFindAndReplace extends DataObject
 
         $replaceWithField = $fields->fieldByName('Root.Main')->fieldByName('ReplaceWith');
         $replaceWithField->setRightTitle(
-            'Enter all the keywords (separated by a comma) you need to be included when a user searches for the original keyword.<br>
-                If you need the original keyword to be included in the search it should also be included <br>'
+            'Enter all the keywords (separated by a comma) you need to be included when a user searches for the original keyword.
+            If you need the original keyword to be included in the search it should also be included.'
         );
 
         return $fields;
