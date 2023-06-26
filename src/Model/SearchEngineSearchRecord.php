@@ -18,11 +18,6 @@ use Wamania\Snowball\StemmerFactory;
 class SearchEngineSearchRecord extends DataObject implements Flushable
 {
     /**
-     * @var bool
-     */
-    protected $listOfIDsUpdateOnly = false;
-
-    /**
      * defaults to three months.
      *
      * @var int
@@ -57,6 +52,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         'ListOfIDsRAW' => 'Text',
         'ListOfIDsSQL' => 'Text',
         'ListOfIDsCUSTOM' => 'Text',
+        'HasCachedData' => 'Boolean',
     ];
 
     private static $has_many = [
@@ -109,7 +105,16 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     ];
 
     /**
-     * clears all records.
+     * @var array
+     */
+    private static $searchable_fields = [
+        'Phrase' => 'PartialMatchFilter',
+        'FinalPhrase' => 'PartialMatchFilter',
+    ];
+
+    /**
+     * clears all records
+     * from their cache data
      */
     public static function flush()
     {
@@ -117,14 +122,19 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             $query = "SHOW TABLES LIKE 'SearchEngineSearchRecord'";
             $tableExists = DB::query($query)->value();
             if ($tableExists) {
-                DB::query("
-                    UPDATE \"SearchEngineSearchRecord\"
-                    SET
-                        \"ListOfIDsRAW\" = '',
-                        \"ListOfIDsSQL\" = '',
-                        \"ListOfIDsCUSTOM\" = '',
-                        \"FinalPhrase\" = ''
-                ");
+                if(DB::get_schema()->hasField('SearchEngineSearchRecord', 'HasCachedData')) {
+                    DB::query(
+                        "
+                                UPDATE \"SearchEngineSearchRecord\"
+                                SET
+                                    \"ListOfIDsRAW\" = '',
+                                    \"ListOfIDsSQL\" = '',
+                                    \"ListOfIDsCUSTOM\" = '',
+                                    \"FinalPhrase\" = '',
+                                    \"HasCachedData\" = 0
+                            "
+                    );
+                }
             }
 
             $query = "SHOW TABLES LIKE 'SearchEngineSearchRecord_SearchEngineKeywords'";
@@ -135,6 +145,22 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 ');
             }
         }
+    }
+
+    protected function doesFieldExist($tableName, $fieldName)
+    {
+        // SQL query to check if the column exists
+        $query = sprintf("SHOW COLUMNS FROM `%s` LIKE '%s'", $tableName, $fieldName);
+
+        // Execute the SQL query
+        $result = DB::query($query);
+
+        // Check if the result has data
+        if ($result->numRecords() > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     public function i18n_singular_name()
@@ -174,7 +200,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      *
      * @return SearchEngineSearchRecord
      */
-    public static function add_search($searchPhrase, $filterProviders, $clear = false)
+    public static function add_search(string $searchPhrase, array $filterProviders, $clear = false)
     {
         $filterProvidersEncoded = '';
         $filterProvidersHashed = '';
@@ -204,6 +230,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 $obj->ListOfIDsRAW = '';
                 $obj->ListOfIDsSQL = '';
                 $obj->ListOfIDsCUSTOM = '';
+                $obj->HasCachedData = false;
                 //keywords are replaced automatically onAfterWrite
                 $obj->write();
             }
@@ -279,7 +306,6 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             }
         }
 
-        $this->listOfIDsUpdateOnly = true;
         $this->write();
 
         return $this->{$field};
@@ -301,28 +327,50 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if ($this->listOfIDsUpdateOnly) {
-            //nothing more to do
-        } else {
-            $cleanedPhrase = SearchEngineFullContent::clean_content($this->Phrase);
-            $keywords = explode(' ', $cleanedPhrase);
-            $finalKeyWordArray = [];
-            foreach ($keywords as $keyword) {
-                if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || 1 === strlen($keyword)) {
-                    continue;
-                }
+        if (! $this->HasCachedData) {
+            $this->FinalPhrase = $this->convertPhraseToFinalPhrase();
+        }
+    }
 
-                $finalKeyWordArray[$keyword] = $keyword;
+    protected function convertPhraseToFinalPhrase(): string
+    {
+        $cleanedPhrase = SearchEngineFullContent::clean_content($this->Phrase);
+        $keywords = explode(' ', $cleanedPhrase);
+        $finalKeyWordArray = ['test'];
+        foreach ($keywords as $keyword) {
+            if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || 1 === strlen($keyword)) {
+                continue;
             }
 
-            $this->FinalPhrase = implode(' ', $finalKeyWordArray);
+            $finalKeyWordArray[$keyword] = $keyword;
         }
+
+        return implode(' ', $finalKeyWordArray);
     }
 
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
-        $this->SearchEngineKeywords()->removeAll();
+        if(! $this->HasCachedData) {
+            $this->attachKeywords();
+            $this->HasCachedData = true;
+            $this->write();
+        }
+    }
+
+    protected function getListIDField(string $filterStep): string
+    {
+        if (! in_array($filterStep, ['RAW', 'SQL', 'CUSTOM'], true)) {
+            user_error("{$filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
+        }
+
+        return 'ListOfIDs' . $filterStep;
+    }
+
+    protected function attachKeywords()
+    {
+        $rel = $this->SearchEngineKeywords();
+        $rel->removeAll();
         $keywordArray = explode(' ', $this->FinalPhrase);
         foreach ($keywordArray as $position => $keyword) {
             $language = substr(i18n::get_locale(), 0, 2);
@@ -332,7 +380,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             $stemmer = StemmerFactory::create($language);
             $stem = $stemmer->stem($keyword);
             $realPosition = $position + 1;
-            $selectArray = [0 => 0];
+            $selectArray = [-1 => 0];
             $keywordsAfterFindReplace = explode(' ', SearchEngineKeywordFindAndReplace::find_replacements($keyword));
             $keywordsAfterFindReplace[] = $keyword;
             $keywordsAfterFindReplace = array_unique($keywordsAfterFindReplace);
@@ -361,22 +409,15 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                     ->exclude(['ID' => $selectArray])
                     ->limit(999)
                 ;
-                $selectArray += $keywords->map('ID', 'ID')->toArray();
+                $newOnes = $keywords->columnUnique();
+                $selectArray = array_unique(array_merge($selectArray, $newOnes));
                 foreach ($selectArray as $id) {
                     if ($id) {
-                        $this->SearchEngineKeywords()->add($id, ['KeywordPosition' => $realPosition]);
+                        $rel->add($id, ['KeywordPosition' => $realPosition]);
                     }
                 }
             }
         }
-    }
 
-    protected function getListIDField(string $filterStep): string
-    {
-        if (! in_array($filterStep, ['RAW', 'SQL', 'CUSTOM'], true)) {
-            user_error("{$filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
-        }
-
-        return 'ListOfIDs' . $filterStep;
     }
 }

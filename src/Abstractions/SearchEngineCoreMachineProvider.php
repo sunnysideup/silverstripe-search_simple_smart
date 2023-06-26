@@ -30,7 +30,7 @@ interface SearchEngineCoreMachineProvider
      *
      * @return DataList
      */
-    public function run($searchPhrase, $filterProviders = [], $sortProvider = '');
+    public function run(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null);
 
     /**
      * returns HTML for Debug.

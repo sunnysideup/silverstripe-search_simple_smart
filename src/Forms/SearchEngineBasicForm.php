@@ -454,8 +454,6 @@ class SearchEngineBasicForm extends Form
             $count = $results->count();
         }
 
-        SearchEngineSearchRecordHistory::add_number_of_results($count);
-
         $resultsPaginated = $this->workOutResultsPaginated($results);
 
         // After dealing with the data you can redirect the user back.

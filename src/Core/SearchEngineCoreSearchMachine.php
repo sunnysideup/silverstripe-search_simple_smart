@@ -11,14 +11,16 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
+use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineCoreMachineProvider;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory;
 use Sunnysideup\SearchSimpleSmart\Sorters\SearchEngineSortByRelevance;
 
-class SearchEngineCoreSearchMachine
+class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
 {
     use Extensible;
     use Injectable;
@@ -289,6 +291,8 @@ class SearchEngineCoreSearchMachine
 
         $this->runSortUsingCustom();
 
+        $this->markResults();
+
         if ($this->debug) {
             $this->runDebugPrep1();
             $this->runDebugPrep2();
@@ -365,7 +369,7 @@ class SearchEngineCoreSearchMachine
     {
         //add record
         $this->searchRecord = SearchEngineSearchRecord::add_search($this->searchPhrase, $this->filterProviders, $this->bypassCaching);
-        if (! $this->searchRecord->FinalPhrase) {
+        if (! $this->searchRecord->HasCachedData) {
             //previous data has been deleted
             //lets retrieve it again.
             $this->searchRecord->write();
@@ -419,6 +423,8 @@ class SearchEngineCoreSearchMachine
             $this->searchProvider->setSearchRecord($this->searchRecord);
             //get search objects that match the keywords
             $this->dataList = $this->searchProvider->getRawResults();
+
+            // storing the RAW results.
             $this->listOfIDsAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'RAW'));
         }
     }
@@ -473,6 +479,7 @@ class SearchEngineCoreSearchMachine
                 }
             }
 
+            // storing the SQL results.
             $this->listOfIDsSQLAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'SQL'));
         }
     }
@@ -525,6 +532,7 @@ class SearchEngineCoreSearchMachine
                 }
             }
 
+            // storing the custom results
             $this->listOfIDsCustomAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'CUSTOM'));
         }
     }
@@ -544,6 +552,14 @@ class SearchEngineCoreSearchMachine
                 $this->endTimeForCustomSort = microtime(true);
             }
         }
+    }
+
+    protected function markResults()
+    {
+        SearchEngineSearchRecordHistory::add_number_of_results(
+            $this->searchRecord,
+            count($this->listOfIDsCustomAsArray)
+        );
     }
 
     protected function runDebugPrep1()
