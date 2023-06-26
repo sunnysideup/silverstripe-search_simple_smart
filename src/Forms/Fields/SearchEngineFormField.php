@@ -4,6 +4,7 @@ namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
+use SilverStripe\Security\Security;
 
 class SearchEngineFormField extends LiteralField
 {
@@ -42,7 +43,7 @@ class SearchEngineFormField extends LiteralField
     {
         $totalNumberOfDaysBack = $this->numberOfDays + $this->endingDaysBack;
         // INNER JOIN SearchEngineSearchRecord ON SearchEngineSearchRecord.ID = SearchEngineSearchRecordHistory.SearchEngineSearchRecordID
-        if (! $this->minimumCount < 2) {
+        if ($this->minimumCount > 0) {
             $sql = '
                 SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount
                 FROM "SearchEngineSearchRecordHistory"
@@ -53,13 +54,15 @@ class SearchEngineFormField extends LiteralField
             $totalCount = (int) DB::query($sql)->value();
             $this->minimumCount = (int) round($totalCount / 1000);
         }
-
+        $endWhere = '';
+        if($this->endingDaysBack > 0) {
+            $endWhere = 'AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )';
+        }
         $sql = '
             SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
                 FROM "SearchEngineSearchRecordHistory"
             WHERE SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
-                AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )
-                AND MemberID = 0
+                '.$endWhere.'
             GROUP BY "Phrase"
             HAVING myCount >= ' . $this->minimumCount . '
             ORDER BY myCount DESC
@@ -76,7 +79,12 @@ class SearchEngineFormField extends LiteralField
 
         $content .= '
         <div id="SearchHistoryTableForCMS">
-            <h3>Search Phrases entered at least ' . $this->minimumCount . ' times between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) . ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) . '</h3>
+            <h3>Search Phrases entered at least
+                ' . $this->minimumCount . ' times '.
+                ' between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) .
+                ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) .
+                ':' .
+            '</h3>
             <table id="HighToLow" style="width: 100%">';
         $list = [];
         $maxwidth = -1;
@@ -96,12 +104,11 @@ class SearchEngineFormField extends LiteralField
                     </td>
                 </tr>';
         }
-
         $content .= '
             </table>';
         asort($list);
         $content .= '
-            <h3>A - Z</h3>
+            <h3>The same list from A - Z:</h3>
             <table id="AToz" style="width: 100%">';
         foreach ($list as $key => $title) {
             $array = explode('-', $key);

@@ -100,8 +100,9 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      */
     private static $summary_fields = [
         'Phrase' => 'Phrase',
-        'FinalPhrase' => 'Final Phrase',
-        'FilterHash' => 'Unique Filter code',
+        'FilterHash' => 'Filter Code (if any)',
+        'SearchEngineSearchRecordHistory.Count' => 'Search Count',
+        'NumberOfResults' => 'Results offered',
     ];
 
     /**
@@ -111,6 +112,26 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         'Phrase' => 'PartialMatchFilter',
         'FinalPhrase' => 'PartialMatchFilter',
     ];
+
+    private static $casting = [
+        'NumberOfResults' => 'Int',
+    ];
+
+
+
+    public function getLastSearchResult(): ?SearchEngineSearchRecordHistory
+    {
+        return $this->SearchEngineSearchRecordHistory()->sort(['ID' => 'DESC'])->first();
+    }
+
+    public function getNumberOfResults(): int
+    {
+        $obj = $this->getLastSearchResult();
+        if($obj) {
+            return $obj->NumberOfResults;
+        }
+        return 0;
+    }
 
     /**
      * clears all records
@@ -336,7 +357,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     {
         $cleanedPhrase = SearchEngineFullContent::clean_content($this->Phrase);
         $keywords = explode(' ', $cleanedPhrase);
-        $finalKeyWordArray = ['test'];
+        $finalKeyWordArray = [];
         foreach ($keywords as $keyword) {
             if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || 1 === strlen($keyword)) {
                 continue;

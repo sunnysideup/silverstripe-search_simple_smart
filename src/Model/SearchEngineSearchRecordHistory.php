@@ -156,7 +156,7 @@ class SearchEngineSearchRecordHistory extends DataObject
     }
 
     /**
-     * add an entry SearchEngineSearchRecordHistory entry.
+     * add the number of results
      *
      * @param int $count
      *
@@ -168,7 +168,11 @@ class SearchEngineSearchRecordHistory extends DataObject
         $obj = self::get_latest_search($searchEngineSearchRecord);
         if ($obj) {
             if(! $count) {
-                $count = substr_count($searchEngineSearchRecord->ListOfIDsCUSTOM, ',') + 1;
+                if(!$searchEngineSearchRecord->ListOfIDsCUSTOM) {
+                    $count = 0;
+                } else {
+                    $count = substr_count($searchEngineSearchRecord->ListOfIDsCUSTOM, ',') + 1;
+                }
             }
             $obj->NumberOfResults = $count;
             $obj->write();
