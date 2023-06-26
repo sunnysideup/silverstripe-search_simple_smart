@@ -72,7 +72,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      */
     public function doCustomSort($objects, $searchRecord)
     {
-        if ($objects->count() < 2) {
+        if ($objects->count() < 3) {
             //do nothing
         } else {
             for($i = 1; $i < 3; $i++) {
@@ -116,7 +116,9 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         }
                     }
                 }
-
+                if (count($listOfIds) === 0) {
+                    $listOfIds  = [-1];
+                }
                 // for the ones not found yet, we do a Mysql "Match" query with higher relevance first.
                 $sql = '
                     SELECT
