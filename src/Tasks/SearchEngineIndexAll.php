@@ -49,7 +49,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                 ->filter($filter)
                 ->count()
             ;
-            $sort = null;
+            $sort = false;
             if ($count > $this->limit) {
                 $count = $this->limit;
                 $sort = true;

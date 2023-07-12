@@ -46,7 +46,6 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         $count = SearchEngineDataObject::get()
             ->count()
         ;
-        $sort = ['ID' => 'ASC'];
         if ($count > $this->limit) {
             $count = $this->limit;
         }

@@ -44,7 +44,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
         $count = SearchEngineDataObject::get()
             ->count()
         ;
-        $sort = null;
+        $sort = false;
         if ($count > $this->limit) {
             $count = $this->limit;
             $sort = true;

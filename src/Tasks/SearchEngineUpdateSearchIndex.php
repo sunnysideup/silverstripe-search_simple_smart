@@ -43,7 +43,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
         SearchEngineDataObjectApi::start_indexing_mode();
 
         $count = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, 99999999)->count();
-        $sort = null;
+        $sort = false;
         if ($count > $this->limit) {
             $count = $this->limit;
             $sort = true;
