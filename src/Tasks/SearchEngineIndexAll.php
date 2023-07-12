@@ -52,7 +52,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
             $sort = null;
             if ($count > $this->limit) {
                 $count = $this->limit;
-                $sort = DB::get_conn()->random() . ' ASC';
+                $sort = true;
             }
 
             $this->flushNow('<h4>Found ' . $count . ' of ' . $classTitle . ' (' . $className . ')</h4>');
@@ -60,7 +60,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
             for ($i = 0; $i <= $count; $i += $this->step) {
                 $objects = $className::get()->filter($filter)->limit($this->step, $i);
                 if ($sort) {
-                    $objects = $objects->sort($sort);
+                    $objects = $objects->shuffle();
                 }
 
                 foreach ($objects as $obj) {

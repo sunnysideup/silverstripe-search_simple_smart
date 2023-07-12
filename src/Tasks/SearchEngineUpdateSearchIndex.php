@@ -46,14 +46,14 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
         $sort = null;
         if ($count > $this->limit) {
             $count = $this->limit;
-            $sort = DB::get_conn()->random() . ' ASC';
+            $sort = true;
         }
 
         for ($i = 0; $i <= $count; $i += $this->step) {
             $timeStart = microtime(true);
             $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, $this->step);
             if ($sort) {
-                $searchEngineDataObjectsToBeIndexed = $searchEngineDataObjectsToBeIndexed->sort($sort);
+                $searchEngineDataObjectsToBeIndexed = $searchEngineDataObjectsToBeIndexed->shuffle();
             }
 
             if (0 === $searchEngineDataObjectsToBeIndexed->count()) {

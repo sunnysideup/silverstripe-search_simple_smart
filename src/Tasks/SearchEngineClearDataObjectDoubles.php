@@ -49,13 +49,12 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         $sort = ['ID' => 'ASC'];
         if ($count > $this->limit) {
             $count = $this->limit;
-            $sort = DB::get_conn()->random() . ' ASC';
         }
 
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
 
         $ids = SearchEngineDataObject::get()
-            ->sort($sort)
+            ->shuffle()
             ->map('DataObjectID', 'DataObjectClassName')
             ->toArray()
         ;

@@ -260,7 +260,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         $objects = self::get()
             ->exclude(['SearchEngineDataObjectID' => 0])
             ->filter(['Completed' => 0])
-            ->sort(DB::get_conn()->random() . ' ASC')
+            ->shuffle()
             ->limit($limit)
         ;
 

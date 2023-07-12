@@ -48,14 +48,13 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
         $sort = ['ID' => 'ASC'];
         if ($count > $this->limit) {
             $count = $this->limit;
-            $sort = DB::get_conn()->random() . ' ASC';
         }
 
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
 
         $ids = SearchEngineDataObjectToBeIndexed::get()
             ->exclude(['Completed' => 1])
-            ->sort($sort)
+            ->shuffle()
             ->map('ID', 'SearchEngineDataObjectID')
             ->toArray()
         ;

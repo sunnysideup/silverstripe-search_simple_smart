@@ -47,14 +47,14 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
         $sort = null;
         if ($count > $this->limit) {
             $count = $this->limit;
-            $sort = DB::get_conn()->random() . ' ASC';
+            $sort = true;
         }
 
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
         for ($i = 0; $i <= $count; $i += $this->step) {
             $objects = SearchEngineDataObject::get()->limit($this->step, $i);
             if ($sort) {
-                $objects = $objects->sort($sort);
+                $objects = $objects->shuffle();
             }
 
             foreach ($objects as $obj) {

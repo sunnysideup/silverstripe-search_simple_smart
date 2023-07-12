@@ -43,10 +43,10 @@ class SearchEngineSetSortDate extends SearchEngineBaseTask
         SearchEngineDataObjectApi::start_indexing_mode();
 
         $count = SearchEngineDataObject::get()->count();
-        $sort = null;
+        $sort = false;
         if ($count > $this->limit) {
             $count = $this->limit;
-            $sort = DB::get_conn()->random() . ' ASC';
+            $sort = true;
         }
 
         for ($i = 0; $i <= $count; $i += $this->step) {
@@ -55,7 +55,7 @@ class SearchEngineSetSortDate extends SearchEngineBaseTask
                 ->limit($this->step, $i)
             ;
             if ($sort) {
-                $objects = $objects->sort($sort);
+                $objects = $objects->shuffle();
             }
 
             foreach ($objects as $object) {
