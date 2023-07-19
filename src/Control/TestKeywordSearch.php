@@ -19,7 +19,7 @@ class TestKeywordSearch extends Controller
         if(! empty($_GET['q'])) {
             $keywords = $_GET['q'];
         } else {
-            $page = Page::get()->sort('RAND()')->first();
+            $page = Page::get()->orderBy('RAND()')->first();
             $keywords = strtok($page->Title, ' ');
         }
         echo '<h2>search for (?q=...): ' . $keywords . '</h2>';

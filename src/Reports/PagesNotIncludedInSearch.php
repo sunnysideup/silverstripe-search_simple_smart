@@ -36,7 +36,7 @@ class PagesNotIncludedInSearch extends Report
         return SiteTree::get()
             ->exclude(['ClassName' => [RedirectorPage::class, VirtualPage::class]])
             ->filter(['ShowInSearch' => false])
-            ->sort('Title');
+            ->sort(['Title' => 'ASC']);
     }
 
     public function columns()

@@ -166,10 +166,10 @@ abstract class SearchEngineSortByDescriptor
                     $keys
                 )->filteredDatalist();
 
-                $objects = $objects->sort('FIELD("ID", ' . implode(',', $keys) . ')');
+                $objects = $objects->orderBy('FIELD("ID", ' . implode(',', $keys) . ')');
                 // $objects = SearchEngineDataObject::get()
                 //     ->filter(['ID' => $keys])
-                //     ->sort('FIELD("ID", ' . implode(',', $keys) . ')');
+                //     ->orderBy('FIELD("ID", ' . implode(',', $keys) . ')');
             }
         }
 

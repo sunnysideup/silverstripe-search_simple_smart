@@ -408,10 +408,10 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
                 $this->listOfIDsAsArray
             )->filteredDatalist();
 
-            $this->dataList = $this->dataList->sort('FIELD("ID", ' . implode(',', $this->listOfIDsAsArray) . ')');
+            $this->dataList = $this->dataList->orderBy('FIELD("ID", ' . implode(',', $this->listOfIDsAsArray) . ')');
             // $this->dataList = SearchEngineDataObject::get()
             //     ->filter(['ID' => $this->listOfIDsAsArray])
-            //     ->sort('FIELD("ID", ' . $this->listOfIDsAsString . ')');
+            //     ->orderBy('FIELD("ID", ' . $this->listOfIDsAsString . ')');
         } else {
             if ($this->debug) {
                 $this->filterExecutedRAW = true;
@@ -444,12 +444,12 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
             )->filteredDatalist();
 
             $this->dataList = $this->dataList
-                ->sort('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')')
+                ->orderBy('FIELD("ID", ' . implode(',', $this->listOfIDsSQLAsArray) . ')')
             ;
 
             // $this->dataList = SearchEngineDataObject::get()
             //     ->filter(['ID' => $this->listOfIDsSQLAsArray])
-            //     ->sort('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
+            //     ->orderBy('FIELD("ID", ' . $this->listOfIDsSQLString . ')');
         } else {
             if ($this->debug) {
                 $this->filterExecutedSQL = true;
@@ -509,11 +509,14 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
                 SearchEngineDataObject::class,
                 $this->listOfIDsCustomAsArray
             )->filteredDatalist();
-
-            $this->dataList = $this->dataList->sort($this->nonCustomSort);
+            if(is_array($this->nonCustomSort) && count($this->nonCustomSort)) {
+                $this->dataList = $this->dataList->sort($this->nonCustomSort);
+            } else {
+                $this->dataList = $this->dataList->orderBy($this->nonCustomSort);
+            }
             // $this->dataList = SearchEngineDataObject::get()
             // ->filter(['ID' => $this->listOfIDsCustomAsArray])
-            // ->sort($this->nonCustomSort);
+            // ->orderBy($this->nonCustomSort);
         } else {
             if ($this->debug) {
                 $this->filterExecutedCustom = true;

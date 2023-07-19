@@ -153,8 +153,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //     SearchEngineDataObject::class,
             //     $objects->columnUnique()
             // )->filteredDatalist();
-            $objects = $objects->sort('FIELD("ID", ' . implode(',', $ids) . ')');
-
+            $sort = 'FIELD("ID", ' . implode(',', $ids) . ')';
+            $objects = $objects->orderBy($sort);
             //group results!
             $objects = $this->makeClassGroups($objects);
         }
@@ -163,28 +163,28 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     }
 
 
-                // $objects = SearchEngineDataObject::get()
-                //     ->filter(['ID' => $ids])
-                //     ->sort('FIELD("ID", ' . implode(',', $ids) . ')');
-                //
-                // TO TEST!
-                // $sql = '
-                //     SELECT
-                //         "SearchEngineDataObject"."ID" AS MyID,
-                //         MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\'  WITH QUERY EXPANSION) AS RELEVANCE
-                //     ' . $fromSQL . '
-                //     WHERE
-                //         "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
-                //         AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
-                //     HAVING
-                //         RELEVANCE > 0
-                //     ' . $sortSQL . '
-                //     ;';
-                // $rows = DB::query($sql);
-                // foreach ($rows as $row) {
-                //     $id = $row['MyID'];
-                //     if (! isset($array[$id])) {
-                //         $array[$id] = $row['RELEVANCE'];
-                //     }
-                // }
+    // $objects = SearchEngineDataObject::get()
+    //     ->filter(['ID' => $ids])
+    //     ->orderBy('FIELD("ID", ' . implode(',', $ids) . ')');
+    //
+    // TO TEST!
+    // $sql = '
+    //     SELECT
+    //         "SearchEngineDataObject"."ID" AS MyID,
+    //         MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\'  WITH QUERY EXPANSION) AS RELEVANCE
+    //     ' . $fromSQL . '
+    //     WHERE
+    //         "SearchEngineDataObjectID" IN (' . $searchRecord->ListOfIDsCUSTOM . ')
+    //         AND "SearchEngineDataObjectID" NOT IN (' . implode(',', array_keys($array)) . ')
+    //     HAVING
+    //         RELEVANCE > 0
+    //     ' . $sortSQL . '
+    //     ;';
+    // $rows = DB::query($sql);
+    // foreach ($rows as $row) {
+    //     $id = $row['MyID'];
+    //     if (! isset($array[$id])) {
+    //         $array[$id] = $row['RELEVANCE'];
+    //     }
+    // }
 }

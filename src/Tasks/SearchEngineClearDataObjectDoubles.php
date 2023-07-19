@@ -78,7 +78,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
                 //             'DataObjectClassName' => $className,
                 //         ]
                 //     )
-                //     ->sort(['ID' => 'DESC']);
+                //     ->orderBy(['ID' => 'DESC']);
                 $count = 0;
                 foreach ($objects as $obj) {
                     if (0 === $count) {
