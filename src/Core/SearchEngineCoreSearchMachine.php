@@ -511,7 +511,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
             )->filteredDatalist();
             if(is_array($this->nonCustomSort) && count($this->nonCustomSort)) {
                 $this->dataList = $this->dataList->sort($this->nonCustomSort);
-            } else {
+            } elseif(is_string($this->nonCustomSort) && strlen($this->nonCustomSort)) {
                 $this->dataList = $this->dataList->orderBy($this->nonCustomSort);
             }
             // $this->dataList = SearchEngineDataObject::get()
