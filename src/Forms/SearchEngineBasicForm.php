@@ -457,7 +457,7 @@ class SearchEngineBasicForm extends Form
         $resultsPaginated = $this->workOutResultsPaginated($results);
 
         // After dealing with the data you can redirect the user back.
-        $link = str_replace('&', '&amp;', $_SERVER['REQUEST_URI']);
+        $link = str_replace('&', '&amp;', filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL));
         $fullResultsLink = '';
         $fullResultsClassName = (string) Config::inst()->get(self::class, 'full_results_page_type');
         if ($fullResultsClassName) {
