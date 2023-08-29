@@ -271,6 +271,9 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
      */
     public function run(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null)
     {
+        if(strlen(trim($searchPhrase)) < 2) {
+            $searchPhrase = '[NO KEYWORD PROVIDED]';
+        }
         // special get vars
         $this->runGetGetVars();
 

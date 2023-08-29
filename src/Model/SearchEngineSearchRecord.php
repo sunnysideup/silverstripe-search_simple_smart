@@ -219,7 +219,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
      * @param array  $filterProviders
      * @param bool   $clear
      *
-     * @return SearchEngineSearchRecord
+     * @return SearchEngineSearchRecord|null
      */
     public static function add_search(string $searchPhrase, array $filterProviders, $clear = false)
     {
