@@ -264,7 +264,7 @@ class SearchEngineFullContent extends DataObject
         //remove non-alpha
         $removeNonAlphas = Config::inst()->get(self::class, 'remove_all_non_alpha_numeric');
         if (true === $removeNonAlphas) {
-            $content = preg_replace('#[^a-zA-Z 0-9]+#', ' ', (string) $content);
+            $content = preg_replace(self::get_pattern_for_alpha_numeric_characters(), ' ', (string) $content);
         }
 
         //remove non letters
@@ -287,6 +287,11 @@ class SearchEngineFullContent extends DataObject
 
         //remove multiple white space
         return trim(preg_replace('#\s+#', ' ', (string) $content));
+    }
+
+    public static function get_pattern_for_alpha_numeric_characters(): string
+    {
+        return "/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ ]+/u";
     }
 
     /**
