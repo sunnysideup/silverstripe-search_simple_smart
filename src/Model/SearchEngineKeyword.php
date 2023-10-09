@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
@@ -40,6 +41,11 @@ class SearchEngineKeyword extends DataObject implements Flushable
     // @var array
     private static $db = [
         'Keyword' => 'Varchar(100)',
+    ];
+
+    private static $auto_replace_map = [
+        'ā' => 'a', 'ē' => 'e', 'ī' => 'i', 'ō' => 'o', 'ū' => 'u',
+        'Ā' => 'A', 'Ē' => 'E', 'Ī' => 'I', 'Ō' => 'O', 'Ū' => 'U',
     ];
 
     // @var array
@@ -199,8 +205,28 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
             self::$_keyword_cache[$keyword] = $obj;
         }
+        self::add_auto_replace($keyword);
 
         return self::$_keyword_cache[$keyword];
+    }
+
+    protected static function add_auto_replace(string $keyword): void
+    {
+        $replaceMap = Config::inst()->get(self::class, 'auto_replace_map');
+        $wordWithoutMacrons = str_replace(array_keys($replaceMap), array_values($replaceMap), $keyword);
+        if($wordWithoutMacrons === $keyword) {
+            return;
+        }
+        $filter = ['Keyword' => $keyword];
+        $obj = SearchEngineKeywordFindAndReplace::get()->filter($filter)->first();
+        if($obj) {
+            $obj->ReplaceWith .= ', '.$wordWithoutMacrons;
+        } else {
+            $obj = SearchEngineKeywordFindAndReplace::create($filter);
+            $obj->ReplaceWith = $wordWithoutMacrons;
+        }
+        $obj->Custom = false;
+        $obj->write();
     }
 
     /**

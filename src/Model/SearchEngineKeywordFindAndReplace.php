@@ -178,7 +178,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
                 }
             }
 
-            return implode(' ', $newerEntries);
+            return implode(' ', array_unique($newerEntries));
         }
 
         return $keyword;
@@ -196,11 +196,11 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         foreach ($replaceWithArray as $keyword) {
             $keyword = SearchEngineKeyword::clean_keyword($keyword);
             if (strlen($keyword) > 1) {
-                $finalArray[] = $keyword;
+                $finalArray[] = trim($keyword);
             }
         }
 
-        $this->ReplaceWith = implode(',', $finalArray);
+        $this->ReplaceWith = implode(',', array_unique($finalArray));
     }
 
     /**
