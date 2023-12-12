@@ -203,7 +203,7 @@ class SearchEngineFullContent extends DataObject
         $fieldArray = ['SearchEngineDataObjectID' => $item->ID, 'Level' => $level];
         /** @var SearchEngineFullContent $obj */
         $obj = DataObject::get_one(self::class, $fieldArray);
-        if (! $obj) {
+        if (!$obj) {
             $obj = self::create($fieldArray);
         }
 
@@ -244,7 +244,7 @@ class SearchEngineFullContent extends DataObject
         //default punctuation removal
         $defaultPuncs = Config::inst()->get(self::class, 'default_punctuation_to_be_removed');
         foreach ($defaultPuncs as $defaultPunc) {
-            $content = str_replace($defaultPunc, ' ', $content);
+            $content = str_replace($defaultPunc, ' ', (string) $content);
         }
 
         //custom punctuation removal
@@ -257,7 +257,7 @@ class SearchEngineFullContent extends DataObject
 
         if (self::$_punctuation_objects) {
             foreach (self::$_punctuation_objects as $punctuationObject) {
-                $content = str_replace($punctuationObject->Character, ' ', $content);
+                $content = str_replace((string) $punctuationObject->Character, ' ', (string) $content);
             }
         }
 
@@ -351,7 +351,7 @@ class SearchEngineFullContent extends DataObject
                     }
 
                     $keywordObject = SearchEngineKeyword::add_keyword($keyword, $runClean = false);
-                    if (! isset($fullArray[$keywordObject->ID])) {
+                    if (!isset($fullArray[$keywordObject->ID])) {
                         $fullArray[$keywordObject->ID] = [
                             'Object' => $keywordObject,
                             'Count' => 0,

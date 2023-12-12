@@ -42,7 +42,7 @@ class ExportKeywordList
                     $rows = DB::query('SELECT "Keyword" FROM "SearchEngineKeyword" ORDER BY "Keyword";');
                     $array = [];
                     foreach ($rows as $row) {
-                        $array[] = str_replace("'", '', Convert::raw2js($row['Keyword']));
+                        $array[] = str_replace("'", '', (string) Convert::raw2js($row['Keyword']));
                     }
 
                     $written = 0;
@@ -71,7 +71,7 @@ class ExportKeywordList
      *
      * @return string|null
      */
-    public static function get_js_keyword_file_name($includeBase = false) : ?string
+    public static function get_js_keyword_file_name($includeBase = false): ?string
     {
         $myFolderName = Config::inst()->get(static::class, 'keyword_list_folder_name');
         if(!$myFolderName) {

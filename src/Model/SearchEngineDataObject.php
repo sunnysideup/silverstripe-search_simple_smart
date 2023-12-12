@@ -297,7 +297,7 @@ class SearchEngineDataObject extends DataObject
 
     public function SearchEngineSourceObjectSortDate($sourceObject = null)
     {
-        if (! $sourceObject) {
+        if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -317,7 +317,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SearchEngineFieldsForIndexing($sourceObject = null)
     {
-        if (! $sourceObject) {
+        if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -329,11 +329,11 @@ class SearchEngineDataObject extends DataObject
     public function getObjectClassName(): string
     {
         $className = $this->DataObjectClassName;
-        if (! class_exists($className)) {
+        if (!class_exists($className)) {
             return 'ERROR - class not found';
         }
 
-        if (! isset(self::$_object_class_name[$className])) {
+        if (!isset(self::$_object_class_name[$className])) {
             $objectClassName = Injector::inst()->get($className)->singular_name();
             self::$_object_class_name[$className] = $objectClassName;
         }
@@ -356,7 +356,7 @@ class SearchEngineDataObject extends DataObject
     public function SourceObject(): ?DataObject
     {
         $key = $this->getSearchEngineKey();
-        if (! isset(self::$_source_objects[$key])) {
+        if (!isset(self::$_source_objects[$key])) {
             $className = $this->DataObjectClassName;
             if ($className && class_exists($className)) {
                 $id = $this->DataObjectID;
@@ -372,7 +372,7 @@ class SearchEngineDataObject extends DataObject
     public function SourceObjectExists(): bool
     {
         $key = $this->getSearchEngineKey();
-        if (! isset(self::$_source_objects_exists[$key])) {
+        if (!isset(self::$_source_objects_exists[$key])) {
             self::$_source_objects_exists[$key] = false;
             $className = $this->DataObjectClassName;
             $id = $this->DataObjectID;
@@ -414,7 +414,7 @@ class SearchEngineDataObject extends DataObject
     public function SpecialSortGroup()
     {
         $className = $this->getSearchEngineKey(true);
-        if (! isset(self::$_special_sort_group[$className])) {
+        if (!isset(self::$_special_sort_group[$className])) {
             self::$_special_sort_group[$className] = '';
             $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups');
             if (is_array($classGroups) && count($classGroups)) {
@@ -499,7 +499,7 @@ class SearchEngineDataObject extends DataObject
 
     public function CMSEditLink()
     {
-        $className = str_replace('\\', '-', self::class);
+        $className = str_replace('\\', '-', (string) self::class);
 
         return '/admin/searchengine/' . $className . '/EditForm/field/' . $className . '/item/' . $this->ID . '/edit';
     }
@@ -544,7 +544,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SearchEngineResultsTemplates($sourceObject = null, $moreDetails = false)
     {
-        if (! $sourceObject) {
+        if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -558,7 +558,7 @@ class SearchEngineDataObject extends DataObject
 
     public function SearchEngineFieldsToBeIndexedHumanReadable($sourceObject = null, $includeExample = false)
     {
-        if (! $sourceObject) {
+        if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -586,7 +586,7 @@ class SearchEngineDataObject extends DataObject
             $this->timeMeasure = [];
         }
 
-        if (! $sourceObject) {
+        if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -646,7 +646,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SearchEngineFullContentForIndexingBuild($sourceObject = null)
     {
-        if (! $sourceObject) {
+        if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 

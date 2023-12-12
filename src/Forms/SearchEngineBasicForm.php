@@ -178,7 +178,7 @@ class SearchEngineBasicForm extends Form
 
     public function forTemplate()
     {
-        if (! self::$_for_template_completed) {
+        if (!self::$_for_template_completed) {
             $this->addFields();
 
             //requirements
@@ -397,9 +397,9 @@ class SearchEngineBasicForm extends Form
 
     protected function workOutRequirements()
     {
-        if($this->Config()->jquery_source ==='none') {
+        if($this->Config()->jquery_source === 'none') {
             //do nothing
-        } elseif($this->Config()->jquery_source ==='block') {
+        } elseif($this->Config()->jquery_source === 'block') {
             Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
         } elseif ($this->Config()->jquery_source) {
             Requirements::block('silverstripe/admin: thirdparty/jquery/jquery.js');
@@ -457,7 +457,7 @@ class SearchEngineBasicForm extends Form
         $resultsPaginated = $this->workOutResultsPaginated($results);
 
         // After dealing with the data you can redirect the user back.
-        $link = str_replace('&', '&amp;', filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL));
+        $link = str_replace('&', '&amp;', (string) filter_var($_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL));
         $fullResultsLink = '';
         $fullResultsClassName = (string) Config::inst()->get(self::class, 'full_results_page_type');
         if ($fullResultsClassName) {
@@ -506,7 +506,7 @@ class SearchEngineBasicForm extends Form
             }
         }
 
-        $sortBy = (! empty($data['SortBy']) && class_exists($data['SortBy']) ? $data['SortBy'] : '');
+        $sortBy = (!empty($data['SortBy']) && class_exists($data['SortBy']) ? $data['SortBy'] : '');
         $this->start = (isset($_GET['start']) ? (int) $_GET['start'] : 0);
         if ($this->totalNumberOfItemsToReturn && $this->totalNumberOfItemsToReturn < $this->start) {
             //$results = SearchEngineDataObject::get()->filter("ID", -1);
@@ -526,7 +526,7 @@ class SearchEngineBasicForm extends Form
             }
         }
 
-        if (! $results) {
+        if (!$results) {
             $results = ArrayList::create();
         }
 
@@ -554,7 +554,7 @@ class SearchEngineBasicForm extends Form
 
         foreach ($options as $className) {
             $provider = Injector::inst()->get($className);
-            if (! $provider instanceof SearchEngineSortByDescriptor) {
+            if (!$provider instanceof SearchEngineSortByDescriptor) {
                 user_error($provider->ClassName . 'should extend SearchEngineSortByDescriptor - like so: class <u>' . $provider->ClassName . ' extends SearchEngineSortByDescriptor</u>');
             }
 
@@ -576,7 +576,7 @@ class SearchEngineBasicForm extends Form
 
         foreach ($options as $className) {
             $provider = Injector::inst()->get($className);
-            if (! $provider instanceof SearchEngineFilterForDescriptor) {
+            if (!$provider instanceof SearchEngineFilterForDescriptor) {
                 user_error(
                     $provider->ClassName . 'should extend SearchEngineFilterForDescriptor' .
                     ' - like so: class <u>' . $provider->ClassName .

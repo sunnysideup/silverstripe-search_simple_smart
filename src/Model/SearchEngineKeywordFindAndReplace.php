@@ -171,7 +171,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
             $newerEntries = [];
             foreach ($newEntries as $newEntryKeyword) {
                 $newEntryKeyword = SearchEngineKeyword::clean_keyword($newEntryKeyword);
-                if (! isset(self::$_words_used[$newEntryKeyword])) {
+                if (!isset(self::$_words_used[$newEntryKeyword])) {
                     $newerEntries[] = self::find_replacements($newEntryKeyword);
                 } else {
                     $newerEntries[] = $newEntryKeyword;
@@ -211,7 +211,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      */
     private function multiExplode($delimiters, $string)
     {
-        $ready = str_replace($delimiters, $delimiters[0], $string);
+        $ready = str_replace($delimiters, $delimiters[0], (string) $string);
 
         return explode($delimiters[0], $ready);
     }
