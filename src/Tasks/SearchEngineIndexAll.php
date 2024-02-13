@@ -41,6 +41,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
     {
         $this->runStart($request);
 
+
         $classNames = SearchEngineDataObjectApi::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
             $filter = ['ClassName' => $className];
@@ -68,21 +69,34 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                     $run = $this->unindexedOnly ? ! (bool) $obj->SearchEngineIsIndexed() : true;
 
                     if ($run) {
-                        $item = SearchEngineDataObjectApi::find_or_make($obj);
-                        if ($item) {
-                            $this->flushNow('Queueing: ' . $obj->getTitle() . ' for indexing');
-                            SearchEngineDataObjectToBeIndexed::add($item, false);
-                        } elseif ($obj->SearchEngineExcludeFromIndex()) {
-                            $this->flushNow('Object is excluded from search index: ' . $obj->getTitle());
+                        if ($obj->SearchEngineExcludeFromIndex()) {
+                            $this->flushNow('Object cannot be indexed: ' . $obj->getTitle() . ' - ' . $obj->ID . ' - ' . $obj->ClassName, 'deleted');
                         } else {
-                            $this->flushNow('Error that needs to be investigating .... object is ....' . $obj->getTitle());
+                            $item = SearchEngineDataObjectApi::find_or_make($obj);
+                            if ($item) {
+                                $this->flushNow('Queueing: ' . $obj->getTitle() . ' for indexing', 'created');
+                                SearchEngineDataObjectToBeIndexed::add($item, false);
+                            } else {
+                                $this->flushNow('Error that needs to be investigating .... object is ....' . $obj->getTitle(), 'deleted');
+                            }
                         }
                     } else {
-                        $this->flushNow('already indexed ...' . $obj->getTitle());
+                        $this->flushNow('already indexed ...' . $obj->getTitle(), 'changed');
                     }
                 }
             }
         }
+        DB::alteration_message('==================================', 'created');
+        DB::alteration_message('Delete doubles', 'created');
+        DB::alteration_message('==================================', 'created');
+        $obj = SearchEngineClearDataObjectDoubles::create();
+        $obj->run($request);
+
+        DB::alteration_message('==================================', 'created');
+        DB::alteration_message('Delete obsoletes', 'created');
+        DB::alteration_message('==================================', 'created');
+        $obj = SearchEngineClearObsoletes::create();
+        $obj->run($request);
 
         $this->runEnd($request);
     }

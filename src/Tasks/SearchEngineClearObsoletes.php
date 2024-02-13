@@ -58,11 +58,9 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
             }
 
             foreach ($objects as $obj) {
-                if (false === $obj->SourceObjectExists()) {
+                if(true === $obj->SearchEngineExcludeFromIndex()) {
                     $this->flushNow('DELETING ' . $obj->ID);
                     $obj->delete();
-                } else {
-                    $this->flushNow('OK ... ' . $obj->ID);
                 }
             }
         }

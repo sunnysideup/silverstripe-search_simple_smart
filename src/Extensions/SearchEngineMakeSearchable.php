@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
+use DNADesign\Elemental\Models\BaseElement;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
@@ -57,9 +58,10 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function doSearchEngineIndex(?SearchEngineDataObject $searchEngineDataObject = null, ?bool $withModeChange = true)
     {
+        $owner = $this->getOwner();
         //last check...
         if (! $searchEngineDataObject) {
-            $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($this->owner);
+            $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($owner);
         } else {
             if ($this->SearchEngineExcludeFromIndex()) {
                 $searchEngineDataObject = null;
@@ -69,7 +71,7 @@ class SearchEngineMakeSearchable extends DataExtension
         }
 
         if ($searchEngineDataObject) {
-            $searchEngineDataObject->doSearchEngineIndex($this->owner, $withModeChange);
+            $searchEngineDataObject->doSearchEngineIndex($owner, $withModeChange);
         }
     }
 
@@ -87,12 +89,13 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineFullContentForIndexingBuild($item = null)
     {
+        $owner = $this->getOwner();
         if (! $item) {
-            $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+            $item = SearchEngineDataObjectApi::find_or_make($owner);
         }
 
         if ($item) {
-            return $item->SearchEngineFullContentForIndexingBuild($this->owner);
+            return $item->SearchEngineFullContentForIndexingBuild($owner);
         }
 
         return [];
@@ -111,8 +114,9 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineAlsoTrigger()
     {
-        if ($this->getOwner()->hasMethod('SearchEngineAlsoTriggerProvider')) {
-            return $this->getOwner()->SearchEngineAlsoTriggerProvider();
+        $owner = $this->getOwner();
+        if ($owner->hasMethod('SearchEngineAlsoTriggerProvider')) {
+            return $owner->SearchEngineAlsoTriggerProvider();
         }
 
         return [];
@@ -131,7 +135,8 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineKeywordDataObjectMatches($level = 1)
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner);
         if ($item) {
             $field = 'SearchEngineKeywords_Level' . $level;
 
@@ -155,9 +160,10 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineResultsTemplates($moreDetails = false)
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner);
         if ($item) {
-            return $item->SearchEngineResultsTemplates($this->owner, $moreDetails);
+            return $item->SearchEngineResultsTemplates($owner, $moreDetails);
         }
 
         return [];
@@ -169,7 +175,8 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        if ($this->owner->SearchEngineExcludeFromIndex()) {
+        $owner = $this->getOwner();
+        if ($owner->SearchEngineExcludeFromIndex()) {
             return;
         }
 
@@ -177,16 +184,16 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($fields->fieldByName('Root')) {
                 $fields->findOrMakeTab('Root.Main');
                 $fields->removeFieldFromTab('Root.Main', 'SearchEngineDataObjectID');
-                if (! $this->getOwner()->hasMethod('getSettingsFields')) {
+                if (! $owner->hasMethod('getSettingsFields')) {
                     $this->updateSettingsFields($fields);
-                } elseif ($this->owner instanceof SiteTree) {
+                } elseif ($owner instanceof SiteTree) {
                     $fields->addFieldToTab(
                         'Root.Keywords',
                         LiteralField::create(
                             'SearchEngineHeader',
                             '<h2>
                                 See
-                                <a href="/admin/pages/settings/show/' . $this->getOwner()->ID . '/">Settings Tab</a>
+                                <a href="/admin/pages/settings/show/' . $owner->ID . '/">Settings Tab</a>
                                 for Keyword Search Details
                             </h2>'
                         )
@@ -198,16 +205,17 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function updateSettingsFields(FieldList $fields)
     {
+        $owner = $this->getOwner();
         if (SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN')) {
             if ($this->SearchEngineExcludeFromIndex()) {
                 return;
             }
 
-            $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+            $item = SearchEngineDataObjectApi::find_or_make($owner);
             if ($item) {
                 $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->getOwner()->HasBeenIndexed ? $this->getOwner()->LastEdited : 'n/a'));
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $owner->HasBeenIndexed ? $owner->LastEdited : 'n/a'));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed));
                 $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
@@ -215,7 +223,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     'Root.SearchEngine',
                     $itemField = new LiteralField(
                         'Levels',
-                        $this->getOwner()->SearchEngineFieldsToBeIndexedHumanReadable(true)
+                        $owner->SearchEngineFieldsToBeIndexedHumanReadable(true)
                     )
                 );
                 $fields->addFieldToTab(
@@ -223,7 +231,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     new GridField(
                         'SearchEngineKeywords_Level1',
                         'Keywords Level 1',
-                        $this->getOwner()->SearchEngineKeywordDataObjectMatches(1),
+                        $owner->SearchEngineKeywordDataObjectMatches(1),
                         $config
                     )
                 );
@@ -232,7 +240,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     new GridField(
                         'SearchEngineKeywords_Level2',
                         'Keywords Level 2',
-                        $this->getOwner()->SearchEngineKeywordDataObjectMatches(2),
+                        $owner->SearchEngineKeywordDataObjectMatches(2),
                         $config
                     )
                 );
@@ -241,7 +249,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     new GridField(
                         'SearchEngineFullContent',
                         'Full Content',
-                        $this->getOwner()->SearchEngineDataObjectFullContent(),
+                        $owner->SearchEngineDataObjectFullContent(),
                         $config
                     )
                 );
@@ -250,7 +258,7 @@ class SearchEngineMakeSearchable extends DataExtension
                     $itemField = new GridField(
                         'SearchEngineDataObject',
                         'Searchable Item',
-                        SearchEngineDataObject::get()->filter(['DataObjectClassName' => $this->getOwner()->ClassName, 'DataObjectID' => $this->getOwner()->ID]),
+                        SearchEngineDataObject::get()->filter(['DataObjectClassName' => $owner->ClassName, 'DataObjectID' => $owner->ID]),
                         $config
                     )
                 );
@@ -260,9 +268,10 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function SearchEngineFieldsToBeIndexedHumanReadable($includeExample = false)
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner);
         if ($item) {
-            return $item->SearchEngineFieldsToBeIndexedHumanReadable($this->owner, $includeExample);
+            return $item->SearchEngineFieldsToBeIndexedHumanReadable($owner, $includeExample);
         }
     }
 
@@ -301,12 +310,13 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function onBeforeWrite()
     {
-        $alsoTrigger = $this->getOwner()->SearchEngineAlsoTrigger();
+        $owner = $this->getOwner();
+        $alsoTrigger = $owner->SearchEngineAlsoTrigger();
         if (is_array($alsoTrigger) && count($alsoTrigger)) {
             foreach ($alsoTrigger as $details) {
                 $className = $details['ClassName'];
                 $id = $details['ID'];
-                if ($this->getOwner()->ID === $id && $this->getOwner()->ClassName = $className) {
+                if ($owner->ID === $id && $owner->ClassName = $className) {
                     user_error('Object can not trigger itself');
                     die();
                 }
@@ -330,20 +340,22 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function onAfterWrite()
     {
-        if ($this->getOwner()->SearchEngineExcludeFromIndex()) {
+        $owner = $this->getOwner();
+        if ($owner->SearchEngineExcludeFromIndex()) {
             //do nothing...
         } else {
-            if (! isset($this->_onAfterWriteCount[$this->getOwner()->ID])) {
-                $this->_onAfterWriteCount[$this->getOwner()->ID] = 0;
+            if (! isset($this->_onAfterWriteCount[$owner->ID])) {
+                $this->_onAfterWriteCount[$owner->ID] = 0;
             }
 
-            register_shutdown_function([$this->owner, 'indexMeOnShutDown']);
+            register_shutdown_function([$owner, 'indexMeOnShutDown']);
         }
     }
 
     public function indexMeOnShutDown()
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner);
         if ($item) {
             $item->write();
             // ExportKeywordList::export_keyword_list();
@@ -353,11 +365,13 @@ class SearchEngineMakeSearchable extends DataExtension
 
     public function SearchEngineDeleteFromIndexing()
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner, $doNotMake = true);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner, $doNotMake = true);
         if ($item && $item->exists()) {
             $item->delete();
         }
     }
+
 
     //####################################
     // get index data ...
@@ -374,9 +388,10 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineFieldsForIndexing()
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner);
         if ($item) {
-            return $item->SearchEngineFieldsForIndexing($this->owner);
+            return $item->SearchEngineFieldsForIndexing($owner);
         }
 
         return [
@@ -392,7 +407,8 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineDataObjectFullContent()
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner);
         if ($item) {
             return $item->SearchEngineFullContents();
         }
@@ -411,7 +427,8 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineIsIndexed()
     {
-        $item = SearchEngineDataObjectApi::find_or_make($this->owner, false);
+        $owner = $this->getOwner();
+        $item = SearchEngineDataObjectApi::find_or_make($owner, false);
         if ($item && $item->exists()) {
             return $item->SearchEngineDataObjectToBeIndexed()->filter(['Completed' => true])->count();
         }
@@ -424,36 +441,50 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function SearchEngineExcludeFromIndex()
     {
-        if (empty($this->getOwner()->ID) || empty($this->getOwner()->ClassName)) {
+        $owner = $this->getOwner();
+
+        if (empty($owner->ID) || empty($owner->ClassName)) {
+            return true;
+        }
+        if(class_exists(BaseElement::class) && isset($owner->ShowTitle) && $owner->ShowTitle === false) {
+            return true;
+        }
+        if(!$owner->Title) {
+            $owner->Title = $owner->getTitle();
+            if($owner->Title && $owner->Title === '#' . $owner->ID) {
+                $owner->Title = '';
+            }
+        }
+        if((string) trim($owner->Link()) === '' || (string) trim($owner->Title) === '') {
             return true;
         }
 
-        $key = $this->getOwner()->ClassName . '_' . $this->getOwner()->ID;
+        $key = $owner->ClassName . '_' . $owner->ID;
         if (! isset(self::$_search_engine_exclude_from_index[$key])) {
-            if (! isset(self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName])) {
+            if (! isset(self::$_search_engine_exclude_from_index_per_class[$owner->ClassName])) {
                 $classNameList = SearchEngineDataObjectApi::searchable_class_names();
-                $exclude = ! isset($classNameList[$this->getOwner()->ClassName]);
-                self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName] = $exclude;
+                $exclude = ! isset($classNameList[$owner->ClassName]);
+                self::$_search_engine_exclude_from_index_per_class[$owner->ClassName] = $exclude;
             }
 
-            $exclude = self::$_search_engine_exclude_from_index_per_class[$this->getOwner()->ClassName];
+            $exclude = self::$_search_engine_exclude_from_index_per_class[$owner->ClassName];
             if (false === $exclude) {
-                if ($this->getOwner()->hasMethod('SearchEngineExcludeFromIndexProvider')) {
-                    $exclude = $this->getOwner()->SearchEngineExcludeFromIndexProvider();
+                if ($owner->hasMethod('SearchEngineExcludeFromIndexProvider')) {
+                    $exclude = $owner->SearchEngineExcludeFromIndexProvider();
                 } else {
-                    $exclude = Config::inst()->get($this->getOwner()->ClassName, 'search_engine_exclude_from_index');
+                    $exclude = Config::inst()->get($owner->ClassName, 'search_engine_exclude_from_index');
                 }
 
                 //special case SiteTree
-                if (isset($this->getOwner()->ShowInSearch)) {
-                    if (! $this->getOwner()->ShowInSearch) {
+                if (isset($owner->ShowInSearch)) {
+                    if (! $owner->ShowInSearch) {
                         $exclude = true;
                     }
                 }
 
                 //important! has it been published?
-                if ($this->getOwner()->hasExtension(Versioned::class)) {
-                    if ($this->getOwner()->IsPublished()) {
+                if ($owner->hasExtension(Versioned::class)) {
+                    if ($owner->IsPublished()) {
                         //do nothing - no need to exclude
                     } else {
                         $exclude = true;
@@ -465,7 +496,7 @@ class SearchEngineMakeSearchable extends DataExtension
             //search index.
             if ($exclude) {
                 $exclude = true;
-            // CAN NOT RUN THIS HERE!!!!
+                // CAN NOT RUN THIS HERE!!!!
                 // $this->SearchEngineDeleteFromIndexing();
             } else {
                 $exclude = false;
@@ -482,10 +513,11 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     public function getSearchEngineKey($classNameOnly = false): string
     {
+        $owner = $this->getOwner();
         if ($classNameOnly) {
-            return $this->getOwner()->ClassName . '';
+            return $owner->ClassName . '';
         }
 
-        return $this->getOwner()->ID . '_' . $this->getOwner()->ClassName;
+        return $owner->ID . '_' . $owner->ClassName;
     }
 }

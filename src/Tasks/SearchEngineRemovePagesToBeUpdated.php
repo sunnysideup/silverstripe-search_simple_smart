@@ -20,7 +20,7 @@ class SearchEngineRemovePagesToBeUpdated extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Goes through all objects marked as to be indexed and removes them from this list so that you just run a couple.';
+    protected $description = 'Goes through all objects marked as to be indexed and removes them from this list so that you can just run a couple (added after you add this one).';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).

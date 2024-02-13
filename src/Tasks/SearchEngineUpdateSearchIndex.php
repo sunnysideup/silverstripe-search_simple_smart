@@ -65,7 +65,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
                 $searchEngineDataObject = $searchEngineDataObjectToBeIndexed->SearchEngineDataObject();
                 if ($searchEngineDataObject) {
                     $sourceObject = $searchEngineDataObject->SourceObject();
-                    if ($sourceObject) {
+                    if ($sourceObject && false === $sourceObject->SearchEngineExcludeFromIndex()) {
                         $this->flushNow('Indexing ' . $searchEngineDataObject->DataObjectClassName . '.' . $searchEngineDataObject->DataObjectID . '', 'created');
                         $searchEngineDataObject->doSearchEngineIndex(
                             $sourceObject,

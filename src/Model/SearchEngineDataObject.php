@@ -377,9 +377,9 @@ class SearchEngineDataObject extends DataObject
             $className = $this->DataObjectClassName;
             $id = $this->DataObjectID;
             if ($id && $className && class_exists($className)) {
-                self::$_source_objects_exists[$key] = 1 === $className::get()
+                self::$_source_objects_exists[$key] = $className::get()
                     ->filter(['ID' => $id])
-                    ->count()
+                    ->exists()
                 ;
             }
         }
@@ -430,6 +430,16 @@ class SearchEngineDataObject extends DataObject
         }
 
         return self::$_special_sort_group[$className];
+    }
+
+    public function SearchEngineExcludeFromIndex(): bool
+    {
+        $sourceObject = $this->SourceObject();
+        if($sourceObject) {
+            return $sourceObject->SearchEngineExcludeFromIndex();
+        } else {
+            return true;
+        }
     }
 
     //############################################

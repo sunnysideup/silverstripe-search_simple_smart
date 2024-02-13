@@ -61,31 +61,19 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         $pos = 0;
         foreach ($ids as $id => $className) {
             $key = $className . '_' . $id;
-            if (isset($test[$key])) {
-                $objects = Injector::inst()->create(
-                    FasterIDLists::class,
-                    SearchEngineDataObject::class,
-                    $id,
-                    'DataObjectID'
-                )->filteredDatalist();
-                $objects = $objects->filter(['DataObjectClassName' => $className]);
-                $objects = $objects->sort(['ID' => 'DESC']);
+            if (! isset($test[$key])) {
+                $objects = SearchEngineDataObject::get()
+                    ->filter(['DataObjectClassName' => $className, 'DataObjectID' => $id])
+                    ->sort(['ID' => 'DESC']);
 
-                // $objects = SearchEngineDataObject::get()
-                //     ->filter(
-                //         [
-                //             'DataObjectID' => $id,
-                //             'DataObjectClassName' => $className,
-                //         ]
-                //     )
-                //     ->orderBy(['ID' => 'DESC']);
                 $count = 0;
                 foreach ($objects as $obj) {
                     if (0 === $count) {
-                        //keep!
+                        //the first one we keep!
                     } else {
+                        // the rest we delete
                         $obj->delete();
-                        $this->flushNow('Deleting ' . $obj->getTitle());
+                        $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is a double-up', 'deleted');
                     }
 
                     ++$count;
