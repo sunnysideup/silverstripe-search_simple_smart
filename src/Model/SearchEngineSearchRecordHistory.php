@@ -189,9 +189,9 @@ class SearchEngineSearchRecordHistory extends DataObject
      *
      * @return null|SearchEngineSearchRecordHistory
      */
-    public static function register_click($searchEngineSearchRecord, $item)
+    public static function register_click($item)
     {
-        $obj = self::get_latest_search($searchEngineSearchRecord);
+        $obj = self::get_latest_search();
         if ($obj && ($item instanceof SearchEngineDataObject)) {
             $obj->ClickedOnDataObjectClassName = $item->DataObjectClassName;
             $obj->ClickedOnDataObjectID = $item->DataObjectID;
@@ -205,7 +205,7 @@ class SearchEngineSearchRecordHistory extends DataObject
     /**
      * @return null|SearchEngineSearchRecordHistory
      */
-    public static function get_latest_search($searchEngineSearchRecord): SearchEngineSearchRecordHistory
+    public static function get_latest_search($searchEngineSearchRecord = null): SearchEngineSearchRecordHistory
     {
         if (null === self::$_latest_search_cache) {
             //a real request - lets start a new search record history ...
@@ -215,11 +215,13 @@ class SearchEngineSearchRecordHistory extends DataObject
                 $currentUserID = $currentUser->ID;
             }
             $fieldArray = [
-                'Phrase' => $searchEngineSearchRecord->Phrase,
                 'MemberID' => $currentUserID,
                 'Session' => self::get_timestamp_based_session_id(),
-                'SearchEngineSearchRecordID' => $searchEngineSearchRecord->ID,
             ];
+            if($searchEngineSearchRecord) {
+                $fieldArray['Phrase'] = $searchEngineSearchRecord->Phrase;
+                $fieldArray['SearchEngineSearchRecordID'] = $searchEngineSearchRecord->ID;
+            }
             self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()
                 ->filter($fieldArray)
                 ->sort(['ID' => 'DESC'])

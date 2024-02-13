@@ -12,6 +12,8 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineCoreMachineProvider;
+use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
+use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineProviderMYSQLFullText;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
@@ -114,9 +116,9 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     protected $searchProviderName = '';
 
     /**
-     * @var string
+     * @var null|SearchEngineSearchEngineProvider
      */
-    protected $searchProvider = '';
+    protected $searchProvider = null;
 
     /**
      * @var array
@@ -149,7 +151,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     protected $nameForSortProvider = '';
 
     /**
-     * @var null
+     * @var null|SearchEngineSortByDescriptor
      */
     protected $sortProviderObject;
 
@@ -422,6 +424,8 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
 
             //run search to search engine specific engine
             $this->searchProviderName = Config::inst()->get(self::class, 'class_name_for_search_provision');
+
+            /** @var SearchEngineSearchEngineProvider $this->searchProvider */
             $this->searchProvider = Injector::inst()->get($this->searchProviderName);
             $this->searchProvider->setSearchRecord($this->searchRecord);
             //get search objects that match the keywords
