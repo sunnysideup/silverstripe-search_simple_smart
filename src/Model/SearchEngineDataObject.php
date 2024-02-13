@@ -728,8 +728,12 @@ class SearchEngineDataObject extends DataObject
         parent::onAfterWrite();
         if ($this->Recalculate && $this->recalculateCount < 2) {
             ++$this->recalculateCount;
-            $this->doSearchEngineIndex();
-            $this->write();
+            if($this->SearchEngineExcludeFromIndex() === true) {
+                $this->delete();
+            } else {
+                $this->doSearchEngineIndex();
+                $this->write();
+            }
         } elseif ($this->Recalculate) {
             $this->Recalculate = false;
             $this->write();

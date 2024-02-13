@@ -234,7 +234,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
         if ($searchEngineDataObject && $searchEngineDataObject->exists() && $searchEngineDataObject instanceof SearchEngineDataObject) {
             $sourceObject = $searchEngineDataObject->SourceObject();
-            if ($sourceObject && $sourceObject->exists()) {
+            if ($sourceObject && $sourceObject->exists() && $sourceObject->SearchEngineExcludeFromIndex() !== true) {
                 $sourceObject->doSearchEngineIndex($searchEngineDataObject);
                 $this->Completed = 1;
                 $this->write();
