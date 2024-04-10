@@ -232,7 +232,7 @@ class SearchEngineFullContent extends DataObject
      */
     public static function clean_content($content)
     {
-        $content = strtolower($content);
+        $content = strtolower((string) $content);
 
         //important!!!! - create space around tags ....
         $content = str_replace('<', ' <', $content);
