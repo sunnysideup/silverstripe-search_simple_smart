@@ -68,8 +68,8 @@ class SearchEngineFormField extends LiteralField
             ORDER BY myCount DESC
         ';
         $data = DB::query($sql);
-        if (! $this->minimumCount) {
-            ++$this->minimumCount;
+        if ((int) $this->minimumCount < 2) {
+            $this->minimumCount = 2;
         }
 
         $content = '';
