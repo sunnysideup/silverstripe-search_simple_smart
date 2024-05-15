@@ -229,7 +229,8 @@ class SearchEngineDataObject extends DataObject
      * @var array
      */
     private static $searchable_fields = [
-        'DataObjectClassName' => 'PartialMatchFilter',
+        'SearchEngineKeywords_Level1.Keyword' => 'PartialMatchFilter',
+        'SearchEngineKeywords_Level2.Keyword' => 'PartialMatchFilter',
     ];
 
     /**
@@ -366,7 +367,7 @@ class SearchEngineDataObject extends DataObject
             }
         }
 
-        return self::$_source_objects[$key];
+        return self::$_source_objects[$key] ?? null;
     }
 
     public function SourceObjectExists(): bool

@@ -172,19 +172,23 @@ class SearchEngineSourceObjectApi implements Flushable
                 $fieldLabels = $sourceObject->fieldLabels();
                 $str = '<ul>';
                 foreach ($levels as $level => $fieldArray) {
-                    $str .= '<li><strong>' . $level . '</strong><ul>';
-                    foreach ($fieldArray as $field) {
-                        $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
-                        if ($includeExample) {
-                            $fields = explode('.', $field);
-                            $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
-                            $str .= '<li> - <strong>' . $title . '</strong> <em>' . $data . '</em></li>';
-                        } else {
-                            $str .= '<li> - ' . $title . '</li>';
+                    if(is_array($fieldArray) && count($fieldArray)) {
+                        $str .= '<li><strong>' . $level . '</strong><ul>';
+                        foreach ($fieldArray as $field) {
+                            $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
+                            if ($includeExample) {
+                                $fields = explode('.', $field);
+                                $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
+                                $str .= '<li> - <strong>' . $title . '</strong> <em>' . $data . '</em></li>';
+                            } else {
+                                $str .= '<li> - ' . $title . '</li>';
+                            }
                         }
-                    }
 
-                    $str .= '</ul></li>';
+                        $str .= '</ul></li>';
+                    } else {
+                        $str .= '<li><strong>' . $level . '</strong> - no fields</li>';
+                    }
                 }
 
                 $str .= '</ul>';
