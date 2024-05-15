@@ -52,39 +52,25 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
 
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
 
-        $ids = SearchEngineDataObject::get()
-            ->shuffle()
-            ->map('DataObjectID', 'DataObjectClassName')
-            ->toArray()
-        ;
-        $test = [];
-        $pos = 0;
-        foreach ($ids as $id => $className) {
-            $key = $className . '_' . $id;
-            if (! isset($test[$key])) {
-                $objects = SearchEngineDataObject::get()
-                    ->filter(['DataObjectClassName' => $className, 'DataObjectID' => $id])
-                    ->sort(['ID' => 'DESC']);
-
-                $count = 0;
-                foreach ($objects as $obj) {
-                    if (0 === $count) {
-                        //the first one we keep!
-                    } else {
-                        // the rest we delete
-                        $obj->delete();
-                        $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is a double-up', 'deleted');
-                    }
-
-                    ++$count;
+        $objects = SearchEngineDataObject::get()->sort(['ID' => 'ASC']);
+        foreach ($objects as $obj) {
+            $source = $obj->SourceObject();
+            if($source) {
+                $key = $source->ClassName.'-'.$source->ID;
+                $key2 = $obj->DataObjectClassName.'-'.$obj->DataObjectID;
+                if($key !== $key2) {
+                    $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is a mismatch between source and search engine object', 'deleted');
+                    $obj->delete();
+                } elseif(isset($test[$key])) {
+                    $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is a double-up', 'deleted');
+                    $obj->delete();
+                } else {
+                    $test[$key] = 1;
                 }
             } else {
-                $this->flushNow($pos);
-                $test[$key] = [];
+                $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is no source object', 'deleted');
+                $obj->delete();
             }
-
-            $test[$key][] = $pos;
-            ++$pos;
         }
 
         $this->runEnd($request);
