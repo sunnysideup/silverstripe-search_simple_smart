@@ -106,18 +106,18 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                                 'Manifesto',
                                 HTMLReadonlyField::create(
                                     'searchable_class_names',
-                                    'Searchable Class Names',
-                                    self::print_nice(SearchEngineDataObjectApi::searchable_class_names())
+                                    'Searchable Records',
+                                    self::print_nice(array_keys(SearchEngineDataObjectApi::searchable_class_names()))
                                 ),
                                 HTMLReadonlyField::create(
                                     'classes_to_exclude',
-                                    'Data Object - Classes To Exclude',
+                                    'Records To Exclude',
                                     self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'classes_to_exclude'))
                                 )
                                     ->setDescription('All classes are included, except these ones'),
                                 HTMLReadonlyField::create(
                                     'classes_to_include',
-                                    'Data Object - Classes To Include',
+                                    'Records to Always Include',
                                     self::print_nice(Config::inst()->get(SearchEngineDataObject::class, 'classes_to_include'))
                                 )
                                     ->setDescription('Only these classes are included'),
@@ -161,11 +161,9 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                                 ),
                                 HTMLReadonlyField::create(
                                     SearchEngineDataObjectToBeIndexed::class,
-                                    '
-                                        Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
+                                    'Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
                                         If set to FALSE, the index will update immediately (pages will take longer to save).
-                                        On DEV Environments, it always runs immediately (you never need to run the cron job)
-                                    ',
+                                        On DEV Environments, it always runs immediately (you never need to run the cron job)',
                                     Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, 'cron_job_running') ? 'True' : 'False'
                                 ),
                             ),
@@ -247,26 +245,29 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
      */
     public static function print_nice($arr)
     {
-        if (is_array($arr)) {
-            return self::array2ul($arr);
-        }
-
-        return '<pre>' . print_r($arr, true) . '</pre>';
+        return self::array2ul($arr, '');
     }
 
     //code by acmol
-    public static function array2ul($array)
+    public static function array2ul(array|string $arrayOrString, string|int|null $key = '')
     {
         $out = '<ul>';
-        foreach ($array as $key => $elem) {
-            if (! is_array($elem)) {
-                if ($key === (int) $key) {
-                    $out .= '<li><span>' . $elem . '</span></li>';
-                } else {
-                    $out .= '<li><span><em>' . $key . ' --- </em> ' . $elem . '</span></li>';
-                }
+        if (is_array($arrayOrString)) {
+            foreach ($arrayOrString as $key => $elem) {
+                $out .= self::array2ul($elem, $key) ;
+            }
+        } else {
+            $elem = $arrayOrString;
+            if(class_exists($elem)) {
+                $elem =  singleton($elem)->i18n_singular_name() . ' (' . $elem . ')';
+            }
+            if(class_exists($key)) {
+                $key =  singleton($key)->i18n_singular_name() . ' (' . $key . ')';
+            }
+            if ($key === (int) $key || !$key) {
+                $out .= '<li><span><pre>' . $elem . '</pre></span></li>';
             } else {
-                $out .= '<li><span>' . $key . '</span>' . self::array2ul($elem) . '</li>';
+                $out .= '<li><span><em>' . $key . ' --- </em> <pre>' . $elem . '</pre></span></li>';
             }
         }
 
