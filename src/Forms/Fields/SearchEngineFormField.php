@@ -53,7 +53,7 @@ class SearchEngineFormField extends LiteralField
                     AND MemberID = 0
             ';
             $totalCount = (int) DB::query($sql)->value();
-            $this->minimumCount = (int) round($totalCount / 2000);
+            $this->minimumCount = (int) round($totalCount / 10000);
         }
         $endWhere = '';
         if($this->endingDaysBack > 0) {
