@@ -5,6 +5,7 @@ namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Security;
+use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
 
 class SearchEngineFormField extends LiteralField
 {
@@ -62,6 +63,7 @@ class SearchEngineFormField extends LiteralField
             SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
                 FROM "SearchEngineSearchRecordHistory"
             WHERE SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
+            AND "Phrase" IS NOT NULL AND "Phrase" <> \'\' AND Phrase <> \''.SearchEngineCoreSearchMachine::NO_KEYWORD_PROVIDED.'\'
                 '.$endWhere.'
             GROUP BY "Phrase"
             HAVING myCount >= ' . $this->minimumCount . '

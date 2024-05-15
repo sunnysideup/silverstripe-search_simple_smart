@@ -28,6 +28,9 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     use Injectable;
     use Configurable;
 
+
+    public const NO_KEYWORD_PROVIDED = '[NO KEYWORD PROVIDED]';
+
     /**
      * ClassNameForFilter => ValuesToFilterFor...
      *
@@ -274,7 +277,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     public function run(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null)
     {
         if(strlen(trim($searchPhrase)) < 2) {
-            $searchPhrase = '[NO KEYWORD PROVIDED]';
+            $searchPhrase = self::NO_KEYWORD_PROVIDED;
         }
         // special get vars
         $this->runGetGetVars();
