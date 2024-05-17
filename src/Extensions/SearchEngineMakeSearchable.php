@@ -23,6 +23,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Exception;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 
 /**
  * Add this DataExtension to any object that you would like to make
@@ -219,50 +220,11 @@ class SearchEngineMakeSearchable extends DataExtension
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $owner->HasBeenIndexed ? $owner->LastEdited : 'n/a'));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed));
-                $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
-                $fields->addFieldToTab(
-                    'Root.SearchEngine',
-                    $itemField = new LiteralField(
-                        'Levels',
-                        $owner->SearchEngineFieldsToBeIndexedHumanReadable(true)
-                    )
-                );
-                $fields->addFieldToTab(
-                    'Root.SearchEngine',
-                    new GridField(
-                        'SearchEngineKeywords_Level1',
-                        'Keywords Level 1',
-                        $owner->SearchEngineKeywordDataObjectMatches(1),
-                        $config
-                    )
-                );
-                $fields->addFieldToTab(
-                    'Root.SearchEngine',
-                    new GridField(
-                        'SearchEngineKeywords_Level2',
-                        'Keywords Level 2',
-                        $owner->SearchEngineKeywordDataObjectMatches(2),
-                        $config
-                    )
-                );
-                $fields->addFieldToTab(
-                    'Root.SearchEngine',
-                    new GridField(
-                        'SearchEngineFullContent',
-                        'Full Content',
-                        $owner->SearchEngineDataObjectFullContent(),
-                        $config
-                    )
-                );
-                $fields->addFieldToTab(
-                    'Root.SearchEngine',
-                    $itemField = new GridField(
-                        'SearchEngineDataObject',
-                        'Searchable Item',
-                        SearchEngineDataObject::get()->filter(['DataObjectClassName' => $owner->ClassName, 'DataObjectID' => $owner->ID]),
-                        $config
-                    )
-                );
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create(
+                    'LinkToSearchEngineDataObject',
+                    'More details',
+                    DBHTMLText::create_field('HTMLText', '<a href="'.$item->CMSEditLink().'">Open Index Entry</a>')
+                ));
             }
         }
     }
