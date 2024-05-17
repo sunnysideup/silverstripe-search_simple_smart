@@ -31,6 +31,9 @@ class SearchEngineFormField extends LiteralField
     protected $minimumCount = 1;
 
 
+    protected bool $showSource = true;
+
+
     public function __construct($name, $title = '')
     {
         parent::__construct($name, $title);
@@ -83,12 +86,13 @@ class SearchEngineFormField extends LiteralField
 
         $content .= '
         <div id="SearchHistoryTableForCMS">
-            <h3>Search Phrases entered at least
-                ' . $this->minimumCount . ' times '.
-                ' between ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) .
-                ' and ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) .
-                ':' .
-            '</h3>
+            <h2>
+                From ' . date('Y-M-d', strtotime('-' . $totalNumberOfDaysBack . ' days')) .
+                ' to ' . date('Y-M-d', strtotime('-' . $this->endingDaysBack . ' days')) .
+                ', entered at least ' . $this->minimumCount . ' times
+            <h2>
+            <h3>By Ranking</h3>
+
             <table id="HighToLow" style="width: 100%">';
         $list = [];
         $maxwidth = -1;
@@ -112,7 +116,7 @@ class SearchEngineFormField extends LiteralField
             </table>';
         asort($list);
         $content .= '
-            <h3>The same list from A - Z:</h3>
+            <h3>The same list from A - Z</h3>
             <table id="AToz" style="width: 100%">';
         foreach ($list as $key => $title) {
             $array = explode('-', $key);
@@ -126,9 +130,13 @@ class SearchEngineFormField extends LiteralField
                 </tr>';
         }
 
-        return $content . '
+        $content .= '
             </table>
         </div>';
+        if($this->showSource) {
+            $content .= '<p><a href="/dev/tasks/searchhistorybrowser">Browse Search History</a></p>';
+        }
+        return $content;
     }
 
     /**
@@ -137,6 +145,16 @@ class SearchEngineFormField extends LiteralField
     public function setNumberOfDays($days): self
     {
         $this->numberOfDays = (int) $days;
+
+        return $this;
+    }
+
+    /**
+     * @param int $days
+     */
+    public function setShowSource(bool $b): self
+    {
+        $this->showSource = (bool) $b;
 
         return $this;
     }

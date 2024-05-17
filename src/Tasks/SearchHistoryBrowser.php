@@ -64,10 +64,11 @@ class SearchHistoryBrowser extends BuildTask
     {
         //set basics
         $this->runStart($request);
-        $field = SearchEngineFormField::create('SearchEngineFormField', 'Search History');
-        $field->setNumberOfDays($this->startDaysAgo - $this->endDaysAgo);
-        $field->setEndingDaysBack($this->endDaysAgo);
-        echo $field->forTemplate();
+        echo SearchEngineFormField::create('SearchEngineFormField', 'Search History')
+            ->setNumberOfDays($this->startDaysAgo - $this->endDaysAgo)
+            ->setEndingDaysBack($this->endDaysAgo)
+            ->setShowSource(false)
+            ->forTemplate();
 
         $this->runEnd($request);
     }
@@ -90,8 +91,6 @@ class SearchHistoryBrowser extends BuildTask
         //20 minutes
         Environment::increaseTimeLimitTo(7200);
 
-        $this->flushNow('<h2>Starting</h2>', false);
-
         if ($request) {
 
 
@@ -104,14 +103,6 @@ class SearchHistoryBrowser extends BuildTask
             }
 
         }
-
-        $this->flushNow('<strong>FROM Days Ago</strong>: ' . $this->startDaysAgo);
-        $this->flushNow('<strong>UNTIL Days Ago</strong>: ' . $this->endDaysAgo);
-    }
-
-    public function runEnd($request)
-    {
-
         if (! Director::is_cli()) {
             $html =
             '
@@ -136,7 +127,13 @@ class SearchHistoryBrowser extends BuildTask
             $this->flushNow($html);
         }
 
-        $this->flushNow('<h2>======================</h2>');
+    }
+
+    public function runEnd($request)
+    {
+
+
+
     }
 
 }
