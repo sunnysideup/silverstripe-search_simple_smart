@@ -14,7 +14,7 @@ class SearchEngineFormField extends LiteralField
      *
      * @var int
      */
-    protected $numberOfDays = 100;
+    protected $numberOfDays = 180;
 
     /**
      * how many days ago the data-analysis should end.

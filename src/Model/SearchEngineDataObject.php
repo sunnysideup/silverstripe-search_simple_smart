@@ -509,7 +509,6 @@ class SearchEngineDataObject extends DataObject
             $fields->fieldByName('Root')->push($myTab);
         }
 
-        $config = GridFieldConfig_RecordEditor::create()->removeComponentsByType(GridFieldAddNewButton::class);
         $fields->addFieldsToTab(
             'Root.Schema',
             [
@@ -518,30 +517,6 @@ class SearchEngineDataObject extends DataObject
                     '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>'.
                     $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
                 ),
-                // new GridField(
-                //     'SearchEngineKeywords_Level1',
-                //     'Keywords Level 1',
-                //     $object->SearchEngineKeywordDataObjectMatches(1),
-                //     $config
-                // ),
-                // new GridField(
-                //     'SearchEngineKeywords_Level2',
-                //     'Keywords Level 2',
-                //     $object->SearchEngineKeywordDataObjectMatches(2),
-                //     $config
-                // ),
-                // new GridField(
-                //     'SearchEngineFullContent',
-                //     'Full Content',
-                //     $object->SearchEngineDataObjectFullContent(),
-                //     $config
-                // ),
-                // new GridField(
-                //     'SearchEngineDataObject',
-                //     'Searchable Item',
-                //     SearchEngineDataObject::get()->filter(['DataObjectClassName' => $object->ClassName, 'DataObjectID' => $object->ID]),
-                //     $config
-                // )
             ]
         );
 

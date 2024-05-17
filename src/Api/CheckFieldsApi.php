@@ -13,6 +13,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Security\LoginAttempt;
+use SilverStripe\Security\Member;
 use SilverStripe\Security\MemberPassword;
 use SilverStripe\Security\RememberLoginHash;
 use SilverStripe\Versioned\ChangeSet;
@@ -207,7 +208,7 @@ class CheckFieldsApi
                         if (!$this->isValidFieldType($className, $name, $type)) {
                             continue;
                         }
-                        if(in_array($name, $this->excludedClassFieldCombos[$className]?? [])) {
+                        if(in_array($name, $this->excludedClassFieldCombos[$className] ?? [])) {
                             continue;
                         }
 
@@ -234,7 +235,7 @@ class CheckFieldsApi
                     if(in_array($relType, $this->excludedClasses)) {
                         continue;
                     }
-                    if(in_array($relType, $this->excludedClassFieldCombos[$className]?? [])) {
+                    if(in_array($relType, $this->excludedClassFieldCombos[$className] ?? [])) {
                         continue;
                     }
                     $hasTitleField = isset($dbFields['Title']) || isset($dbFields['Name']) ;
