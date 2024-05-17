@@ -455,6 +455,9 @@ class SearchEngineMakeSearchable extends DataExtension
                 $owner->Title = '';
             }
         }
+        if(!$owner->exists()) {
+            return true;
+        }
         if(trim((string) $owner->Link()) === '' ||  trim((string)$owner->Title) === '') {
             return true;
         }

@@ -67,11 +67,11 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
 
         if ('all' === $this->type) {
             $allTables = array_merge(
-                Config::inst()->get(self::class, 'search_history_tables'),
+                // Config::inst()->get(self::class, 'search_history_tables'),
                 Config::inst()->get(self::class, 'index_tables')
             );
         } elseif ('history' === $this->type) {
-            $allTables = Config::inst()->get(self::class, 'search_history_tables');
+            // $allTables = Config::inst()->get(self::class, 'search_history_tables');
         } elseif ('indexes' === $this->type) {
             $allTables = Config::inst()->get(self::class, 'index_tables');
         } else {
