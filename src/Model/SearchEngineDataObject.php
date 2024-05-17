@@ -662,7 +662,7 @@ class SearchEngineDataObject extends DataObject
             SearchEngineFullContent::add_data_object_array($this, $fullContentArray);
 
             if ($timeMeasure) {
-                $this->timeMeasure['Add Content'] = microtime(true) - $startTime;
+                $this->timeMeasure['AddContent'] = microtime(true) - $startTime;
             }
 
             if ($withModeChange) {
