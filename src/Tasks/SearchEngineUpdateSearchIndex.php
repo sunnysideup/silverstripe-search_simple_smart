@@ -73,7 +73,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
                             $timeMeasure = true
                         );
                         foreach ($searchEngineDataObject->getTimeMeasure() as $key => $time) {
-                            $this->flushNow($key . ': ' . round($time, 2));
+                            $this->flushNow($key . ': ' . round($time, 2).' seconds');
                         }
                     } else {
                         $this->flushNow('Could not find ' . $searchEngineDataObject->DataObjectClassName . '.' . $searchEngineDataObject->DataObjectID . ' thus deleting entry', 'deleted');
