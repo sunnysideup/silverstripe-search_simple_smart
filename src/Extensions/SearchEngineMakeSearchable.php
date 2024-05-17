@@ -22,6 +22,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
+use Exception;
 
 /**
  * Add this DataExtension to any object that you would like to make
@@ -193,7 +194,7 @@ class SearchEngineMakeSearchable extends DataExtension
                             'SearchEngineHeader',
                             '<h2>
                                 See
-                                <a href="/admin/pages/settings/show/' . $owner->ID . '/">Settings Tab</a>
+                                <a href="/admin/pages/settings/show/' . $owner->ID . '#Root_SearchEngine">Settings Tab</a>
                                 for Keyword Search Details
                             </h2>'
                         )
@@ -455,8 +456,13 @@ class SearchEngineMakeSearchable extends DataExtension
                 $owner->Title = '';
             }
         }
-        if(!$owner->exists()) {
+        try {
+            if(!$owner->exists()) {
+                return true;
+            }
+        } catch (Exception $e) {
             return true;
+            // do nothing
         }
         if(trim((string) $owner->Link()) === '' ||  trim((string)$owner->Title) === '') {
             return true;

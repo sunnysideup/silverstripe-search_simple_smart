@@ -72,11 +72,11 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
      */
     public function doCustomSort($objects, $searchRecord)
     {
-        if ($objects->count() < 3) {
+        if ($objects->count() < 2) {
             //do nothing
         } else {
+            $array = [];
             for($i = 1; $i < 3; $i++) {
-                $array = [];
                 $fromSQL = '
                     FROM "SearchEngineFullContent"
                         INNER JOIN "SearchEngineDataObject"
@@ -112,7 +112,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         $id = $row['MyID'];
                         if (! isset($array[$id])) {
                             $array[$id] = $row['RELEVANCE'];
-                            unset($listOfIds[$id]);
+                            unset($listOfIds[(int) $id]);
+                            unset($listOfIds[(string) $id]);
                         }
                     }
                 }
@@ -143,6 +144,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             }
 
             $ids = array_keys($array);
+
+            // add the ones not mentioned yet!
             foreach($listOfIds as $lastId) {
                 $ids[] = $lastId;
             }
@@ -155,6 +158,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             // )->filteredDatalist();
             $sort = 'FIELD("ID", ' . implode(',', $ids) . ')';
             $objects = $objects->orderBy($sort);
+
             //group results!
             $objects = $this->makeClassGroups($objects);
         }

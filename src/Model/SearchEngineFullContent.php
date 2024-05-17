@@ -292,23 +292,37 @@ class SearchEngineFullContent extends DataObject
         $removeNonLetters = Config::inst()->get(self::class, 'remove_all_non_letters');
         if (true === $removeNonLetters) {
             $content = trim(
-                strtolower(
-                    preg_replace(
-                        '#[\P{L}\P{N}]+#u',
-                        ' ',
-                        (string) $content
-                    )
+                preg_replace(
+                    '/[^\p{L}\p{N}]+/u',
+                    ' ',
+                    (string) $content
                 )
             );
         }
 
-        //remove multiple white space
+        // remove multiple white space
         return trim(preg_replace('#\s+#', ' ', (string) $content));
     }
 
     public static function get_pattern_for_alpha_numeric_characters(): string
     {
         return "/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ ]+/u";
+    }
+
+    public static function get_pattern_for_alpha_numeric_characters_human_readable(): array
+    {
+        $pattern = self::get_pattern_for_alpha_numeric_characters();
+        preg_match('/\[\^([^\]]+)\]/u', $pattern, $matches);
+        if (!isset($matches[1])) {
+            return [];
+        }
+
+        // Extract characters within the character class and remove ranges
+        $allowedCharacters = $matches[1];
+        $allowedCharacters = str_replace('-', '', $allowedCharacters);
+
+        // Return the unique characters as an array
+        return array_unique(mb_str_split($allowedCharacters));
     }
 
     /**

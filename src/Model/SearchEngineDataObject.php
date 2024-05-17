@@ -611,15 +611,10 @@ class SearchEngineDataObject extends DataObject
             $this->DataObjectDate = $this->SearchEngineSourceObjectSortDate($sourceObject);
             $this->write();
 
-            if ($timeMeasure) {
-                $startTime = microtime(true);
-            }
-
             //get the full content
             $fullContentArray = $this->SearchEngineFullContentForIndexingBuild($sourceObject);
 
             if ($timeMeasure) {
-                $this->timeMeasure['FullContentBuild'] = microtime(true) - $startTime;
                 $startTime = microtime(true);
             }
 
