@@ -85,7 +85,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 $sortSQL = '
                     ORDER BY
                         "Level",
-                        RELEVANCE DESC
+                        RELEVANCE DESC,
+                        LENGTH ASC
                 ';
                 $listOfIds = explode(',', $searchRecord->ListOfIDsCUSTOM);
                 $listOfIds = array_combine($listOfIds, $listOfIds);
@@ -97,7 +98,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                     $sql = '
                         SELECT
                             "SearchEngineDataObject"."ID" AS MyID,
-                            (9999999 - LOCATE(\'' . $phrase . '\',"Content")) AS RELEVANCE
+                            (9999999 - LOCATE(\'' . $phrase . '\',"Content")) AS RELEVANCE,
+                            LENGTH("Content") AS LENGTH
                         ' . $fromSQL . '
                         WHERE
                             "Content" LIKE \'%' . $phrase . '%\'
@@ -124,7 +126,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                 $sql = '
                     SELECT
                         "SearchEngineDataObject"."ID" AS MyID,
-                        MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\') AS RELEVANCE
+                        MATCH ("Content") AGAINST (\'' . $searchRecord->FinalPhrase . '\') AS RELEVANCE,
+                        LENGTH("Content") AS LENGTH
                     ' . $fromSQL . '
                     WHERE
                         "SearchEngineDataObject"."ID" IN (' .implode(', ', $listOfIds) .  ')
