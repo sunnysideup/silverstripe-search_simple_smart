@@ -30,9 +30,11 @@ class SearchEngineFormField extends LiteralField
      */
     protected $minimumCount = 1;
 
+
     public function __construct($name, $title = '')
     {
         parent::__construct($name, $title);
+        $this->title = $title;
     }
 
     public function FieldHolder($properties = [])
