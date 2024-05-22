@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Flushable;
@@ -264,6 +265,9 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     protected static function cachedValuesAreExpired(SearchEngineSearchRecord $obj): bool
     {
+        if(Director::isDev()) {
+            return true;
+        }
         $maxAge = Config::inst()->get(static::class, 'max_cache_age_in_minutes');
         return strtotime($obj->LastEdited) < strtotime('-' . $maxAge . ' minutes');
     }

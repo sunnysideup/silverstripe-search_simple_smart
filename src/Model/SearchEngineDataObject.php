@@ -9,6 +9,10 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
@@ -505,6 +509,17 @@ class SearchEngineDataObject extends DataObject
             $fields->fieldByName('Root')->push($myTab);
         }
 
+        $fields->addFieldsToTab(
+            'Root.Schema',
+            [
+                new LiteralField(
+                    'Levels',
+                    '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>'.
+                    $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
+                ),
+            ]
+        );
+
         return $fields;
     }
 
@@ -611,15 +626,10 @@ class SearchEngineDataObject extends DataObject
             $this->DataObjectDate = $this->SearchEngineSourceObjectSortDate($sourceObject);
             $this->write();
 
-            if ($timeMeasure) {
-                $startTime = microtime(true);
-            }
-
             //get the full content
             $fullContentArray = $this->SearchEngineFullContentForIndexingBuild($sourceObject);
 
             if ($timeMeasure) {
-                $this->timeMeasure['FullContentBuild'] = microtime(true) - $startTime;
                 $startTime = microtime(true);
             }
 

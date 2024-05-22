@@ -154,14 +154,14 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                                 ),
                                 HTMLReadonlyField::create(
                                     'remove_all_non_alpha_numeric_full_content',
-                                    'Full Content - Remove Non Alpha Numeric Keywords',
+                                    'Remove non Latin Characters',
                                     Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_alpha_numeric') ? 'True' : 'False'
-                                ),
+                                )->setDescription('Inclusion list: '.implode(' ', SearchEngineFullContent::get_pattern_for_alpha_numeric_characters_human_readable())),
                                 HTMLReadonlyField::create(
                                     'remove_all_non_letters',
-                                    'Keywords - Remove Non Letter Characters',
+                                    'Remove Non Letter Characters',
                                     Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_letters') ? 'True' : 'False'
-                                ),
+                                )->setDescription('Remove any characters that are not considered letters or numbers in any language. '),
                                 HTMLReadonlyField::create(
                                     SearchEngineDataObjectToBeIndexed::class,
                                     'Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
@@ -180,7 +180,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                                 HTMLReadonlyField::create(
                                     'get_js_keyword_file_name',
                                     'Location for saving Keywords as JSON for autocomplete',
-                                    self::print_nice((ExportKeywordList::get_js_keyword_file_name(true) ?: '--- not set ---'))
+                                    self::print_nice((ExportKeywordList::get_js_keyword_file_name(false) ?: '--- not set ---'))
                                 ),
                                 HTMLReadonlyField::create(
                                     'get_js_keyword_file_last_changed',

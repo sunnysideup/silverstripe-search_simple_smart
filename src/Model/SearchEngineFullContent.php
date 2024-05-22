@@ -268,30 +268,61 @@ class SearchEngineFullContent extends DataObject
         }
 
         //remove non letters
-        //remove non-alpha
+        //
+        //remove all white space with single space
+        //see: http://stackoverflow.com/questions/5059996/php-preg-replace-with-unicode-chars
+        //see: http://stackoverflow.com/questions/11989482/how-to-replace-all-none-alphabetic-characters-in-php-with-utf-8-support
+        //                     Let's break down the regular expression #[\P{L}\P{N}]+#u:
+
+        // #: These are delimiters for the regular expression. You can use other characters as delimiters, but # is common because it is less likely to appear in the pattern itself.
+
+        // [\P{L}\P{N}]+: This is the core of the regular expression pattern.
+
+        // [ and ]: These square brackets define a character class, which matches any one character that is listed within them.
+        // \P{L}: This matches any character that is not a letter. \P (uppercase 'P') is the negation of \p (lowercase 'p'), which matches a letter. L stands for letter in Unicode properties.
+        // \P{N}: This matches any character that is not a number. Similarly, \P negates \p, and N stands for number in Unicode properties.
+        // \P{L}\P{N}: Together, these match any character that is neither a letter nor a number.
+        // +: This quantifier matches one or more occurrences of the preceding character class.
+        // #u: These are modifiers applied to the regular expression.
+
+        // #: The closing delimiter for the regular expression.
+        // u: This is the Unicode modifier, which tells the regular expression engine to treat the pattern as a Unicode string.
+        // Putting it all together, the pattern #[\P{L}\P{N}]+#u matches any sequence of one or more characters that are neither letters nor numbers. In other words, it matches any group of non-letter, non-number characters and replaces them with a single space.
+
         $removeNonLetters = Config::inst()->get(self::class, 'remove_all_non_letters');
         if (true === $removeNonLetters) {
             $content = trim(
-                strtolower(
-                    //remove all white space with single space
-                    //see: http://stackoverflow.com/questions/5059996/php-preg-replace-with-unicode-chars
-                    //see: http://stackoverflow.com/questions/11989482/how-to-replace-all-none-alphabetic-characters-in-php-with-utf-8-support
-                    preg_replace(
-                        '#\P{L}+#u',
-                        ' ',
-                        (string) $content
-                    )
+                preg_replace(
+                    '/[^\p{L}\p{N}]+/u',
+                    ' ',
+                    (string) $content
                 )
             );
         }
 
-        //remove multiple white space
+        // remove multiple white space
         return trim(preg_replace('#\s+#', ' ', (string) $content));
     }
 
     public static function get_pattern_for_alpha_numeric_characters(): string
     {
         return "/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ ]+/u";
+    }
+
+    public static function get_pattern_for_alpha_numeric_characters_human_readable(): array
+    {
+        $pattern = self::get_pattern_for_alpha_numeric_characters();
+        preg_match('/\[\^([^\]]+)\]/u', $pattern, $matches);
+        if (!isset($matches[1])) {
+            return [];
+        }
+
+        // Extract characters within the character class and remove ranges
+        $allowedCharacters = $matches[1];
+        $allowedCharacters = str_replace('-', '', $allowedCharacters);
+
+        // Return the unique characters as an array
+        return array_unique(mb_str_split($allowedCharacters));
     }
 
     /**
