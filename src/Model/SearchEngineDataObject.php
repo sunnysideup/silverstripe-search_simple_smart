@@ -161,18 +161,20 @@ class SearchEngineDataObject extends DataObject
     //	'SearchEngineKeywords_Level3' => 'SearchEngineKeyword.SearchEngineDataObjects_Level3'
     //);
 
-    /**
-     * @var array
-     */
-    private static $belongs_many_many = [
-        'SearchEngineKeywords_Level1' => SearchEngineKeyword::class,
-    ];
+
 
     /**
      * @var array
      */
     private static $many_many = [
         'SearchEngineKeywords_Level2' => SearchEngineKeyword::class,
+    ];
+
+    /**
+     * @var array
+     */
+    private static $belongs_many_many = [
+        'SearchEngineKeywords_Level1' => SearchEngineKeyword::class,
     ];
 
     /**

@@ -46,6 +46,10 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private $_onAfterWriteCount = [];
 
+    private static $many_many = [
+        'AlwaysOnTopFor' => SearchEngineKeyword::class,
+    ];
+
     //###########################
     // do stuff ....
     //###########################
@@ -217,7 +221,7 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($item) {
                 $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $owner->HasBeenIndexed ? $owner->LastEdited : 'n/a'));
+                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed));
                 $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create(
