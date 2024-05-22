@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Admin;
 
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
@@ -84,18 +85,20 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 <br /><br />
                 To bypass all caching please add ?flush=1 to the end of the search result link AND make sure you are logged in as an ADMIN.
                 <br /><br />
-                Also please review the <a href="/admin/searchenginemanifest">full search manifest</a>.
+                Also please review the <a href="/admin-searchenginemanifest">full search manifest</a>.
                 </h4>'
             );
-            $linkFields[] = HTMLReadonlyField::create(
-                rand(0, 333333),
-                'Tasks',
-                '
-                <h4>
-                    <a href="/dev/tasks/searchenginebasetask/">Run tasks now .... (careful!)</a>
-                </h4>
-                '
-            );
+            if(Director::isDev()) {
+                $linkFields[] = HTMLReadonlyField::create(
+                    rand(0, 333333),
+                    'Tasks',
+                    '
+                    <h4>
+                        <a href="/dev/tasks/searchenginebasetask/">Run tasks now .... (careful!)</a>
+                    </h4>
+                    '
+                );
+            }
             $field = new FieldList(
                 [
                     new TabSet(

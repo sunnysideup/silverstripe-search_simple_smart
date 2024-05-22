@@ -4,5 +4,5 @@ Name: search_simple_smart_routes
 SilverStripe\Control\Director:
   rules:
     searchenginerecordclick//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\SearchEngineRecordClick
-    admin/searchenginemanifest//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\SearchEngineManifest
+    'admin-searchenginemanifest//$Action/$ID/$Name': Sunnysideup\SearchSimpleSmart\Control\SearchEngineManifest
     tests/testkeywordsearch//$Action/$ID/$Name: Sunnysideup\SearchSimpleSmart\Control\TestKeywordSearch

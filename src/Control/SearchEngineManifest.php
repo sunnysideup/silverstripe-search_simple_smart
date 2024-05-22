@@ -17,6 +17,8 @@ class SearchEngineManifest extends Controller
         'index' => 'ADMIN',
     ];
 
+    private static $url_segment = 'admin-searchenginemanifest';
+
     public function index(HTTPRequest $request)
     {
         Requirements::javascript('sunnysideup/search_simple_smart:client/javascript/CMS.js');

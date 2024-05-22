@@ -266,7 +266,7 @@ class SearchEngineMakeSearchable extends DataExtension
         }
     }
 
-    public function SearchEngineFieldsToBeIndexedHumanReadable($includeExample = false)
+    public function SearchEngineFieldsToBeIndexedHumanReadable(?bool $includeExample = false)
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);

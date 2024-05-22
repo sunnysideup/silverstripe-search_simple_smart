@@ -567,7 +567,7 @@ class SearchEngineDataObject extends DataObject
         ;
     }
 
-    public function SearchEngineFieldsToBeIndexedHumanReadable($sourceObject = null, $includeExample = false)
+    public function SearchEngineFieldsToBeIndexedHumanReadable($sourceObject = null, ?bool $includeExample = false)
     {
         if (!$sourceObject) {
             $sourceObject = $this->SourceObject();
