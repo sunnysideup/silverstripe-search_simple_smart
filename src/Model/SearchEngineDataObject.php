@@ -119,6 +119,7 @@ class SearchEngineDataObject extends DataObject
         Folder::class,
     ];
 
+
     /**
      * Defines the database table name.
      *
@@ -144,6 +145,7 @@ class SearchEngineDataObject extends DataObject
         'DataObjectID' => 'Int',
         'Recalculate' => 'Boolean',
         'DataObjectDate' => 'Datetime',
+        'AlwaysOnTopItem' => 'Boolean'
     ];
 
     /**
@@ -168,6 +170,7 @@ class SearchEngineDataObject extends DataObject
      */
     private static $many_many = [
         'SearchEngineKeywords_Level2' => SearchEngineKeyword::class,
+        'AlwaysOnTopFor' => SearchEngineSearchRecord::class,
     ];
 
     /**

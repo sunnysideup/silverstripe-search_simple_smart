@@ -23,7 +23,11 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineFullContent;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Exception;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
 use SilverStripe\ORM\FieldType\DBHTMLText;
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 /**
  * Add this DataExtension to any object that you would like to make
@@ -46,8 +50,12 @@ class SearchEngineMakeSearchable extends DataExtension
      */
     private $_onAfterWriteCount = [];
 
+    private static $db = [
+        'AlwaysOnTopItem' => 'Boolean'
+    ];
+
     private static $many_many = [
-        'AlwaysOnTopFor' => SearchEngineKeyword::class,
+        'AlwaysOnTopFor' => SearchEngineSearchRecord::class,
     ];
 
     //###########################
@@ -221,14 +229,31 @@ class SearchEngineMakeSearchable extends DataExtension
             if ($item) {
                 $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'));
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed));
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed));
-                $fields->addFieldToTab('Root.SearchEngine', ReadonlyField::create(
-                    'LinkToSearchEngineDataObject',
-                    'More details',
-                    DBHTMLText::create_field('HTMLText', '<a href="'.$item->CMSEditLink().'">Open Index Entry</a>')
-                ));
+                $fields->addFieldsToTab(
+                    'Root.SearchEngine',
+                    [
+                        CheckboxField::create('AlwaysOnTopItem', 'Always show on top for certain keywords?'),
+                        ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'),
+                        ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed),
+                        ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed),
+                        ReadonlyField::create(
+                            'LinkToSearchEngineDataObject',
+                            'More details',
+                            DBHTMLText::create_field('HTMLText', '<a href="'.$item->CMSEditLink().'">Open Index Entry</a>')
+                        )
+                    ]
+                );
+                if($owner->AlwaysOnTopItem) {
+                    $fields->addFieldToTab(
+                        'Root.SearchEngine',
+                        GridField::create(
+                            'AlwaysOnTopFor',
+                            'Always on top for',
+                            $owner->AlwaysOnTopFor(),
+                            CheckboxSetField::create('AlwaysOnTopFor', 'Always on top for', SearchEngineSearchRecord::get()->map('ID', 'FinalPhrase'))
+                        )
+                    );
+                }
             }
         }
     }
