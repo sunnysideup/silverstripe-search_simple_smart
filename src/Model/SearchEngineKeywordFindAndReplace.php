@@ -195,7 +195,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         $finalArray = [];
         foreach ($replaceWithArray as $keyword) {
             $keyword = SearchEngineKeyword::clean_keyword($keyword);
-            if (strlen($keyword) > 1) {
+            if (strlen($keyword) > 0) {
                 $finalArray[] = trim($keyword);
             }
         }
