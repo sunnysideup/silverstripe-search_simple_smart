@@ -76,7 +76,8 @@ class SearchEngineSourceObjectApi implements Flushable
                     }
                 }
             }
-
+            // add the keyword stuffer!
+            array_unshift($levelFields[1], 'KeywordStuffer');
             self::$_search_engine_fields_for_indexing[$className] = $levelFields;
         }
 

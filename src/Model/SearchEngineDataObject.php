@@ -145,7 +145,6 @@ class SearchEngineDataObject extends DataObject
         'DataObjectID' => 'Int',
         'Recalculate' => 'Boolean',
         'DataObjectDate' => 'Datetime',
-        'AlwaysOnTopItem' => 'Boolean'
     ];
 
     /**

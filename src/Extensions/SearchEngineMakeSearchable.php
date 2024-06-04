@@ -26,6 +26,7 @@ use Exception;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RelationEditor;
+use SilverStripe\Forms\TextareaField;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
@@ -51,12 +52,9 @@ class SearchEngineMakeSearchable extends DataExtension
     private $_onAfterWriteCount = [];
 
     private static $db = [
-        'AlwaysOnTopItem' => 'Boolean'
+        'KeywordStuffer' => 'Text'
     ];
 
-    private static $many_many = [
-        'AlwaysOnTopFor' => SearchEngineSearchRecord::class,
-    ];
 
     //###########################
     // do stuff ....
@@ -232,7 +230,8 @@ class SearchEngineMakeSearchable extends DataExtension
                 $fields->addFieldsToTab(
                     'Root.SearchEngine',
                     [
-                        CheckboxField::create('AlwaysOnTopItem', 'Always show on top for certain keywords?'),
+                        TextareaField::create('KeywordStuffer', 'Keywords to add to search engine')
+                            ->setDescription('Adding keywords here will ensure this records ranks well for those keywords.'),
                         ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'),
                         ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed),
                         ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed),
@@ -243,17 +242,6 @@ class SearchEngineMakeSearchable extends DataExtension
                         )
                     ]
                 );
-                if($owner->AlwaysOnTopItem) {
-                    $fields->addFieldToTab(
-                        'Root.SearchEngine',
-                        GridField::create(
-                            'AlwaysOnTopFor',
-                            'Always on top for',
-                            $owner->AlwaysOnTopFor(),
-                            CheckboxSetField::create('AlwaysOnTopFor', 'Always on top for', SearchEngineSearchRecord::get()->map('ID', 'FinalPhrase'))
-                        )
-                    );
-                }
             }
         }
     }
