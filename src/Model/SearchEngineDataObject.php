@@ -169,7 +169,6 @@ class SearchEngineDataObject extends DataObject
      */
     private static $many_many = [
         'SearchEngineKeywords_Level2' => SearchEngineKeyword::class,
-        'AlwaysOnTopFor' => SearchEngineSearchRecord::class,
     ];
 
     /**
@@ -249,7 +248,7 @@ class SearchEngineDataObject extends DataObject
         'DataObjectID' => 'ID',
         'DataObjectDate' => 'Sort Date',
         'SearchEngineDataObjectToBeIndexed' => 'Listed for indexing',
-        'Recalculate' => 'Check and re-index (as required)',
+        'Recalculate' => 'Check data and re-index now (as required)',
     ];
 
     private $recalculateCount = 0;
@@ -464,26 +463,31 @@ class SearchEngineDataObject extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->replaceField(
-            'DataObjectClassName',
-            ReadonlyField::create(
-                'DataObjectClassName',
-                'Class Name'
-            )
-        );
-        $fields->replaceField(
-            'DataObjectID',
-            ReadonlyField::create(
-                'DataObjectID',
-                'Record ID'
-            )
-        );
-        $fields->addFieldToTab(
+
+
+        $fields->addFieldsToTab(
             'Root.Main',
-            ReadonlyField::create(
-                'Title',
-                'Title'
-            ),
+            [
+                ReadonlyField::create(
+                    'Title',
+                    'Title'
+                ),
+                ReadonlyField::create(
+                    'SearchEngineIsIndexedNice',
+                    'Is Indexed',
+                    $this->SearchEngineIsIndexed() ? 'Yes' : 'No'
+                ),
+                ReadonlyField::create(
+                    'toBeIndexedNice',
+                    'To be indexed',
+                    $this->toBeIndexed() ? 'Yes' : 'No'
+                ),
+                ReadonlyField::create(
+                    'toBeIndexedNice',
+                    'To be Reindexed',
+                    $this->toBeReIndexed() ? 'Yes' : 'No'
+                ),
+            ],
             'DataObjectClassName'
         );
         $object = $this->SourceObject();
@@ -522,9 +526,16 @@ class SearchEngineDataObject extends DataObject
                     '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>'.
                     $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
                 ),
+                ReadonlyField::create(
+                    'DataObjectClassName',
+                    'Class Name'
+                ),
+                ReadonlyField::create(
+                    'DataObjectID',
+                    'Record ID'
+                )
             ]
         );
-
         return $fields;
     }
 
@@ -633,14 +644,12 @@ class SearchEngineDataObject extends DataObject
 
             //get the full content
             $fullContentArray = $this->SearchEngineFullContentForIndexingBuild($sourceObject);
-
             if ($timeMeasure) {
                 $startTime = microtime(true);
             }
 
             //add the full content
             SearchEngineFullContent::add_data_object_array($this, $fullContentArray);
-
             if ($timeMeasure) {
                 $this->timeMeasure['AddContent'] = microtime(true) - $startTime;
             }
@@ -772,8 +781,8 @@ class SearchEngineDataObject extends DataObject
                 $this->delete();
             } else {
                 $this->doSearchEngineIndex();
-                $this->write();
                 $this->IndexNow();
+                $this->write();
             }
         } elseif ($this->Recalculate) {
             $this->Recalculate = false;

@@ -93,13 +93,7 @@ class SearchEngineSourceObjectApi implements Flushable
         if ($sourceObject->hasMethod('SearchEngineFullContentForIndexingProvider')) {
             $finalArray = $sourceObject->SearchEngineFullContentForIndexingProvider();
         } else {
-            $levels = Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array');
-            if (is_array($levels)) {
-                //do nothing
-            } else {
-                $levels = $sourceObject->SearchEngineFieldsForIndexing();
-            }
-
+            $levels = $this->FieldsForIndexing($sourceObject);
             if (is_array($levels) && count($levels)) {
                 foreach ($levels as $level => $fieldArray) {
                     $level = SearchEngineKeyword::level_sanitizer($level);
