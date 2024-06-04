@@ -249,6 +249,7 @@ class SearchEngineDataObject extends DataObject
         'DataObjectID' => 'ID',
         'DataObjectDate' => 'Sort Date',
         'SearchEngineDataObjectToBeIndexed' => 'Listed for indexing',
+        'Recalculate' => 'Check and re-index (as required)',
     ];
 
     private $recalculateCount = 0;
@@ -696,6 +697,30 @@ class SearchEngineDataObject extends DataObject
         return $this->DataObjectID . '_' . $this->DataObjectClassName;
     }
 
+    public function toBeIndexed(): bool
+    {
+        return $this->SearchEngineDataObjectToBeIndexed()
+            ->filter(['Completed' => false])
+            ->exists();
+    }
+
+    /**
+     * has been indexed, but needs to be indexed again!
+     *
+     * @return boolean
+     */
+    public function toBeReIndexed(): bool
+    {
+        return $this->SearchEngineIsIndexed() && $this->toBeIndexed();
+    }
+
+    public function SearchEngineIsIndexed(): bool
+    {
+        return $this->SearchEngineDataObjectToBeIndexed()
+            ->filter(['Completed' => true])
+            ->exists();
+    }
+
     /**
      * make sure all the references are deleted as well.
      */
@@ -730,7 +755,7 @@ class SearchEngineDataObject extends DataObject
     {
         parent::onBeforeWrite();
         if ($this->Recalculate) {
-            //in databas object, make sure onAfterWrite runs!
+            //this is a method in the DataObject class to forces onAfterWrite to run
             $this->forceChange();
         }
     }
@@ -748,10 +773,17 @@ class SearchEngineDataObject extends DataObject
             } else {
                 $this->doSearchEngineIndex();
                 $this->write();
+                $this->IndexNow();
             }
         } elseif ($this->Recalculate) {
             $this->Recalculate = false;
             $this->write();
         }
+    }
+
+    public function IndexNow()
+    {
+        $obj = SearchEngineDataObjectToBeIndexed::add($this);
+        $obj->IndexNow();
     }
 }

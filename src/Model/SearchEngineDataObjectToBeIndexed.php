@@ -226,7 +226,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         return null;
     }
 
-    public function IndexNow(SearchEngineDataObject $searchEngineDataObject = null)
+    public function IndexNow(?SearchEngineDataObject $searchEngineDataObject = null)
     {
         if (! $searchEngineDataObject) {
             $searchEngineDataObject = $this->SearchEngineDataObject();

@@ -76,10 +76,9 @@ class SearchEngineMakeSearchable extends DataExtension
             $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($owner);
         } else {
             if ($this->SearchEngineExcludeFromIndex()) {
+                //do nothing
                 $searchEngineDataObject = null;
             }
-
-            //do nothing
         }
 
         if ($searchEngineDataObject) {
@@ -225,16 +224,17 @@ class SearchEngineMakeSearchable extends DataExtension
 
             $item = SearchEngineDataObjectApi::find_or_make($owner);
             if ($item) {
-                $toBeIndexed = SearchEngineDataObjectToBeIndexed::get()->filter(['SearchEngineDataObjectID' => $item->ID, 'Completed' => 0])->count() ? 'yes' : 'no';
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
+                $toBeIndexed = $item->toBeIndexed() ? 'yes' : 'no';
+                $re = $item->toBeReIndexed() ? 're' : '';
                 $fields->addFieldsToTab(
                     'Root.SearchEngine',
                     [
                         TextareaField::create('KeywordStuffer', 'Keywords to add to search engine')
                             ->setDescription('Adding keywords here will ensure this records ranks well for those keywords.'),
-                        ReadonlyField::create('LastIndexed', 'Approximately Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'),
-                        ReadonlyField::create('ToBeIndexed', 'On the list to be indexed', $toBeIndexed),
                         ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed),
+                        ReadonlyField::create('LastIndexed', 'Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'),
+                        ReadonlyField::create('ToBeIndexed', 'On the list to be '.$re.'indexed', $toBeIndexed),
                         ReadonlyField::create(
                             'LinkToSearchEngineDataObject',
                             'More details',
@@ -405,12 +405,12 @@ class SearchEngineMakeSearchable extends DataExtension
      *
      * @return bool
      */
-    public function SearchEngineIsIndexed()
+    public function SearchEngineIsIndexed(): bool
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner, false);
         if ($item && $item->exists()) {
-            return $item->SearchEngineDataObjectToBeIndexed()->filter(['Completed' => true])->count();
+            return $item->SearchEngineIsIndexed();
         }
 
         return false;

@@ -69,7 +69,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
                         $this->flushNow('Indexing ' . $searchEngineDataObject->DataObjectClassName . '.' . $searchEngineDataObject->DataObjectID . '', 'created');
                         $searchEngineDataObject->doSearchEngineIndex(
                             $sourceObject,
-                            $withModeChange = false,
+                            $withModeChange = false, // already done above!
                             $timeMeasure = true
                         );
                         foreach ($searchEngineDataObject->getTimeMeasure() as $key => $time) {
