@@ -31,6 +31,8 @@ class SearchEngineFullContent extends DataObject
         '&nbsp',
     ];
 
+    private static $acceptable_one_letter_words = ['0', '1', '2', '3', '4'. '5', '6', '7', '8', '9', 'a', 'i'];
+
     /**
      * Defines the database table name.
      *
@@ -374,7 +376,8 @@ class SearchEngineFullContent extends DataObject
             foreach ($keywords as $keyword) {
                 // we know content is clean already!
                 // $keyword = SearchEngineKeyword::clean_keyword($keyword);
-                if (strlen($keyword) > 1) {
+                $oneLetterWords = Config::inst()->get(self::class, 'acceptable_one_letter_words');
+                if (strlen($keyword) > 1 || in_array($keyword, $oneLetterWords, true)) {
                     //check if it is a valid keyword.
                     if (SearchEngineKeywordFindAndRemove::is_listed($keyword)) {
                         //not a valid keyword
