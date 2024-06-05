@@ -374,10 +374,11 @@ class SearchEngineFullContent extends DataObject
             //2. remove stuff that is not needed (e.g. strip_tags)
             $keywords = explode(' ', $content);
             foreach ($keywords as $keyword) {
+                $keyword = (string) $keyword;
                 // we know content is clean already!
                 // $keyword = SearchEngineKeyword::clean_keyword($keyword);
                 $oneLetterWords = Config::inst()->get(self::class, 'acceptable_one_letter_words');
-                if (strlen($keyword) > 1 || in_array($keyword, $oneLetterWords, true)) {
+                if (strlen($keyword) > 1 || in_array($keyword, (array) $oneLetterWords, true)) {
                     //check if it is a valid keyword.
                     if (SearchEngineKeywordFindAndRemove::is_listed($keyword)) {
                         //not a valid keyword
