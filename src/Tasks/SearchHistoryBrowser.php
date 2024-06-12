@@ -2,12 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
-use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
-use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Forms\Fields\SearchEngineFormField;
 
 class SearchHistoryBrowser extends BuildTask
@@ -73,7 +71,6 @@ class SearchHistoryBrowser extends BuildTask
         $this->runEnd($request);
     }
 
-
     public function flushNow($message, $type = '', $bullet = true)
     {
         echo '<div style="padding: 20px;">' . $message . '</div>';
@@ -92,8 +89,6 @@ class SearchHistoryBrowser extends BuildTask
         Environment::increaseTimeLimitTo(7200);
 
         if ($request) {
-
-
             if ($request->getVar('startDaysAgo')) {
                 $this->startDaysAgo = (int) $request->getVar('startDaysAgo');
             }
@@ -101,7 +96,6 @@ class SearchHistoryBrowser extends BuildTask
             if ($request->getVar('endDaysAgo')) {
                 $this->endDaysAgo = (int) $request->getVar('endDaysAgo');
             }
-
         }
         if (! Director::is_cli()) {
             $html =
@@ -109,11 +103,11 @@ class SearchHistoryBrowser extends BuildTask
             <style>
                 div {padding: 20px;}
             </style>
-            <form method="get" action="'.$this->Link().'">
+            <form method="get" action="' . $this->Link() . '">
                 <fieldset>
 
-                    <div><input name="startDaysAgo" value="'.$this->startDaysAgo.'" type="number" /> FROM Days Ago (e.g. 365 = starting one year ago)</div>
-                    <div><input name="endDaysAgo" value="'.$this->endDaysAgo.'" type="number" /> UNTIL Days Ago (e.g. 0 = up to today)</div>
+                    <div><input name="startDaysAgo" value="' . $this->startDaysAgo . '" type="number" /> FROM Days Ago (e.g. 365 = starting one year ago)</div>
+                    <div><input name="endDaysAgo" value="' . $this->endDaysAgo . '" type="number" /> UNTIL Days Ago (e.g. 0 = up to today)</div>
 
                 </fieldset>
 
@@ -126,14 +120,9 @@ class SearchHistoryBrowser extends BuildTask
 
             $this->flushNow($html);
         }
-
     }
 
     public function runEnd($request)
     {
-
-
-
     }
-
 }

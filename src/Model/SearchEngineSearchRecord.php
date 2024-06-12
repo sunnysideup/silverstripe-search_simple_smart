@@ -7,7 +7,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\Forms\Tab;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
@@ -118,8 +117,6 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         'NumberOfResults' => 'Int',
     ];
 
-
-
     public function getLastSearchResult(): ?SearchEngineSearchRecordHistory
     {
         return $this->SearchEngineSearchRecordHistory()->sort(['ID' => 'DESC'])->first();
@@ -128,7 +125,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     public function getNumberOfResults(): int
     {
         $obj = $this->getLastSearchResult();
-        if($obj) {
+        if ($obj instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory) {
             return $obj->NumberOfResults;
         }
         return 0;
@@ -143,10 +140,9 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         if (Security::database_is_ready()) {
             $query = "SHOW TABLES LIKE 'SearchEngineSearchRecord'";
             $tableExists = DB::query($query)->value();
-            if ($tableExists) {
-                if(DB::get_schema()->hasField('SearchEngineSearchRecord', 'HasCachedData')) {
-                    DB::query(
-                        "
+            if ($tableExists && DB::get_schema()->hasField('SearchEngineSearchRecord', 'HasCachedData')) {
+                DB::query(
+                    "
                                 UPDATE \"SearchEngineSearchRecord\"
                                 SET
                                     \"ListOfIDsRAW\" = '',
@@ -155,8 +151,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                                     \"FinalPhrase\" = '',
                                     \"HasCachedData\" = 0
                             "
-                    );
-                }
+                );
             }
 
             $query = "SHOW TABLES LIKE 'SearchEngineSearchRecord_SearchEngineKeywords'";
@@ -176,13 +171,8 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
         // Execute the SQL query
         $result = DB::query($query);
-
         // Check if the result has data
-        if ($result->numRecords() > 0) {
-            return true;
-        }
-
-        return false;
+        return $result->numRecords() > 0;
     }
 
     public function i18n_singular_name()
@@ -216,8 +206,6 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     }
 
     /**
-     * @param string $searchPhrase
-     * @param array  $filterProviders
      * @param bool   $clear
      *
      * @return SearchEngineSearchRecord|null
@@ -226,7 +214,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     {
         $filterProvidersEncoded = '';
         $filterProvidersHashed = '';
-        if (is_array($filterProviders) && count($filterProviders)) {
+        if ($filterProviders !== []) {
             $filterProvidersEncoded = Convert::raw2sql(serialize($filterProviders));
             $filterProvidersHashed = md5($filterProvidersEncoded);
         }
@@ -234,9 +222,8 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $fieldArray = [
             'Phrase' => $searchPhrase,
         ];
-        if($filterProvidersHashed) {
+        if ($filterProvidersHashed !== '' && $filterProvidersHashed !== '0') {
             $fieldArray['FilterHash'] = $filterProvidersHashed;
-
         }
         /** @var SearchEngineSearchRecord $obj */
         $obj = DataObject::get_one(self::class, $fieldArray);
@@ -245,17 +232,14 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             if ($filterProvidersEncoded) {
                 $obj->FilterString = $filterProvidersEncoded;
             }
-
             $obj->write();
-        } else {
-            if ($clear || self::cachedValuesAreExpired($obj)) {
-                $obj->ListOfIDsRAW = '';
-                $obj->ListOfIDsSQL = '';
-                $obj->ListOfIDsCUSTOM = '';
-                $obj->HasCachedData = false;
-                //keywords are replaced automatically onAfterWrite
-                $obj->write();
-            }
+        } elseif ($clear || self::cachedValuesAreExpired($obj)) {
+            $obj->ListOfIDsRAW = '';
+            $obj->ListOfIDsSQL = '';
+            $obj->ListOfIDsCUSTOM = '';
+            $obj->HasCachedData = false;
+            //keywords are replaced automatically onAfterWrite
+            $obj->write();
         }
 
         SearchEngineSearchRecordHistory::add_entry($obj);
@@ -265,7 +249,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     protected static function cachedValuesAreExpired(SearchEngineSearchRecord $obj): bool
     {
-        if(Director::isDev()) {
+        if (Director::isDev()) {
             return true;
         }
         $maxAge = Config::inst()->get(static::class, 'max_cache_age_in_minutes');
@@ -296,7 +280,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 new ReadonlyField('ListOfIDsRAW', 'Step 1 IDs'),
                 new ReadonlyField('ListOfIDsSQL', 'Step 2 IDs'),
                 new ReadonlyField('ListOfIDsCUSTOM', 'Step 3 IDs'),
-                new ReadonlyField('cachedValuesAreExpiredNice', 'Cache valid?', self::cachedValuesAreExpired($this) ? 'NO' : 'YES')
+                new ReadonlyField('cachedValuesAreExpiredNice', 'Cache valid?', self::cachedValuesAreExpired($this) ? 'NO' : 'YES'),
             ]
         );
 
@@ -359,16 +343,8 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     protected function convertPhraseToFinalPhrase(): string
     {
-        $cleanedPhrase = SearchEngineFullContent::clean_content($this->Phrase);
-        $keywords = explode(' ', $cleanedPhrase);
+        SearchEngineFullContent::clean_content($this->Phrase);
         $finalKeyWordArray = [];
-        foreach ($keywords as $keyword) {
-            if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || 1 === strlen($keyword)) {
-                continue;
-            }
-
-            $finalKeyWordArray[$keyword] = $keyword;
-        }
 
         return implode(' ', $finalKeyWordArray);
     }
@@ -376,7 +352,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
-        if(! $this->HasCachedData) {
+        if (! $this->HasCachedData) {
             $this->attachKeywords();
             $this->HasCachedData = true;
             $this->write();
@@ -399,7 +375,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $keywordArray = explode(' ', $this->FinalPhrase);
         foreach ($keywordArray as $position => $keyword) {
             $language = substr(i18n::get_locale(), 0, 2);
-            if(! strlen($language) === 2) {
+            if (! strlen($language) === 2) {
                 $language = 'en';
             }
             $stemmer = StemmerFactory::create($language);
@@ -443,6 +419,5 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 }
             }
         }
-
     }
 }

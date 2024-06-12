@@ -214,13 +214,13 @@ class SearchEngineKeyword extends DataObject implements Flushable
     {
         $replaceMap = Config::inst()->get(self::class, 'auto_replace_map');
         $wordWithoutMacrons = str_replace(array_keys($replaceMap), array_values($replaceMap), $keyword);
-        if($wordWithoutMacrons === $keyword) {
+        if ($wordWithoutMacrons === $keyword) {
             return;
         }
         $filter = ['Keyword' => $keyword];
         $obj = SearchEngineKeywordFindAndReplace::get()->filter($filter)->first();
-        if($obj) {
-            $obj->ReplaceWith .= ', '.$wordWithoutMacrons;
+        if ($obj) {
+            $obj->ReplaceWith .= ', ' . $wordWithoutMacrons;
         } else {
             $obj = SearchEngineKeywordFindAndReplace::create($filter);
             $obj->ReplaceWith = $wordWithoutMacrons;

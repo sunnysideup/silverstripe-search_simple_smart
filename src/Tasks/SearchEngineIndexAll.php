@@ -41,7 +41,6 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
     {
         $this->runStart($request);
 
-
         $classNames = SearchEngineDataObjectApi::searchable_class_names();
         foreach ($classNames as $className => $classTitle) {
             $filter = ['ClassName' => $className];
@@ -65,7 +64,6 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                 }
 
                 foreach ($objects as $obj) {
-                    $run = false;
                     $run = $this->unindexedOnly ? ! (bool) $obj->SearchEngineIsIndexed() : true;
 
                     if ($run) {
@@ -73,7 +71,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                             $this->flushNow('Object cannot be indexed: ' . $obj->getTitle() . ' - ' . $obj->ID . ' - ' . $obj->ClassName, 'deleted');
                         } else {
                             $item = SearchEngineDataObjectApi::find_or_make($obj);
-                            if ($item) {
+                            if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
                                 $this->flushNow('Queueing: ' . $obj->getTitle() . ' for indexing', 'created');
                                 SearchEngineDataObjectToBeIndexed::add($item, false);
                             } else {

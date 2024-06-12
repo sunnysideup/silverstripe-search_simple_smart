@@ -2,7 +2,6 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
-use SilverStripe\Control\Director;
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBVarchar;
@@ -92,5 +91,4 @@ class SearchEngineContentControllerExtension extends Extension
 
         return DBField::create_field('Varchar', $val);
     }
-
 }

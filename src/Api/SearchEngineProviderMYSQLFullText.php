@@ -64,7 +64,6 @@ class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvi
 
         // check for always on top
 
-
         for ($i = 1; $i < $max; ++$i) {
             $keywordIDArray = [0 => 0];
             $rows = DB::query(

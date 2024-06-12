@@ -101,7 +101,7 @@ class FasterIDLists
         }
 
         $whereStatement = $this->shortenIdList();
-        if ($whereStatement) {
+        if ($whereStatement !== '' && $whereStatement !== '0') {
             return $className::get()->where($whereStatement);
         }
 
@@ -150,12 +150,10 @@ class FasterIDLists
                 }
             } elseif ($countMyIDList > $this->Config()->acceptable_max_number_of_select_statements) {
                 $excludeList = $this->excludeList();
-                if ($excludeList) {
-                    if (count($excludeList) < $countMyIDList) {
-                        $myIDList = $excludeList;
-                        $glue = 'AND';
-                        $operator = 'NOT';
-                    }
+                if ($excludeList && count($excludeList) < $countMyIDList) {
+                    $myIDList = $excludeList;
+                    $glue = 'AND';
+                    $operator = 'NOT';
                 }
 
                 $finalArray[] = '"' . $this->getTableName() . '"."' . $this->field . '" ' . $operator . "  IN('" . implode("','", $myIDList) . "')";

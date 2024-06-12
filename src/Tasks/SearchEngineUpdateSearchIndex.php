@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 
@@ -73,7 +72,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
                             $timeMeasure = true
                         );
                         foreach ($searchEngineDataObject->getTimeMeasure() as $key => $time) {
-                            $this->flushNow($key . ': ' . round($time, 2).' seconds');
+                            $this->flushNow($key . ': ' . round($time, 2) . ' seconds');
                         }
                     } else {
                         $this->flushNow('Could not find ' . $searchEngineDataObject->DataObjectClassName . '.' . $searchEngineDataObject->DataObjectID . ' thus deleting entry', 'deleted');

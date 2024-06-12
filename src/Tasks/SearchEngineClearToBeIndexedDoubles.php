@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
 
@@ -45,7 +44,6 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
         $count = SearchEngineDataObjectToBeIndexed::get()
             ->count()
         ;
-        $sort = ['ID' => 'ASC'];
         if ($count > $this->limit) {
             $count = $this->limit;
         }

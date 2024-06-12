@@ -31,7 +31,7 @@ class SearchEngineFullContent extends DataObject
         '&nbsp',
     ];
 
-    private static $acceptable_one_letter_words = ['0', '1', '2', '3', '4'. '5', '6', '7', '8', '9', 'a', 'i'];
+    private static $acceptable_one_letter_words = ['0', '1', '2', '3', '45', '6', '7', '8', '9', 'a', 'i'];
 
     /**
      * Defines the database table name.
@@ -205,7 +205,7 @@ class SearchEngineFullContent extends DataObject
         $fieldArray = ['SearchEngineDataObjectID' => $item->ID, 'Level' => $level];
         /** @var SearchEngineFullContent $obj */
         $obj = DataObject::get_one(self::class, $fieldArray);
-        if (!$obj) {
+        if (! $obj) {
             $obj = self::create($fieldArray);
         }
 
@@ -308,14 +308,14 @@ class SearchEngineFullContent extends DataObject
 
     public static function get_pattern_for_alpha_numeric_characters(): string
     {
-        return "/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ ]+/u";
+        return '/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ ]+/u';
     }
 
     public static function get_pattern_for_alpha_numeric_characters_human_readable(): array
     {
         $pattern = self::get_pattern_for_alpha_numeric_characters();
         preg_match('/\[\^([^\]]+)\]/u', $pattern, $matches);
-        if (!isset($matches[1])) {
+        if (! isset($matches[1])) {
             return [];
         }
 
@@ -374,7 +374,6 @@ class SearchEngineFullContent extends DataObject
             //2. remove stuff that is not needed (e.g. strip_tags)
             $keywords = explode(' ', $content);
             foreach ($keywords as $keyword) {
-                $keyword = (string) $keyword;
                 // we know content is clean already!
                 // $keyword = SearchEngineKeyword::clean_keyword($keyword);
                 $oneLetterWords = Config::inst()->get(self::class, 'acceptable_one_letter_words');
@@ -386,7 +385,7 @@ class SearchEngineFullContent extends DataObject
                     }
 
                     $keywordObject = SearchEngineKeyword::add_keyword($keyword, $runClean = false);
-                    if (!isset($fullArray[$keywordObject->ID])) {
+                    if (! isset($fullArray[$keywordObject->ID])) {
                         $fullArray[$keywordObject->ID] = [
                             'Object' => $keywordObject,
                             'Count' => 0,

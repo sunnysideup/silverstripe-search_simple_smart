@@ -4,7 +4,6 @@ namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
-use SilverStripe\Security\Security;
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
 
 class SearchEngineFormField extends LiteralField
@@ -30,9 +29,7 @@ class SearchEngineFormField extends LiteralField
      */
     protected $minimumCount = 1;
 
-
     protected bool $showSource = true;
-
 
     public function __construct($name, $title = '')
     {
@@ -61,15 +58,15 @@ class SearchEngineFormField extends LiteralField
             $this->minimumCount = (int) round($totalCount / 10000);
         }
         $endWhere = '';
-        if($this->endingDaysBack > 0) {
+        if ($this->endingDaysBack > 0) {
             $endWhere = 'AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )';
         }
         $sql = '
             SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
                 FROM "SearchEngineSearchRecordHistory"
             WHERE SearchEngineSearchRecordHistory.Created > ( NOW() - INTERVAL ' . $totalNumberOfDaysBack . ' DAY )
-            AND "Phrase" IS NOT NULL AND "Phrase" <> \'\' AND Phrase <> \''.SearchEngineCoreSearchMachine::NO_KEYWORD_PROVIDED.'\'
-                '.$endWhere.'
+            AND "Phrase" IS NOT NULL AND "Phrase" <> \'\' AND Phrase <> \'' . SearchEngineCoreSearchMachine::NO_KEYWORD_PROVIDED . '\'
+                ' . $endWhere . '
             GROUP BY "Phrase"
             HAVING myCount >= ' . $this->minimumCount . '
             ORDER BY myCount DESC
@@ -133,7 +130,7 @@ class SearchEngineFormField extends LiteralField
         $content .= '
             </table>
         </div>';
-        if($this->showSource) {
+        if ($this->showSource) {
             $content .= '<p><a href="/dev/tasks/searchhistorybrowser">Browse Search History</a></p>';
         }
         return $content;
@@ -149,12 +146,9 @@ class SearchEngineFormField extends LiteralField
         return $this;
     }
 
-    /**
-     * @param int $days
-     */
     public function setShowSource(bool $b): self
     {
-        $this->showSource = (bool) $b;
+        $this->showSource = $b;
 
         return $this;
     }

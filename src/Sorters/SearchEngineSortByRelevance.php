@@ -76,7 +76,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             //do nothing
         } else {
             $array = [];
-            for($i = 1; $i < 3; $i++) {
+            for ($i = 1; $i < 3; $i++) {
                 $fromSQL = '
                     FROM "SearchEngineFullContent"
                         INNER JOIN "SearchEngineDataObject"
@@ -103,8 +103,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         ' . $fromSQL . '
                         WHERE
                             "Content" LIKE \'%' . $phrase . '%\'
-                            AND "SearchEngineDataObject"."ID" IN (' .implode(', ', $listOfIds) . ')
-                            AND Level = '.$i.'
+                            AND "SearchEngineDataObject"."ID" IN (' . implode(', ', $listOfIds) . ')
+                            AND Level = ' . $i . '
                         HAVING
                             RELEVANCE > 0
                         ' . $sortSQL . '
@@ -119,8 +119,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         }
                     }
                 }
-                if (count($listOfIds) === 0) {
-                    $listOfIds  = [-1];
+                if ($listOfIds === []) {
+                    $listOfIds = [-1];
                 }
                 // for the ones not found yet, we do a Mysql "Match" query with higher relevance first.
                 $sql = '
@@ -130,8 +130,8 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         LENGTH("Content") AS LENGTH
                     ' . $fromSQL . '
                     WHERE
-                        "SearchEngineDataObject"."ID" IN (' .implode(', ', $listOfIds) .  ')
-                        AND Level = '.$i.'
+                        "SearchEngineDataObject"."ID" IN (' . implode(', ', $listOfIds) . ')
+                        AND Level = ' . $i . '
                     HAVING
                         RELEVANCE > 0
                     ' . $sortSQL . '
@@ -149,7 +149,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
             $ids = array_keys($array);
 
             // add the ones not mentioned yet!
-            foreach($listOfIds as $lastId) {
+            foreach ($listOfIds as $lastId) {
                 $ids[] = $lastId;
             }
 
@@ -168,7 +168,6 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
 
         return $objects;
     }
-
 
     // $objects = SearchEngineDataObject::get()
     //     ->filter(['ID' => $ids])

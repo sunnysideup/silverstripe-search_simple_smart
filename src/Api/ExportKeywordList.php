@@ -29,7 +29,7 @@ class ExportKeywordList
 
     public static function export_keyword_list()
     {
-        if(Config::inst()->get(static::class, 'export_keyword_list')) {
+        if (Config::inst()->get(static::class, 'export_keyword_list')) {
             $fileName = self::get_js_keyword_file_name(true);
             if ($fileName) {
                 //only write once a minute
@@ -62,19 +62,18 @@ class ExportKeywordList
                 return 'no file name specified';
             }
         }
+        return null;
     }
 
     /**
      * returns the location of the keyword file...
      *
      * @param bool $includeBase
-     *
-     * @return string|null
      */
     public static function get_js_keyword_file_name($includeBase = false): ?string
     {
         $myFolderName = Config::inst()->get(static::class, 'keyword_list_folder_name');
-        if(!$myFolderName) {
+        if (! $myFolderName) {
             $myFolderName = 'searchkeywords';
         }
         //without folder name we return null!

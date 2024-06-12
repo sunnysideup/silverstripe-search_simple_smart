@@ -16,7 +16,7 @@ class TestKeywordSearch extends Controller
 
     public function index()
     {
-        if(! empty($_GET['q'])) {
+        if (! empty($_GET['q'])) {
             $keywords = $_GET['q'];
         } else {
             $page = Page::get()->orderBy('RAND()')->first();
@@ -35,7 +35,7 @@ class TestKeywordSearch extends Controller
         var_dump($searchList->Count());
         echo '<h2>Results</h2>';
         foreach ($searchList as $item) {
-            echo '<li>' . $item->title . ' - '.$item->ID.'</li>';
+            echo '<li>' . $item->title . ' - ' . $item->ID . '</li>';
         }
     }
 }

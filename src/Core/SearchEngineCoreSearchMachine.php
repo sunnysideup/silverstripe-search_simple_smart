@@ -28,7 +28,6 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     use Injectable;
     use Configurable;
 
-
     public const NO_KEYWORD_PROVIDED = '[NO KEYWORD PROVIDED]';
 
     /**
@@ -121,7 +120,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     /**
      * @var null|SearchEngineSearchEngineProvider
      */
-    protected $searchProvider = null;
+    protected $searchProvider;
 
     /**
      * @var array
@@ -267,16 +266,13 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
     /**
      * this function runs the Core Search Machine.
      *
-     * @param string $searchPhrase
-     * @param array  $filterProviders
-     * @param string $sortProvider
      * @param object $sortProviderValues
      *
      * @return DataList
      */
     public function run(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null)
     {
-        if(strlen(trim($searchPhrase)) < 2) {
+        if (strlen(trim($searchPhrase)) < 2) {
             $searchPhrase = self::NO_KEYWORD_PROVIDED;
         }
         // special get vars
@@ -360,11 +356,11 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
         $this->searchPhrase = $searchPhrase;
 
         //save variables
-        if (! empty($filterProviders)) {
+        if ($filterProviders !== null && $filterProviders !== []) {
             $this->filterProviders += $filterProviders;
         }
 
-        if (! empty($sortProvider)) {
+        if ($sortProvider !== null && $sortProvider !== '' && $sortProvider !== '0') {
             $this->sortProvider = $sortProvider;
         }
 
@@ -519,9 +515,9 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
                 SearchEngineDataObject::class,
                 $this->listOfIDsCustomAsArray
             )->filteredDatalist();
-            if(is_array($this->nonCustomSort) && count($this->nonCustomSort)) {
+            if (is_array($this->nonCustomSort) && count($this->nonCustomSort)) {
                 $this->dataList = $this->dataList->sort($this->nonCustomSort);
-            } elseif(is_string($this->nonCustomSort) && strlen((string) $this->nonCustomSort) > 0) {
+            } elseif (is_string($this->nonCustomSort) && strlen((string) $this->nonCustomSort) > 0) {
                 $this->dataList = $this->dataList->orderBy($this->nonCustomSort);
             }
             // $this->dataList = SearchEngineDataObject::get()

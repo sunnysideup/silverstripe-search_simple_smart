@@ -86,6 +86,7 @@ class SearchEngineBaseTask extends BuildTask
         }
 
         $this->runEnd($request);
+        return null;
     }
 
     public function flushNow($message, $type = '', $bullet = true)

@@ -3,9 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\DB;
-use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
@@ -55,13 +52,13 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         $objects = SearchEngineDataObject::get()->sort(['ID' => 'ASC']);
         foreach ($objects as $obj) {
             $source = $obj->SourceObject();
-            if($source) {
-                $key = $source->ClassName.'-'.$source->ID;
-                $key2 = $obj->DataObjectClassName.'-'.$obj->DataObjectID;
-                if($key !== $key2) {
+            if ($source) {
+                $key = $source->ClassName . '-' . $source->ID;
+                $key2 = $obj->DataObjectClassName . '-' . $obj->DataObjectID;
+                if ($key !== $key2) {
                     $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is a mismatch between source and search engine object', 'deleted');
                     $obj->delete();
-                } elseif(isset($test[$key])) {
+                } elseif (isset($test[$key])) {
                     $this->flushNow('Deleting ' . $obj->getTitle() . ' as there is a double-up', 'deleted');
                     $obj->delete();
                 } else {

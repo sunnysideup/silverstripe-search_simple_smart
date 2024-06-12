@@ -22,7 +22,7 @@ class SearchEngineRecordClick extends Controller
     public function add(HTTPRequest $request)
     {
         $itemID = (int) $request->param('ID');
-        if ($itemID) {
+        if ($itemID !== 0) {
             $item = SearchEngineDataObject::get()->byID($itemID);
             if ($item) {
                 SearchEngineSearchRecordHistory::register_click($item);

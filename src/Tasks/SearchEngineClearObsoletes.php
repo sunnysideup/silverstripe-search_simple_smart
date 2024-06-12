@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
 class SearchEngineClearObsoletes extends SearchEngineBaseTask
@@ -56,7 +55,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
             }
 
             foreach ($objects as $obj) {
-                if(true === $obj->SearchEngineExcludeFromIndex()) {
+                if (true === $obj->SearchEngineExcludeFromIndex()) {
                     $this->flushNow('DELETING ' . $obj->ID);
                     $obj->delete();
                 }

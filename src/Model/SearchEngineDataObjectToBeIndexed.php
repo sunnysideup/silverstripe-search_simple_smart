@@ -7,7 +7,6 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -228,7 +227,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     public function IndexNow(?SearchEngineDataObject $searchEngineDataObject = null)
     {
-        if (! $searchEngineDataObject) {
+        if (! $searchEngineDataObject instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
             $searchEngineDataObject = $this->SearchEngineDataObject();
         }
 

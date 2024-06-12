@@ -9,9 +9,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ErrorPage\ErrorPage;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
@@ -119,7 +116,6 @@ class SearchEngineDataObject extends DataObject
         Folder::class,
     ];
 
-
     /**
      * Defines the database table name.
      *
@@ -161,8 +157,6 @@ class SearchEngineDataObject extends DataObject
     //	'SearchEngineKeywords_Level2' => 'SearchEngineKeyword.SearchEngineDataObjects_Level2',
     //	'SearchEngineKeywords_Level3' => 'SearchEngineKeyword.SearchEngineDataObjects_Level3'
     //);
-
-
 
     /**
      * @var array
@@ -306,7 +300,7 @@ class SearchEngineDataObject extends DataObject
 
     public function SearchEngineSourceObjectSortDate($sourceObject = null)
     {
-        if (!$sourceObject) {
+        if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -326,7 +320,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SearchEngineFieldsForIndexing($sourceObject = null)
     {
-        if (!$sourceObject) {
+        if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -338,11 +332,11 @@ class SearchEngineDataObject extends DataObject
     public function getObjectClassName(): string
     {
         $className = $this->DataObjectClassName;
-        if (!class_exists($className)) {
+        if (! class_exists($className)) {
             return 'ERROR - class not found';
         }
 
-        if (!isset(self::$_object_class_name[$className])) {
+        if (! isset(self::$_object_class_name[$className])) {
             $objectClassName = Injector::inst()->get($className)->singular_name();
             self::$_object_class_name[$className] = $objectClassName;
         }
@@ -357,7 +351,7 @@ class SearchEngineDataObject extends DataObject
     {
         $objectClassName = $this->getObjectClassName();
         $object = $this->SourceObject();
-        $objectName = $object ? $object->getTitle() : 'ERROR: NOT FOUND';
+        $objectName = $object instanceof \SilverStripe\ORM\DataObject ? $object->getTitle() : 'ERROR: NOT FOUND';
 
         return $objectClassName . ': ' . $objectName;
     }
@@ -365,7 +359,7 @@ class SearchEngineDataObject extends DataObject
     public function SourceObject(): ?DataObject
     {
         $key = $this->getSearchEngineKey();
-        if (!isset(self::$_source_objects[$key])) {
+        if (! isset(self::$_source_objects[$key])) {
             $className = $this->DataObjectClassName;
             if ($className && class_exists($className)) {
                 $id = $this->DataObjectID;
@@ -381,7 +375,7 @@ class SearchEngineDataObject extends DataObject
     public function SourceObjectExists(): bool
     {
         $key = $this->getSearchEngineKey();
-        if (!isset(self::$_source_objects_exists[$key])) {
+        if (! isset(self::$_source_objects_exists[$key])) {
             self::$_source_objects_exists[$key] = false;
             $className = $this->DataObjectClassName;
             $id = $this->DataObjectID;
@@ -423,7 +417,7 @@ class SearchEngineDataObject extends DataObject
     public function SpecialSortGroup()
     {
         $className = $this->getSearchEngineKey(true);
-        if (!isset(self::$_special_sort_group[$className])) {
+        if (! isset(self::$_special_sort_group[$className])) {
             self::$_special_sort_group[$className] = '';
             $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups');
             if (is_array($classGroups) && count($classGroups)) {
@@ -444,7 +438,7 @@ class SearchEngineDataObject extends DataObject
     public function SearchEngineExcludeFromIndex(): bool
     {
         $sourceObject = $this->SourceObject();
-        if($sourceObject) {
+        if ($sourceObject instanceof \SilverStripe\ORM\DataObject) {
             return $sourceObject->SearchEngineExcludeFromIndex();
         } else {
             return true;
@@ -463,7 +457,6 @@ class SearchEngineDataObject extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-
 
         $fields->addFieldsToTab(
             'Root.Main',
@@ -523,7 +516,7 @@ class SearchEngineDataObject extends DataObject
             [
                 new LiteralField(
                     'Levels',
-                    '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>'.
+                    '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>' .
                     $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
                 ),
                 ReadonlyField::create(
@@ -533,7 +526,7 @@ class SearchEngineDataObject extends DataObject
                 ReadonlyField::create(
                     'DataObjectID',
                     'Record ID'
-                )
+                ),
             ]
         );
         return $fields;
@@ -541,7 +534,7 @@ class SearchEngineDataObject extends DataObject
 
     public function CMSEditLink()
     {
-        $className = str_replace('\\', '-', (string) self::class);
+        $className = str_replace('\\', '-', self::class);
 
         return '/admin/searchengine/' . $className . '/EditForm/field/' . $className . '/item/' . $this->ID . '/edit';
     }
@@ -586,7 +579,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SearchEngineResultsTemplates($sourceObject = null, $moreDetails = false)
     {
-        if (!$sourceObject) {
+        if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -600,7 +593,7 @@ class SearchEngineDataObject extends DataObject
 
     public function SearchEngineFieldsToBeIndexedHumanReadable($sourceObject = null, ?bool $includeExample = false)
     {
-        if (!$sourceObject) {
+        if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -628,7 +621,7 @@ class SearchEngineDataObject extends DataObject
             $this->timeMeasure = [];
         }
 
-        if (!$sourceObject) {
+        if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -681,7 +674,7 @@ class SearchEngineDataObject extends DataObject
      */
     public function SearchEngineFullContentForIndexingBuild($sourceObject = null)
     {
-        if (!$sourceObject) {
+        if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
 
@@ -715,8 +708,6 @@ class SearchEngineDataObject extends DataObject
 
     /**
      * has been indexed, but needs to be indexed again!
-     *
-     * @return boolean
      */
     public function toBeReIndexed(): bool
     {
@@ -777,7 +768,7 @@ class SearchEngineDataObject extends DataObject
         parent::onAfterWrite();
         if ($this->Recalculate && $this->recalculateCount < 2) {
             ++$this->recalculateCount;
-            if($this->SearchEngineExcludeFromIndex() === true) {
+            if ($this->SearchEngineExcludeFromIndex()) {
                 $this->delete();
             } else {
                 $this->doSearchEngineIndex();

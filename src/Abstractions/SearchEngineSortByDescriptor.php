@@ -130,47 +130,42 @@ abstract class SearchEngineSortByDescriptor
      */
     protected function makeClassGroups($objects)
     {
-        if ($this->hasClassGroups()) {
-            if ($objects->count() > 1) {
-                $classGroupCounts = [];
-                $classGroups = Config::inst()->get(self::class, 'class_groups');
-                $classGroupLimits = Config::inst()->get(self::class, 'class_group_limits');
-                $newArray = [];
-                $array = $objects->Map('ID', 'DataObjectClassName')->toArray();
-                foreach ($classGroups as $key => $classGroupGroup) {
-                    if (! isset($classGroupCounts[$key])) {
-                        $classGroupCounts[$key] = 0;
-                    }
-
-                    foreach ($array as $id => $className) {
-                        if (in_array($className, $classGroupGroup, true)) {
-                            if (! isset($classGroupLimits[$key]) || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
-                                ++$classGroupCounts[$key];
-                                $newArray[$id] = $className;
-                            }
-
-                            unset($array[$id]);
-                        }
-                    }
+        if ($this->hasClassGroups() && $objects->count() > 1) {
+            $classGroupCounts = [];
+            $classGroups = Config::inst()->get(self::class, 'class_groups');
+            $classGroupLimits = Config::inst()->get(self::class, 'class_group_limits');
+            $newArray = [];
+            $array = $objects->Map('ID', 'DataObjectClassName')->toArray();
+            foreach ($classGroups as $key => $classGroupGroup) {
+                if (! isset($classGroupCounts[$key])) {
+                    $classGroupCounts[$key] = 0;
                 }
 
                 foreach ($array as $id => $className) {
-                    $newArray[$id] = $className;
+                    if (in_array($className, $classGroupGroup, true)) {
+                        if (! isset($classGroupLimits[$key]) || (isset($classGroupLimits[$key]) && ($classGroupCounts[$key] <= $classGroupLimits[$key]))) {
+                            ++$classGroupCounts[$key];
+                            $newArray[$id] = $className;
+                        }
+
+                        unset($array[$id]);
+                    }
                 }
-
-                $keys = array_keys($newArray);
-                //retrieve objects
-                $objects = Injector::inst()->create(
-                    FasterIDLists::class,
-                    SearchEngineDataObject::class,
-                    $keys
-                )->filteredDatalist();
-
-                $objects = $objects->orderBy('FIELD("ID", ' . implode(',', $keys) . ')');
-                // $objects = SearchEngineDataObject::get()
-                //     ->filter(['ID' => $keys])
-                //     ->orderBy('FIELD("ID", ' . implode(',', $keys) . ')');
             }
+            foreach ($array as $id => $className) {
+                $newArray[$id] = $className;
+            }
+            $keys = array_keys($newArray);
+            //retrieve objects
+            $objects = Injector::inst()->create(
+                FasterIDLists::class,
+                SearchEngineDataObject::class,
+                $keys
+            )->filteredDatalist();
+            $objects = $objects->orderBy('FIELD("ID", ' . implode(',', $keys) . ')');
+            // $objects = SearchEngineDataObject::get()
+            //     ->filter(['ID' => $keys])
+            //     ->orderBy('FIELD("ID", ' . implode(',', $keys) . ')');
         }
 
         return $objects;

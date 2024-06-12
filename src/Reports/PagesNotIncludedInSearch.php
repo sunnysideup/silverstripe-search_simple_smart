@@ -17,7 +17,7 @@ class PagesNotIncludedInSearch extends Report
 
     public function group()
     {
-        return _t(__CLASS__.'.ContentGroupTitle', "Content reports");
+        return _t(__CLASS__ . '.ContentGroupTitle', 'Content reports');
     }
 
     public function sort()
@@ -34,7 +34,9 @@ class PagesNotIncludedInSearch extends Report
     public function sourceRecords($params = null)
     {
         return SiteTree::get()
-            ->exclude(['ClassName' => [RedirectorPage::class, VirtualPage::class]])
+            ->exclude([
+                'ClassName' => [RedirectorPage::class, VirtualPage::class],
+            ])
             ->filter(['ShowInSearch' => false])
             ->sort(['Title' => 'ASC']);
     }
@@ -42,9 +44,9 @@ class PagesNotIncludedInSearch extends Report
     public function columns()
     {
         return [
-            "Title" => [
-                "title" => "Title", // todo: use NestedTitle(2)
-                "link" => true,
+            'Title' => [
+                'title' => 'Title', // todo: use NestedTitle(2)
+                'link' => true,
             ],
         ];
     }

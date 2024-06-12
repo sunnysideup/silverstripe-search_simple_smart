@@ -3,11 +3,10 @@
 namespace Sunnysideup\SearchSimpleSmart\Api;
 
 use Psr\SimpleCache\CacheInterface;
-use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Injector\Injector;
-
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Flushable;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
@@ -30,7 +29,7 @@ class SearchEngineSourceObjectApi implements Flushable
 
     public function SearchEngineSourceObjectSortDate(?DataObject $sourceObject = null)
     {
-        if ($sourceObject) {
+        if ($sourceObject instanceof \SilverStripe\ORM\DataObject) {
             if ($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
                 return $sourceObject->SearchEngineSourceObjectSortDate();
             }
@@ -42,6 +41,7 @@ class SearchEngineSourceObjectApi implements Flushable
                 }
             }
         }
+        return null;
     }
 
     public function FieldsForIndexing(DataObject $sourceObject): array
@@ -77,7 +77,7 @@ class SearchEngineSourceObjectApi implements Flushable
                 }
             }
             // add the keyword stuffer!
-            if(!isset($levelFields['level1']) || !is_array($levelFields['level1'])) {
+            if (! isset($levelFields['level1']) || ! is_array($levelFields['level1'])) {
                 $levelFields['level1'] = [];
             }
             array_unshift($levelFields['level1'], 'KeywordStuffer');
@@ -94,15 +94,13 @@ class SearchEngineSourceObjectApi implements Flushable
             $finalArray = $sourceObject->SearchEngineFullContentForIndexingProvider();
         } else {
             $levels = $this->FieldsForIndexing($sourceObject);
-            if (is_array($levels) && count($levels)) {
-                foreach ($levels as $level => $fieldArray) {
-                    $level = SearchEngineKeyword::level_sanitizer($level);
-                    $finalArray[$level] = '';
-                    if (is_array($fieldArray) && count($fieldArray)) {
-                        foreach ($fieldArray as $field) {
-                            $fields = explode('.', $field);
-                            $finalArray[$level] .= ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
-                        }
+            foreach ($levels as $level => $fieldArray) {
+                $level = SearchEngineKeyword::level_sanitizer($level);
+                $finalArray[$level] = '';
+                if (is_array($fieldArray) && count($fieldArray)) {
+                    foreach ($fieldArray as $field) {
+                        $fields = explode('.', $field);
+                        $finalArray[$level] .= ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
                     }
                 }
             }
@@ -170,7 +168,7 @@ class SearchEngineSourceObjectApi implements Flushable
                 $fieldLabels = $sourceObject->fieldLabels();
                 $str = '<ul>';
                 foreach ($levels as $level => $fieldArray) {
-                    if(is_array($fieldArray) && count($fieldArray)) {
+                    if (is_array($fieldArray) && count($fieldArray)) {
                         $str .= '<li><strong>' . $level . '</strong><ul>';
                         foreach ($fieldArray as $field) {
                             $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
@@ -207,7 +205,7 @@ class SearchEngineSourceObjectApi implements Flushable
         if ($sourceObject) {
             $arrayOfTemplates = $sourceObject->SearchEngineResultsTemplates($moreDetails);
             $cacheKey = preg_replace(
-                "/[^A-Za-z0-9 ]/",
+                '/[^A-Za-z0-9 ]/',
                 '',
                 'SearchEngine_' . $sourceObject->ClassName . '_' . abs($sourceObject->ID) . '_' . ($moreDetails ? 'MOREDETAILS' : 'NOMOREDETAILS')
             );

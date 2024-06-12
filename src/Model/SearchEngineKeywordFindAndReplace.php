@@ -171,7 +171,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
             $newerEntries = [];
             foreach ($newEntries as $newEntryKeyword) {
                 $newEntryKeyword = SearchEngineKeyword::clean_keyword($newEntryKeyword);
-                if (!isset(self::$_words_used[$newEntryKeyword])) {
+                if (! isset(self::$_words_used[$newEntryKeyword])) {
                     $newerEntries[] = self::find_replacements($newEntryKeyword);
                 } else {
                     $newerEntries[] = $newEntryKeyword;

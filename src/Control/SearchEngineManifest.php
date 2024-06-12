@@ -38,7 +38,7 @@ class SearchEngineManifest extends Controller
         $classNames = SearchEngineDataObjectApi::searchable_class_names();
         asort($classNames);
         $manifest = '';
-        if (is_array($classNames) && count($classNames)) {
+        if ($classNames !== []) {
             $manifest .=
                 '<div id="SearchEngineManifest">
                     <ul>';

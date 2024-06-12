@@ -88,7 +88,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                 Also please review the <a href="/admin-searchenginemanifest">full search manifest</a>.
                 </h4>'
             );
-            if(Director::isDev()) {
+            if (Director::isDev()) {
                 $linkFields[] = HTMLReadonlyField::create(
                     rand(0, 333333),
                     'Tasks',
@@ -156,7 +156,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                                     'remove_all_non_alpha_numeric_full_content',
                                     'Remove non Latin Characters',
                                     Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_alpha_numeric') ? 'True' : 'False'
-                                )->setDescription('Inclusion list: '.implode(' ', SearchEngineFullContent::get_pattern_for_alpha_numeric_characters_human_readable())),
+                                )->setDescription('Inclusion list: ' . implode(' ', SearchEngineFullContent::get_pattern_for_alpha_numeric_characters_human_readable())),
                                 HTMLReadonlyField::create(
                                     'remove_all_non_letters',
                                     'Remove Non Letter Characters',
@@ -215,7 +215,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                                 ...$linkFields
                             )
                         )
-                    )
+                    ),
                 ]
             );
             $form->setFields($field);
@@ -227,13 +227,13 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                         'Root',
                         new Tab(
                             'Graph',
-                            SearchEngineFormField::create("SearchHistoryTable")
+                            SearchEngineFormField::create('SearchHistoryTable')
                         ),
                         new Tab(
                             'Log',
                             $gridField
                         )
-                    )
+                    ),
                 ]
             );
             $form->setFields($field);
@@ -257,17 +257,17 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         $out = '<ul>';
         if (is_array($arrayOrString)) {
             foreach ($arrayOrString as $key => $elem) {
-                $out .= self::array2ul($elem, $key) ;
+                $out .= self::array2ul($elem, $key);
             }
         } else {
             $elem = $arrayOrString;
-            if(class_exists($elem)) {
-                $elem =  singleton($elem)->i18n_singular_name() . ' (' . $elem . ')';
+            if (class_exists($elem)) {
+                $elem = singleton($elem)->i18n_singular_name() . ' (' . $elem . ')';
             }
-            if(class_exists($key)) {
-                $key =  singleton($key)->i18n_singular_name() . ' (' . $key . ')';
+            if (class_exists($key)) {
+                $key = singleton($key)->i18n_singular_name() . ' (' . $key . ')';
             }
-            if ($key === (int) $key || !$key) {
+            if ($key === (int) $key || ! $key) {
                 $out .= '<li><span><pre>' . $elem . '</pre></span></li>';
             } else {
                 $out .= '<li><span><em>' . $key . ' --- </em> <pre>' . $elem . '</pre></span></li>';

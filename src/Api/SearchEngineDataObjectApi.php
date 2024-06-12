@@ -114,15 +114,12 @@ class SearchEngineDataObjectApi
                         $excludeClassNames = array_merge($excludeClassNames, ClassInfo::subclassesFor($excludeOne));
                     }
                 }
-
             }
             $excludeClassNames = array_unique($excludeClassNames);
-            if ([] !== $excludeClassNames) {
-                foreach ($excludeClassNames as $excludeOne) {
-                    $key = array_search($excludeOne, $testArray);
-                    if ($key !== false) {
-                        unset($testArray[$key]);
-                    }
+            foreach ($excludeClassNames as $excludeOne) {
+                $key = array_search($excludeOne, $testArray);
+                if ($key !== false) {
+                    unset($testArray[$key]);
                 }
             }
 
@@ -131,7 +128,7 @@ class SearchEngineDataObjectApi
                 if ($className::has_extension(SearchEngineMakeSearchable::class)) {
                     $singleton = Injector::inst()->get($className);
                     $dbFields = Config::inst()->get($className, 'db');
-                    $hasTitleField = isset($dbFields['Title']) || isset($dbFields['Name']) ;
+                    $hasTitleField = isset($dbFields['Title']) || isset($dbFields['Name']);
                     $hasLinkField = $singleton->hasMethod('Link') || $singleton->hasMethod('getLink');
                     $finalClasses[$className] = $singleton->i18n_singular_name() .
                         ($hasLinkField ? '' : ' - ERROR: no link field') .
