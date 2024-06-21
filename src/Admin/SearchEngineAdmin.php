@@ -56,9 +56,9 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     {
         return [
             'SEARCH_ENGINE_ADMIN' => [
-                'name' =>  'Administer Search Engine',
-                'category' =>  'Keywords',
-            ]
+                'name' => 'Administer Search Engine',
+                'category' => 'Keywords',
+            ],
         ];
     }
 
