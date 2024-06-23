@@ -14,6 +14,6 @@ class SearchEngineSiteConfigExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        $fields->addFieldToTab('Root.SearchEngine', new CheckboxField('SearchEngineDebug', 'Debug Search Engine'));
+        $fields->addFieldToTab('Root.KeywordSearch', new CheckboxField('SearchEngineDebug', 'Debug Search Engine'));
     }
 }

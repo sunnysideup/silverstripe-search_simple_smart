@@ -215,7 +215,7 @@ class SearchEngineMakeSearchable extends DataExtension
                 $toBeIndexed = $item->toBeIndexed() ? 'yes' : 'no';
                 $re = $item->toBeReIndexed() ? 're' : '';
                 $fields->addFieldsToTab(
-                    'Root.SearchEngine',
+                    'Root.KeywordSearch',
                     [
                         TextareaField::create('KeywordStuffer', 'Keywords to add to search engine')
                             ->setDescription('Adding keywords here will ensure this records ranks well for those keywords.'),
