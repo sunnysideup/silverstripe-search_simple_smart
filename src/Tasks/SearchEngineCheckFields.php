@@ -58,6 +58,7 @@ class SearchEngineCheckFields extends BuildTask
         $start .= PHP_EOL . 'Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject:';
         $start .= PHP_EOL . '  default_exclude_fields:';
         $start .= PHP_EOL . '    - ExtraClass';
+        $start .= PHP_EOL . '  classes_to_exclude: []';
         $start .= PHP_EOL . '  classes_to_include:';
         $array = (new CheckFieldsApi())->getList();
         foreach ($array['AllValidFields'] as $className => $classData) {

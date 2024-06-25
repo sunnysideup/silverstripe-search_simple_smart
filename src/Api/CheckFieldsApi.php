@@ -51,6 +51,7 @@ class CheckFieldsApi
         ChangeSetItem::class,
         RememberLoginHash::class,
         LoginSession::class,
+        SearchEngineDataObject::class,
     ];
 
     private static $default_exclude_fields = [
