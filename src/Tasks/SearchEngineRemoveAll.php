@@ -75,7 +75,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
         } elseif ('indexes' === $this->type) {
             $allTables = Config::inst()->get(self::class, 'index_tables');
         } else {
-            die('Please set type: all|history|indexes');
+            die('Please set type: all|history|indexes - currently set to '.$this->type.'.');
         }
 
         foreach ($allTables as $table) {

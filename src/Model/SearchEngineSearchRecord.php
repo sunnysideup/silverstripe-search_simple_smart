@@ -336,17 +336,12 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if (! $this->HasCachedData) {
-            $this->FinalPhrase = $this->convertPhraseToFinalPhrase();
-        }
+        $this->FinalPhrase = $this->convertPhraseToFinalPhrase();
     }
 
     protected function convertPhraseToFinalPhrase(): string
     {
-        SearchEngineFullContent::clean_content($this->Phrase);
-        $finalKeyWordArray = [];
-
-        return implode(' ', $finalKeyWordArray);
+        return SearchEngineFullContent::clean_content($this->Phrase);
     }
 
     protected function onAfterWrite()

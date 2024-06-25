@@ -232,7 +232,7 @@ class SearchEngineFullContent extends DataObject
      * @return string
      * @todo: cache using SS caching system.
      */
-    public static function clean_content($content)
+    public static function clean_content($content): string
     {
         $content = strtolower((string) $content);
 
@@ -290,7 +290,6 @@ class SearchEngineFullContent extends DataObject
         // #: The closing delimiter for the regular expression.
         // u: This is the Unicode modifier, which tells the regular expression engine to treat the pattern as a Unicode string.
         // Putting it all together, the pattern #[\P{L}\P{N}]+#u matches any sequence of one or more characters that are neither letters nor numbers. In other words, it matches any group of non-letter, non-number characters and replaces them with a single space.
-
         $removeNonLetters = Config::inst()->get(self::class, 'remove_all_non_letters');
         if (true === $removeNonLetters) {
             $content = trim(
@@ -301,7 +300,6 @@ class SearchEngineFullContent extends DataObject
                 )
             );
         }
-
         // remove multiple white space
         return trim(preg_replace('#\s+#', ' ', (string) $content));
     }
