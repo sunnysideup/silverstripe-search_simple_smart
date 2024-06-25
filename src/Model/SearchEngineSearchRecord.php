@@ -341,8 +341,20 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
 
     protected function convertPhraseToFinalPhrase(): string
     {
-        return SearchEngineFullContent::clean_content($this->Phrase);
+        $cleanedPhrase = SearchEngineFullContent::clean_content($this->Phrase);
+        $keywords = explode(' ', $cleanedPhrase);
+        $finalKeyWordArray = [];
+        foreach ($keywords as $keyword) {
+            if (SearchEngineKeywordFindAndRemove::is_listed($keyword) || 1 === strlen($keyword)) {
+                continue;
+            }
+
+            $finalKeyWordArray[$keyword] = $keyword;
+        }
+
+        return implode(' ', $finalKeyWordArray);
     }
+
 
     protected function onAfterWrite()
     {
