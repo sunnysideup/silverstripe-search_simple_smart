@@ -504,6 +504,24 @@ class SearchEngineDataObject extends DataObject
                     DBField::create_field('HTMLText', '<a href="' . $object->Link() . '" target="_blank">open to view</a>')
                 )
             );
+            $fields->addFieldsToTab(
+                'Root.Schema',
+                [
+                    new LiteralField(
+                        'Levels',
+                        '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>' .
+                        $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
+                    ),
+                    ReadonlyField::create(
+                        'DataObjectClassName',
+                        'Class Name'
+                    ),
+                    ReadonlyField::create(
+                        'DataObjectID',
+                        'Record ID'
+                    ),
+                ]
+            );
         }
 
         if ($myTab = $fields->fieldByName('Root.SearchEngineKeywords_Level2')) {
@@ -511,24 +529,6 @@ class SearchEngineDataObject extends DataObject
             $fields->fieldByName('Root')->push($myTab);
         }
 
-        $fields->addFieldsToTab(
-            'Root.Schema',
-            [
-                new LiteralField(
-                    'Levels',
-                    '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>' .
-                    $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
-                ),
-                ReadonlyField::create(
-                    'DataObjectClassName',
-                    'Class Name'
-                ),
-                ReadonlyField::create(
-                    'DataObjectID',
-                    'Record ID'
-                ),
-            ]
-        );
         return $fields;
     }
 
