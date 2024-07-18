@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataList;
@@ -10,6 +11,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 /**
  * presents a list of dataobjects
@@ -305,4 +307,12 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         parent::onBeforeDelete();
         $this->flushCache();
     }
+
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
+    }
+
+
 }

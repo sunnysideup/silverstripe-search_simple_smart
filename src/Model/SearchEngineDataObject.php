@@ -16,6 +16,7 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineSourceObjectApi;
 
@@ -532,12 +533,6 @@ class SearchEngineDataObject extends DataObject
         return $fields;
     }
 
-    public function CMSEditLink()
-    {
-        $className = str_replace('\\', '-', self::class);
-
-        return '/admin/searchengine/' . $className . '/EditForm/field/' . $className . '/item/' . $this->ID . '/edit';
-    }
 
     //####################
     // display
@@ -786,4 +781,12 @@ class SearchEngineDataObject extends DataObject
         $obj = SearchEngineDataObjectToBeIndexed::add($this);
         $obj->IndexNow();
     }
+
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
+    }
+
+
 }

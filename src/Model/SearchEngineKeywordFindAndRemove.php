@@ -3,10 +3,12 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineStopWords;
 
 class SearchEngineKeywordFindAndRemove extends DataObject
@@ -157,4 +159,10 @@ class SearchEngineKeywordFindAndRemove extends DataObject
         parent::onBeforeWrite();
         $this->Keyword = SearchEngineKeyword::clean_keyword($this->Keyword);
     }
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
+    }
+
 }

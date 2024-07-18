@@ -2,9 +2,11 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 /**
  * keyword replace engine.
@@ -215,4 +217,10 @@ class SearchEngineKeywordFindAndReplace extends DataObject
 
         return explode($delimiters[0], $ready);
     }
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
+    }
+
 }

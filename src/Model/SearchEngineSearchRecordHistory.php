@@ -4,10 +4,12 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 /**
  * the DataObject ClassName + ID is recorded separately
@@ -286,5 +288,11 @@ class SearchEngineSearchRecordHistory extends DataObject
             }
         }
         return self::$_session_cache;
+    }
+
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 }

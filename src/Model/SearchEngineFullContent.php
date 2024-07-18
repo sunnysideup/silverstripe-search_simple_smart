@@ -3,6 +3,7 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
@@ -10,6 +11,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 /**
  * Full Content for each dataobject, separated by level of importance.
@@ -41,10 +43,10 @@ class SearchEngineFullContent extends DataObject
     private static $table_name = 'SearchEngineFullContent';
 
     // @var string
-    private static $singular_name = 'Full Content';
+    private static $singular_name = 'Full Content Extract';
 
     // @var string
-    private static $plural_name = 'Full Contents';
+    private static $plural_name = 'Full Content Extracts';
 
     // @var array
     private static $db = [
@@ -404,5 +406,10 @@ class SearchEngineFullContent extends DataObject
                 $list->add($a['Object'], ['Count' => $a['Count']]);
             }
         }
+    }
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 }

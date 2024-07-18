@@ -5,12 +5,14 @@ namespace Sunnysideup\SearchSimpleSmart\Model;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Flushable;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 
 /**
@@ -273,4 +275,11 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
         return $fields;
     }
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
+    }
+
+
 }

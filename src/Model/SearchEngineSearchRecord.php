@@ -6,6 +6,7 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Flushable;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
@@ -13,6 +14,7 @@ use SilverStripe\ORM\DB;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 use Wamania\Snowball\StemmerFactory;
 
 class SearchEngineSearchRecord extends DataObject implements Flushable
@@ -426,5 +428,11 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
                 }
             }
         }
+    }
+
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 }

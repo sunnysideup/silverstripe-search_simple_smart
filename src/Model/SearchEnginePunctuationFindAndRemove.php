@@ -3,10 +3,12 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 class SearchEnginePunctuationFindAndRemove extends DataObject
 {
@@ -148,4 +150,11 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
             }
         }
     }
+
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
+    }
+
 }

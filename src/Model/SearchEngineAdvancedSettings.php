@@ -2,9 +2,11 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 /**
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
@@ -77,5 +79,11 @@ class SearchEngineAdvancedSettings extends DataObject
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
+    }
+
+
+    public function CMSEditLink()
+    {
+        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 }
