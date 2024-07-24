@@ -408,8 +408,5 @@ class SearchEngineFullContent extends DataObject
         }
     }
 
-    public function CMSEditLink()
-    {
-        return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
-    }
+
 }
