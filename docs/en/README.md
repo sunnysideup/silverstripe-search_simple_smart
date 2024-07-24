@@ -16,44 +16,49 @@ INDEXING IDEAS
 To get some ideas of what you can index, go here:
 `/dev/tasks/checkfields/?flush=all`
 
-This is a default template for your setup.  Please carefully review! 
+This is a default template for your setup.  Please carefully review!
 
 Below we will take you through how to set this up manually.
 
-For a DataObject to be included, it needs to have a `getLink` or `Link` method. 
+For a DataObject to be included, it needs to have a `getLink` or `Link` method.
 
 BACK-END PREPARATION
 --------------------
- - Identify what objects and what fields in those objects need to be indexed.
- - Prepare a keyword list and a full-content index, grouped into LEVEL 1 and LEVEL 2.
- - LEVEL 1 are important, salient fields, such as Title and LEVEL 2 is content from less important fields such as Content.
- - As part of an object, you can include has_one, has_many, and many_many relationship data (belongs_many_many coming soon).
 
+- Identify what objects and what fields in those objects need to be indexed.
+- Prepare a keyword list and a full-content index, grouped into LEVEL 1 and LEVEL 2.
+- LEVEL 1 are important, salient fields, such as Title and LEVEL 2 is content from less important fields such as Content.
+- As part of an object, you can include has_one, has_many, and many_many relationship data (belongs_many_many coming soon).
 
 KEYWORD MANIPULATION
 --------------------
- - You can add words to be removed from search, such as stop words (e.g. and, the)
- - You can add words to be replaced with other ones (e.g. NZ with New Zealand)
- - You can remove punctuation, etc...
+
+- You can add words to be removed from search, such as stop words (e.g. and, the)
+- You can add words to be replaced with other ones (e.g. NZ with New Zealand)
+- You can remove punctuation, etc...
 
 SMART SEARCH
 ------------
+
 The search carried out by this module returns a list of Data Objects sorted
 in a particular order.  The search uses some caching and other tricks to do this fast and meaningful.
 
 FRONT-END
 ---------
- - You can add a search form to any page using the `$SearchEngineBasicForm` variable.
+
+- You can add a search form to any page using the `$SearchEngineBasicForm` variable.
     Also available are: `$SearchEngineSuperBasicForm` and `$SearchEngineCustomForm`.
     Please have a look at: `/searchengine/code/extensions/ContentControllerExtension.php`
     to see how to use the `SearchEngineBasicForm`.
 
 ANALYSIS
 --------
- - The module provides basic analytics of searches carried out on the site.
+
+- The module provides basic analytics of searches carried out on the site.
 
 DEBUG
 -----
+
 You can turn on debug in `admin/settings` or with an `.env` variable: `SEARCH_ENGINE_ADMIN` - set it to `true`
 
 PREPARING DATA
@@ -63,28 +68,32 @@ Run `dev/tasks/searchengineindexall` to index all objects when you start. In gen
 
 DEPENDENCIES
 ------------
+
 There are no additional requirements for the Silverstripe Search.
 There are two JS libraries that are used (awesomplete and infinite scroll),
 but you can make the module work without them.
 
-
 CUSTOMISATION STRATEGY
 ----------------------
+
 To customise this module, you can use many of the standard strategies.
 Below is a list tricks (just some examples - not conclusive), from easy to difficult
-  - theme CSS (copy CSS files from `/searchengine/css/` to `/themes/mytheme_searchengine/css/`)
-  - theme the templates - similar to CSS (copy to theme and adjust), but you can also create new templates for displaying
+
+- theme CSS (copy CSS files from `/searchengine/css/` to `/themes/mytheme_searchengine/css/`)
+- theme the templates - similar to CSS (copy to theme and adjust), but you can also create new templates for displaying
      objects in the search results.
-  - change the yml settings.  Please review /searchengine/\_config/searchengine.yml.example for examples.
-  - extend `SearchEngineBasicForm` e.g. `MySearchEngineBasicForm extends SearchEngineBasicForm {...}`
-  - add/change language definitions (see. `/searchengine/lang/`)
-  - customise the indexing by adding a number of methods to indexed dataobjects (use the `SearchEngineMakeSearchable` interface).
-  - add filters and sorters (see `/searchengine/code/filters` and `/searchengine/code/sorters` for examples).
+- change the yml settings.  Please review /searchengine/\_config/searchengine.yml.example for examples.
+- extend `SearchEngineBasicForm` e.g. `MySearchEngineBasicForm extends SearchEngineBasicForm {...}`
+- add/change language definitions (see. `/searchengine/lang/`)
+- customise the indexing by adding a number of methods to indexed dataobjects (use the `SearchEngineMakeSearchable` interface).
+- add filters and sorters (see `/searchengine/code/filters` and `/searchengine/code/sorters` for examples).
 
 CUSTOMISATION OF INDEXING
 -------------------------
+
 First of all you need to decide what DataObjects are going to be indexed.
 You do this as follows:
+
 ```yml
     Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed:
       cron_job_running: true
@@ -112,25 +121,70 @@ You do this as follows:
 
 ```
 
+Rather than settings the "search_engine_full_contents_fields_array" in the yml, you can also set it in the DataObject itself.
+
+```php
+    class MyDataObject extends DataObject implements SearchEngineMakeSearchable
+    {
+        private static $search_engine_full_contents_fields_array = [
+            'level1' => [
+                'Title',
+                'MenuTitle',
+                'HeaderCustomHeading',
+                'HeaderCustomSubHeading',
+            ],
+            'level2' => [
+                'Content',
+                'MyThirdDataObject.Title',
+            ],
+        ];
+    }
+```
+
+Or like this:
+
+```php
+    class MyDataObject extends DataObject implements SearchEngineMakeSearchable
+    {
+        public function SearchEngineFieldsForIndexing()
+        {
+            return [
+                'level1' => [
+                    'Title',
+                    'MenuTitle',
+                    'HeaderCustomHeading',
+                    'HeaderCustomSubHeading',
+                ],
+                'level2' => [
+                    'Content',
+                    'MyThirdDataObject.Title',
+                ],
+            ];
+        }
+    }
+```
 
 CUSTOMISATION OF SEARCHING
 --------------------------
- - you can swap out the back-end search engine. So far a MYSQL FullText has been implemented.
+
+- you can swap out the back-end search engine. So far a MYSQL FullText has been implemented.
     This can be done by setting another class in the configs.
 
 CUSTOMISATION OF RESULTS DISPLAY
 --------------------------------
+
 For customisation of the
- - you can Requirements::block("searchengine/javascript/SearchEngineInitFunctions.js"); and add your own JS.
- - you can replace variables or methods in the JS `SearchEngineInitFunctions` object,
+
+- you can Requirements::block("searchengine/javascript/SearchEngineInitFunctions.js"); and add your own JS.
+- you can replace variables or methods in the JS `SearchEngineInitFunctions` object,
     by writing your own JS like so:
         SearchEngineInitFunctions.myVar = "foo"
         SearchEngineInitFunctions.myMethod = function(){...}
     this will replace methods and variables in SearchEngineInitFunctions
 
-
 HOW TO SET UP A SEARCH
 ----------------------
+
 ```php
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
 use Sunnysideup\SearchSimpleSmart\Filters\SearchEngineFilterForClassName;
@@ -158,7 +212,6 @@ class ExampleClass
 
 HOW TO INDEX AN OBJECT
 ----------------------
-
 
 HOW TO ADD A SEARCH FORM
 ------------------------
