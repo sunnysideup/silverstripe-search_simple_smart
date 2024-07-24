@@ -324,7 +324,6 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
-
         return Injector::inst()->get(SearchEngineSourceObjectApi::class)
             ->FieldsForIndexing($sourceObject)
         ;
@@ -524,10 +523,23 @@ class SearchEngineDataObject extends DataObject
                 ]
             );
         }
+        $firstTab = $fields->fieldByName('Root.SearchEngineKeywords_Level1');
+        $secondTab = $fields->fieldByName('Root.SearchEngineKeywords_Level2');
+        if($firstTab && $secondTab) {
 
-        if ($myTab = $fields->fieldByName('Root.SearchEngineKeywords_Level2')) {
-            $fields->removeFieldFromTab('Root', 'SearchEngineKeywords_Level2');
-            $fields->fieldByName('Root')->push($myTab);
+            // Remove original tabs
+            $fields->removeByName('SearchEngineKeywords_Level1');
+            $fields->removeByName('SearchEngineKeywords_Level2');
+
+            // Add tabs in new order
+            $fields->addFieldToTab('Root.Keywords 1', $firstTab);
+            $fields->addFieldToTab('Root.Keywords 2', $secondTab);
+            foreach(['1', '2'] as $level) {
+                $field = $fields->dataFieldByName('SearchEngineKeywords_Level' . $level);
+                if($field) {
+                    $field->setTitle('Keywords ' . $level);
+                }
+            }
         }
 
         return $fields;
@@ -635,7 +647,6 @@ class SearchEngineDataObject extends DataObject
             if ($timeMeasure) {
                 $startTime = microtime(true);
             }
-
             //add the full content
             SearchEngineFullContent::add_data_object_array($this, $fullContentArray);
             if ($timeMeasure) {
