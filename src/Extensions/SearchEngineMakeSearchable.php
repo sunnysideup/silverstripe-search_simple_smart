@@ -192,7 +192,7 @@ class SearchEngineMakeSearchable extends DataExtension
                         'SearchEngineHeader',
                         '<h2>
                                 See
-                                <a href="/admin/pages/settings/show/' . $owner->ID . '#Root_SearchEngine">Settings Tab</a>
+                                <a href="/admin/pages/settings/show/' . $owner->ID . '#Root_KeywordSearch">Settings Tab</a>
                                 for Keyword Search Details
                             </h2>'
                     )
@@ -220,7 +220,7 @@ class SearchEngineMakeSearchable extends DataExtension
                         TextareaField::create('KeywordStuffer', 'Keywords to add to search engine')
                             ->setDescription('Adding keywords here will ensure this records ranks well for those keywords.'),
                         ReadonlyField::create('HasBeenIndexed', 'Has been indexed', $hasBeenIndexed),
-                        ReadonlyField::create('LastIndexed', 'Last Index', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'),
+                        ReadonlyField::create('LastIndexed', 'Last Indexed', $this->SearchEngineIsIndexed() ? $owner->LastEdited : 'n/a'),
                         ReadonlyField::create('ToBeIndexed', 'On the list to be ' . $re . 'indexed', $toBeIndexed),
                         ReadonlyField::create(
                             'LinkToSearchEngineDataObject',
@@ -313,10 +313,10 @@ class SearchEngineMakeSearchable extends DataExtension
             //do nothing...
         } else {
             if (! isset($this->_onAfterWriteCount[$owner->ID])) {
-                $this->_onAfterWriteCount[$owner->ID] = 0;
+                $this->_onAfterWriteCount[$owner->ID] = true ;
+                register_shutdown_function([$owner, 'indexMeOnShutDown']);
             }
 
-            register_shutdown_function([$owner, 'indexMeOnShutDown']);
         }
     }
 
@@ -360,7 +360,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
             return $item->SearchEngineFieldsForIndexing($owner);
         }
-
+        die('kkkkkkkkkkkkkkkkk');
         return [
             1 => [],
             2 => [],
