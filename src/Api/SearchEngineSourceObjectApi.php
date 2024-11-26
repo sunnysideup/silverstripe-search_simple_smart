@@ -29,7 +29,7 @@ class SearchEngineSourceObjectApi implements Flushable
 
     public function SearchEngineSourceObjectSortDate(?DataObject $sourceObject = null)
     {
-        if ($sourceObject instanceof \SilverStripe\ORM\DataObject) {
+        if ($sourceObject instanceof DataObject) {
             if ($sourceObject->hasMethod('SearchEngineSourceObjectSortDate')) {
                 return $sourceObject->SearchEngineSourceObjectSortDate();
             }
@@ -48,41 +48,39 @@ class SearchEngineSourceObjectApi implements Flushable
     {
         $className = $sourceObject->getSearchEngineKey(true);
         if (! isset(self::$_search_engine_fields_for_indexing[$className])) {
-            if($sourceObject->hasMethod('SearchEngineFieldsForIndexing')) {
-                $levelFields = $this->checkLevelArray($sourceObject->SearchEngineFieldsForIndexing());
-            }
-            if (!$levelFields) {
-                //do nothing
-                $levelFields = $this->checkLevelArray(Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array'));
-                if (! $levelFields) {
-                    $levelOneFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields');
-                    $excludedFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields');
-                    $dbArray = SearchEngineMakeSearchableApi::search_engine_rel_fields($sourceObject, 'db');
-                    $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
-                    foreach ($dbArray as $field => $type) {
-                        //get without brackets ...
-                        if (preg_match('#^(\w+)\(#', $type, $match)) {
-                            $type = $match[1];
-                        }
+            // if ($sourceObject->hasMethod('SearchEngineFieldsForIndexing')) {
+            //     $levelFields = $this->checkLevelArray($sourceObject->SearchEngineFieldsForIndexing());
+            // }
+            //do nothing
+            $levelFields = $this->checkLevelArray(Config::inst()->get($sourceObject->ClassName, 'search_engine_full_contents_fields_array'));
+            if (! $levelFields) {
+                $levelOneFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields');
+                $excludedFieldArray = Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_excluded_db_fields');
+                $dbArray = SearchEngineMakeSearchableApi::search_engine_rel_fields($sourceObject, 'db');
+                $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
+                foreach ($dbArray as $field => $type) {
+                    //get without brackets ...
+                    if (preg_match('#^(\w+)\(#', $type, $match)) {
+                        $type = $match[1];
+                    }
 
-                        if (is_subclass_of($type, DBString::class)) {
-                            if (in_array($field, $excludedFieldArray, true)) {
-                                //do nothing
-                            } else {
-                                $level = 2;
-                                if (in_array($field, $levelOneFieldArray, true)) {
-                                    $level = 1;
-                                }
-
-                                $levelFields[$level][] = $field;
+                    if (is_subclass_of($type, DBString::class)) {
+                        if (in_array($field, $excludedFieldArray, true)) {
+                            //do nothing
+                        } else {
+                            $level = 2;
+                            if (in_array($field, $levelOneFieldArray, true)) {
+                                $level = 1;
                             }
+
+                            $levelFields[$level][] = $field;
                         }
                     }
                 }
-                // add the keyword stuffer!
-                if (! isset($levelFields['level1']) || ! is_array($levelFields['level1'])) {
-                    $levelFields['level1'] = [];
-                }
+            }
+            // add the keyword stuffer!
+            if (! isset($levelFields['level1']) || ! is_array($levelFields['level1'])) {
+                $levelFields['level1'] = [];
             }
             array_unshift($levelFields['level1'], 'KeywordStuffer');
             self::$_search_engine_fields_for_indexing[$className] = $levelFields;
@@ -93,14 +91,14 @@ class SearchEngineSourceObjectApi implements Flushable
 
     protected function checkLevelArray(array $array): ?array
     {
-        if(is_array($array) && count($array)) {
-            foreach(['1', '2'] as $level) {
-                if(isset($array[$level])) {
+        if (is_array($array) && count($array)) {
+            foreach (['1', '2'] as $level) {
+                if (isset($array[$level])) {
                     $array['level'.$level] = $array[$level];
                     unset($array[$level]);
                 }
             }
-            if(count($array) === 2 && isset($array['level1']) && isset($array['level2'])) {
+            if (count($array) === 2 && isset($array['level1']) && isset($array['level2'])) {
                 return $array;
             }
             user_error('You need to provide two levels of fields for indexing (level1 and level2).  You have provided: '.print_r($array, 1));

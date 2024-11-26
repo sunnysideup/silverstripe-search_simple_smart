@@ -24,16 +24,22 @@ class SearchEngineFullContent extends DataObject
 {
     protected static $_punctuation_objects;
 
+    /**
+     * we keep the . for website addresses.
+     *
+     * @var array
+     */
     private static $default_punctuation_to_be_removed = [
         "'",
         '"',
         ';',
-        '.',
         ',',
         '&nbsp',
     ];
 
-    private static $acceptable_one_letter_words = ['0', '1', '2', '3', '45', '6', '7', '8', '9', 'a', 'i'];
+    private static $pattern_for_alpha_numeric_characters = '/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ_~\-\.\/\: ]+/u';
+
+    private static $acceptable_one_letter_words = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'i'];
 
     /**
      * Defines the database table name.
@@ -83,7 +89,7 @@ class SearchEngineFullContent extends DataObject
         'LastEdited.Nice' => 'Last Changed',
         'SearchEngineDataObject.Title' => 'Searchable Object',
         'Level' => 'Level',
-        'ShortContent' => 'Content',
+        'Content.LimitWordCount' => 'Content',
     ];
 
     /**
@@ -99,11 +105,6 @@ class SearchEngineFullContent extends DataObject
     // @var array
     private static $field_labels = [
         'SearchEngineDataObject' => 'Data Object',
-    ];
-
-    // @var array
-    private static $casting = [
-        'ShortContent' => 'Varchar',
     ];
 
     /**
@@ -217,16 +218,6 @@ class SearchEngineFullContent extends DataObject
     }
 
     /**
-     * @casted variable
-     *
-     * @return string
-     */
-    public function getShortContent()
-    {
-        return substr((string) $this->Content, 0, 50);
-    }
-
-    /**
      * cleans a string.
      *
      * @param string $content
@@ -308,7 +299,7 @@ class SearchEngineFullContent extends DataObject
 
     public static function get_pattern_for_alpha_numeric_characters(): string
     {
-        return '/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ ]+/u';
+        return Config::inst()->get(self::class, 'pattern_for_alpha_numeric_characters');
     }
 
     public static function get_pattern_for_alpha_numeric_characters_human_readable(): array

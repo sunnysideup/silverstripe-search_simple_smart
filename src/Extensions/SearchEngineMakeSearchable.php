@@ -237,8 +237,8 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);
-        if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
-            return $item->SearchEngineFieldsToBeIndexedHumanReadable($owner, $includeExample);
+        if ($item instanceof SearchEngineDataObject) {
+            return $item->FieldsForIndexing($owner, $includeExample);
         }
         return null;
     }
@@ -357,10 +357,9 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);
-        if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if ($item instanceof SearchEngineDataObject) {
             return $item->SearchEngineFieldsForIndexing($owner);
         }
-        die('kkkkkkkkkkkkkkkkk');
         return [
             1 => [],
             2 => [],

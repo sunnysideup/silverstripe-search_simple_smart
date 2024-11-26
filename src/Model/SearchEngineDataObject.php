@@ -510,7 +510,7 @@ class SearchEngineDataObject extends DataObject
                     new LiteralField(
                         'Levels',
                         '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>' .
-                        $object->SearchEngineFieldsToBeIndexedHumanReadable(true)
+                        $this->SearchEngineFieldsToBeIndexedHumanReadable($object, true)
                     ),
                     ReadonlyField::create(
                         'DataObjectClassName',
@@ -525,7 +525,7 @@ class SearchEngineDataObject extends DataObject
         }
         $firstTab = $fields->fieldByName('Root.SearchEngineKeywords_Level1');
         $secondTab = $fields->fieldByName('Root.SearchEngineKeywords_Level2');
-        if($firstTab && $secondTab) {
+        if ($firstTab && $secondTab) {
 
             // Remove original tabs
             $fields->removeByName('SearchEngineKeywords_Level1');
@@ -534,9 +534,9 @@ class SearchEngineDataObject extends DataObject
             // Add tabs in new order
             $fields->addFieldToTab('Root.Keywords 1', $firstTab);
             $fields->addFieldToTab('Root.Keywords 2', $secondTab);
-            foreach(['1', '2'] as $level) {
+            foreach (['1', '2'] as $level) {
                 $field = $fields->dataFieldByName('SearchEngineKeywords_Level' . $level);
-                if($field) {
+                if ($field) {
                     $field->setTitle('Keywords ' . $level);
                 }
             }

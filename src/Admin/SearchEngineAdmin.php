@@ -9,6 +9,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\HTMLReadonlyField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TabSet;
 use SilverStripe\Security\Permission;
@@ -140,37 +141,40 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
                             ),
                             new Tab(
                                 'Settings',
-                                HTMLReadonlyField::create(
+                                ReadonlyField::create(
                                     'class_name_for_search_provision',
                                     'Class or Search Provision',
                                     Config::inst()->get(SearchEngineCoreSearchMachine::class, 'class_name_for_search_provision')
                                 ),
-                                HTMLReadonlyField::create(
+                                ReadonlyField::create(
                                     'add_stop_words',
                                     'Add Default Stop Words',
                                     Config::inst()->get(SearchEngineKeywordFindAndRemove::class, 'add_stop_words') ? 'True' : 'False'
-                                ),
-                                HTMLReadonlyField::create(
+                                )
+                                    ->setDescription('This adds the default stop word list for excluding common words from searches (e.g. the, and, a).'),
+                                ReadonlyField::create(
                                     'add_stop_words_length',
                                     'Length of Default Stop Words List',
                                     Config::inst()->get(SearchEngineKeywordFindAndRemove::class, 'add_stop_words_length')
                                 ),
-                                HTMLReadonlyField::create(
+                                ReadonlyField::create(
                                     'remove_all_non_alpha_numeric_full_content',
                                     'Remove non Latin Characters',
                                     Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_alpha_numeric') ? 'True' : 'False'
                                 )->setDescription('Inclusion list: ' . implode(' ', SearchEngineFullContent::get_pattern_for_alpha_numeric_characters_human_readable())),
-                                HTMLReadonlyField::create(
+                                ReadonlyField::create(
                                     'remove_all_non_letters',
                                     'Remove Non Letter Characters',
                                     Config::inst()->get(SearchEngineFullContent::class, 'remove_all_non_letters') ? 'True' : 'False'
                                 )->setDescription('Remove any characters that are not considered letters or numbers in any language. '),
-                                HTMLReadonlyField::create(
+                                ReadonlyField::create(
                                     SearchEngineDataObjectToBeIndexed::class,
-                                    'Cron Job Is Running - if set to TRUE you need to set up a CRON JOB for indexing.
-                                        If set to FALSE, the index will update immediately (pages will take longer to save).
-                                        On DEV Environments, it always runs immediately (you never need to run the cron job)',
+                                    'Cron Job Is Running',
                                     Config::inst()->get(SearchEngineDataObjectToBeIndexed::class, 'cron_job_running') ? 'True' : 'False'
+                                )->setDescription(
+                                    'If set to TRUE you need to set up a CRON JOB for indexing.
+                                        If set to FALSE, the index will update immediately (pages will take longer to save).
+                                        On DEV Environments, it always runs immediately (you never need to run the cron job)'
                                 ),
                             ),
                             new Tab(
