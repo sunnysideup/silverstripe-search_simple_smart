@@ -37,7 +37,8 @@ class SearchEngineFullContent extends DataObject
         '&nbsp',
     ];
 
-    private static $pattern_for_alpha_numeric_characters = '/[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ_~\-\.\/\: ]+/u';
+    private static $pattern_for_alpha_numeric_characters = '[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ_~\-\.\/\: ]';
+    private static $pattern_for_letters = '[^\p{L}\p{N}]';
 
     private static $acceptable_one_letter_words = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'i'];
 
@@ -259,7 +260,11 @@ class SearchEngineFullContent extends DataObject
         //remove non-alpha
         $removeNonAlphas = Config::inst()->get(self::class, 'remove_all_non_alpha_numeric');
         if (true === $removeNonAlphas) {
-            $content = preg_replace(self::get_pattern_for_alpha_numeric_characters(), ' ', (string) $content);
+            $content = preg_replace(
+                '/'.self::get_pattern_for_alpha_numeric_characters() .'+/u',
+                ' ',
+                (string) $content
+            );
         }
 
         //remove non letters
@@ -285,9 +290,13 @@ class SearchEngineFullContent extends DataObject
         // Putting it all together, the pattern #[\P{L}\P{N}]+#u matches any sequence of one or more characters that are neither letters nor numbers. In other words, it matches any group of non-letter, non-number characters and replaces them with a single space.
         $removeNonLetters = Config::inst()->get(self::class, 'remove_all_non_letters');
         if (true === $removeNonLetters) {
+            $exclude = self::get_pattern_for_letters();
+            if ($removeNonAlphas) {
+                $exclude .= '|'.self::get_pattern_for_alpha_numeric_characters();
+            }
             $content = trim(
                 preg_replace(
-                    '/[^\p{L}\p{N}]+/u',
+                    '/'. $exclude . '+/u',
                     ' ',
                     (string) $content
                 )
@@ -300,6 +309,11 @@ class SearchEngineFullContent extends DataObject
     public static function get_pattern_for_alpha_numeric_characters(): string
     {
         return Config::inst()->get(self::class, 'pattern_for_alpha_numeric_characters');
+    }
+
+    public static function get_pattern_for_letters(): string
+    {
+        return Config::inst()->get(self::class, 'pattern_for_letters');
     }
 
     public static function get_pattern_for_alpha_numeric_characters_human_readable(): array
