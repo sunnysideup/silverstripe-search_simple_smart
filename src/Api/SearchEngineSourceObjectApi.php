@@ -173,15 +173,19 @@ class SearchEngineSourceObjectApi implements Flushable
                 $str = '<ul>';
                 foreach ($levels as $level => $fieldArray) {
                     $str .= '<li><strong>' . $level . '</strong><ul>';
-                    foreach ($fieldArray as $field) {
-                        $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
-                        if ($includeExample) {
-                            $fields = explode('.', $field);
-                            $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
-                            $str .= '<li> - <strong>' . $title . '</strong> <em>' . $data . '</em></li>';
-                        } else {
-                            $str .= '<li> - ' . $title . '</li>';
+                    if (is_array($fieldArray)) {
+                        foreach ($fieldArray as $field) {
+                            $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
+                            if ($includeExample) {
+                                $fields = explode('.', $field);
+                                $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
+                                $str .= '<li> - <strong>' . $title . '</strong> <em>' . $data . '</em></li>';
+                            } else {
+                                $str .= '<li> - ' . $title . '</li>';
+                            }
                         }
+                    } else {
+                        $str .= '<li> - [none]</li>';
                     }
 
                     $str .= '</ul></li>';
