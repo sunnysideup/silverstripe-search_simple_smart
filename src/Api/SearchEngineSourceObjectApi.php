@@ -94,14 +94,23 @@ class SearchEngineSourceObjectApi implements Flushable
         if (is_array($array) && count($array)) {
             foreach (['1', '2'] as $level) {
                 if (isset($array[$level])) {
-                    $array['level'.$level] = $array[$level];
+                    $array['level' . $level] = $array[$level];
                     unset($array[$level]);
                 }
             }
-            if (count($array) === 2 && isset($array['level1']) && isset($array['level2'])) {
+            if (!isset($array['level1']) && !isset($array['level2'])) {
+                return null;
+            }
+            if (!isset($array['level1'])) {
+                $array['level1'] = [];
+            }
+            if (!isset($array['level2'])) {
+                $array['level2'] = [];
+            }
+            if (count($array) === 2) {
                 return $array;
             }
-            user_error('You need to provide two levels of fields for indexing (level1 and level2).  You have provided: '.print_r($array, 1));
+            user_error('You need to provide two levels of fields for indexing (level1 and level2).  You have provided: ' . print_r($array, 1));
         }
         return null;
     }
