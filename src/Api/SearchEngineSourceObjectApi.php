@@ -89,7 +89,7 @@ class SearchEngineSourceObjectApi implements Flushable
         return self::$_search_engine_fields_for_indexing[$className];
     }
 
-    protected function checkLevelArray(array $array): ?array
+    protected function checkLevelArray(?array $array): ?array
     {
         if (is_array($array) && count($array)) {
             foreach (['1', '2'] as $level) {
