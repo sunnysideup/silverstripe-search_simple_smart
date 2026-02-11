@@ -280,6 +280,4 @@ class SearchEngineKeyword extends DataObject implements Flushable
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
-
-
 }

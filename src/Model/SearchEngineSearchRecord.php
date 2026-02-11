@@ -357,7 +357,6 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return implode(' ', $finalKeyWordArray);
     }
 
-
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
@@ -429,7 +428,6 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
             }
         }
     }
-
 
     public function CMSEditLink()
     {

@@ -197,7 +197,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         $finalArray = [];
         foreach ($replaceWithArray as $keyword) {
             $keyword = SearchEngineKeyword::clean_keyword($keyword);
-            if (strlen($keyword) > 0) {
+            if ((string) $keyword !== '') {
                 $finalArray[] = trim($keyword);
             }
         }
@@ -222,5 +222,4 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
-
 }

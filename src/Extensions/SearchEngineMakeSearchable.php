@@ -311,12 +311,9 @@ class SearchEngineMakeSearchable extends DataExtension
         $owner = $this->getOwner();
         if ($owner->SearchEngineExcludeFromIndex()) {
             //do nothing...
-        } else {
-            if (! isset($this->_onAfterWriteCount[$owner->ID])) {
-                $this->_onAfterWriteCount[$owner->ID] = true ;
-                register_shutdown_function([$owner, 'indexMeOnShutDown']);
-            }
-
+        } elseif (! isset($this->_onAfterWriteCount[$owner->ID])) {
+            $this->_onAfterWriteCount[$owner->ID] = true;
+            register_shutdown_function([$owner, 'indexMeOnShutDown']);
         }
     }
 

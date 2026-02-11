@@ -164,5 +164,4 @@ class SearchEngineKeywordFindAndRemove extends DataObject
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
-
 }

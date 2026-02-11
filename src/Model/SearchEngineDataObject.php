@@ -545,7 +545,6 @@ class SearchEngineDataObject extends DataObject
         return $fields;
     }
 
-
     //####################
     // display
     //####################
@@ -793,11 +792,8 @@ class SearchEngineDataObject extends DataObject
         $obj->IndexNow();
     }
 
-
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
-
-
 }

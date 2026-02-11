@@ -98,13 +98,13 @@ class SearchEngineSourceObjectApi implements Flushable
                     unset($array[$level]);
                 }
             }
-            if (!isset($array['level1']) && !isset($array['level2'])) {
+            if (! isset($array['level1']) && ! isset($array['level2'])) {
                 return null;
             }
-            if (!isset($array['level1'])) {
+            if (! isset($array['level1'])) {
                 $array['level1'] = [];
             }
-            if (!isset($array['level2'])) {
+            if (! isset($array['level2'])) {
                 $array['level2'] = [];
             }
             if (count($array) === 2) {

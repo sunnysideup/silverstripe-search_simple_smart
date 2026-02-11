@@ -3,7 +3,6 @@
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\Connect\MySQLSchemaManager;
@@ -11,7 +10,6 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
 
 /**
  * Full Content for each dataobject, separated by level of importance.
@@ -38,6 +36,7 @@ class SearchEngineFullContent extends DataObject
     ];
 
     private static $pattern_for_alpha_numeric_characters = '[^a-zA-Z0-9āēīōūĀĒĪŌŪáéíóúÁÉÍÓÚüÜöÖäÄçÇñÑßåÅæÆøØčČřŘšŠžŽłŁęĘśćŚĆżŻźŹđĐ_~\-\.\/\: ]';
+
     private static $pattern_for_letters = '[^\p{L}\p{N}]';
 
     private static $acceptable_one_letter_words = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'i'];
@@ -223,7 +222,6 @@ class SearchEngineFullContent extends DataObject
      *
      * @param string $content
      *
-     * @return string
      * @todo: cache using SS caching system.
      */
     public static function clean_content($content): string
@@ -261,7 +259,7 @@ class SearchEngineFullContent extends DataObject
         $removeNonAlphas = Config::inst()->get(self::class, 'remove_all_non_alpha_numeric');
         if (true === $removeNonAlphas) {
             $content = preg_replace(
-                '/'.self::get_pattern_for_alpha_numeric_characters() .'+/u',
+                '/' . self::get_pattern_for_alpha_numeric_characters() . '+/u',
                 ' ',
                 (string) $content
             );
@@ -292,11 +290,11 @@ class SearchEngineFullContent extends DataObject
         if (true === $removeNonLetters) {
             $exclude = self::get_pattern_for_letters();
             if ($removeNonAlphas) {
-                $exclude .= '|'.self::get_pattern_for_alpha_numeric_characters();
+                $exclude .= '|' . self::get_pattern_for_alpha_numeric_characters();
             }
             $content = trim(
                 preg_replace(
-                    '/'. $exclude . '+/u',
+                    '/' . $exclude . '+/u',
                     ' ',
                     (string) $content
                 )
@@ -412,6 +410,4 @@ class SearchEngineFullContent extends DataObject
             }
         }
     }
-
-
 }

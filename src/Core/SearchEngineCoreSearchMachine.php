@@ -360,7 +360,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
             $this->filterProviders += $filterProviders;
         }
 
-        if ($sortProvider !== null && $sortProvider !== '' && $sortProvider !== '0') {
+        if (! in_array($sortProvider, [null, '', '0'], true)) {
             $this->sortProvider = $sortProvider;
         }
 
@@ -517,7 +517,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
             )->filteredDatalist();
             if (is_array($this->nonCustomSort) && count($this->nonCustomSort)) {
                 $this->dataList = $this->dataList->sort($this->nonCustomSort);
-            } elseif (is_string($this->nonCustomSort) && strlen((string) $this->nonCustomSort) > 0) {
+            } elseif (is_string($this->nonCustomSort) && (string) (string) $this->nonCustomSort !== '') {
                 $this->dataList = $this->dataList->orderBy($this->nonCustomSort);
             }
             // $this->dataList = SearchEngineDataObject::get()

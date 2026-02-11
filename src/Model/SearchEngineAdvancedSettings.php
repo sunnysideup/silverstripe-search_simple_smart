@@ -81,7 +81,6 @@ class SearchEngineAdvancedSettings extends DataObject
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
-
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

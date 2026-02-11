@@ -290,7 +290,6 @@ class SearchEngineSearchRecordHistory extends DataObject
         return self::$_session_cache;
     }
 
-
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

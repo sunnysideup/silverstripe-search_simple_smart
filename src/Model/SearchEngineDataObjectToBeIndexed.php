@@ -308,11 +308,8 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         $this->flushCache();
     }
 
-
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
-
-
 }
