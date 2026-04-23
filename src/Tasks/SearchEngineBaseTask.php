@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Exception;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
@@ -102,7 +103,7 @@ class SearchEngineBaseTask extends BuildTask
                 }
 
                 ob_start();
-            } catch (\Exception $exception) {
+            } catch (Exception) {
                 echo ' ';
             }
 

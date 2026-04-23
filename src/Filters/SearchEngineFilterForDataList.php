@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
 use SilverStripe\ORM\SS_List;

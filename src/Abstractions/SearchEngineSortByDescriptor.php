@@ -18,8 +18,6 @@ abstract class SearchEngineSortByDescriptor
     use Injectable;
     use Configurable;
 
-    protected $debug = false;
-
     /**
      * retains debug information if turned on.
      *
@@ -49,9 +47,8 @@ abstract class SearchEngineSortByDescriptor
      */
     private static $class_group_limits = [];
 
-    public function __construct($debug = false)
+    public function __construct(protected $debug = false)
     {
-        $this->debug = $debug;
     }
 
     /**
@@ -152,9 +149,11 @@ abstract class SearchEngineSortByDescriptor
                     }
                 }
             }
+
             foreach ($array as $id => $className) {
                 $newArray[$id] = $className;
             }
+
             $keys = array_keys($newArray);
             //retrieve objects
             $objects = Injector::inst()->create(

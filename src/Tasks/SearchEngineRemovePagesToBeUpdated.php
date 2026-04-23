@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use SilverStripe\Control\HTTPRequest;

@@ -2,12 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
-use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 /**

@@ -22,8 +22,9 @@ class TestKeywordSearch extends Controller
             $page = Page::get()->orderBy('RAND()')->first();
             $keywords = strtok($page->Title, ' ');
         }
+
         echo '<h2>search for (?q=...): ' . $keywords . '</h2>';
-        $obj = (new SearchEngineCoreSearchMachine());
+        $obj = (SearchEngineCoreSearchMachine::create());
         $searchList = $obj
             ->setDebug(true)
             ->run($keywords)

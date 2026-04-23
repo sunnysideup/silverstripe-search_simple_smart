@@ -14,8 +14,6 @@ abstract class SearchEngineFilterForDescriptor
     use Injectable;
     use Configurable;
 
-    protected $debug = false;
-
     protected $filterValues;
 
     /**
@@ -25,9 +23,8 @@ abstract class SearchEngineFilterForDescriptor
      */
     protected $debugArray = [];
 
-    public function __construct($debug = false)
+    public function __construct(protected $debug = false)
     {
-        $this->debug = $debug;
     }
 
     /**

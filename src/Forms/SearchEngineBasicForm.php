@@ -156,16 +156,12 @@ class SearchEngineBasicForm extends Form
             $this->keywords = $_GET['SearchEngineKeywords'];
         }
 
-        $fields = new FieldList(
-            TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', ' '), $this->keywords)
-                ->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'Search phrase ...'))
-                ->addExtraClass('awesomplete')
-                ->setAttribute('autocomplete', 'off')
-        );
+        $fields = FieldList::create(TextField::create('SearchEngineKeywords', _t('SearchEngineBasicForm.KEYWORDS', ' '), $this->keywords)
+            ->setAttribute('placeholder', _t('SearchEngineBasicForm.WHAT_ARE_YOU_LOOKING_FOR', 'Search phrase ...'))
+            ->addExtraClass('awesomplete')
+            ->setAttribute('autocomplete', 'off'));
 
-        $actions = new FieldList(
-            FormAction::create('doSubmitForm', 'Search')
-        );
+        $actions = FieldList::create(FormAction::create('doSubmitForm', 'Search'));
 
         parent::__construct($controller, $name, $fields, $actions);
 
@@ -318,7 +314,7 @@ class SearchEngineBasicForm extends Form
     {
         $sortBy = $this->SortByProvider();
         if ($sortBy && count($sortBy) > 1) {
-            $default = isset($_GET['SortBy']) ? $_GET['SortBy'] : key($sortBy);
+            $default = $_GET['SortBy'] ?? key($sortBy);
             if ($this->includeSort) {
                 $this->Fields()->insertAfter(
                     //TextField::create('SortBy', _t("SearchEngineBasicForm.SORT_BY", "Sort by ..."), $sortBy, $default),
@@ -340,7 +336,7 @@ class SearchEngineBasicForm extends Form
 
         $filterFor = $this->FilterForProvider();
         if ($filterFor && count($filterFor) > 1 && $this->includeFilter) {
-            $defaults = isset($_GET['FilterFor']) ? $_GET['FilterFor'] : [];
+            $defaults = $_GET['FilterFor'] ?? [];
             $this->Fields()->insertAfter(
                 'SortBy',
                 CheckboxSetField::create('FilterFor', _t('SearchEngineBasicForm.FILTER_FOR', 'Filter for ...'), $filterFor)->setDefaultItems($defaults)
@@ -394,10 +390,12 @@ class SearchEngineBasicForm extends Form
                 Requirements::javascript(ExportKeywordList::get_js_keyword_file_name($includeBase = false));
             }
         }
+
         if ($hasScript) {
             if ($this->displayedFormInputSelector) {
                 $this->customScript[] = 'SearchEngineInitFunctions.displayedFormInputSelector = "' . $this->displayedFormInputSelector . '";';
             }
+
             Requirements::themedCSS('client/css/SearchEngine', 'searchengine');
             Requirements::themedCSS('client/css/awesomplete', 'searchengine');
             if ($this->updateBrowserHistory) {
@@ -436,19 +434,17 @@ class SearchEngineBasicForm extends Form
             }
         }
 
-        $arrayData = new ArrayData(
-            [
-                'SearchedFor' => Convert::raw2xml($data['SearchEngineKeywords']),
-                'Results' => $resultsPaginated,
-                'ResultsGrouped' => GroupedList::create($resultsPaginated),
-                'Count' => $count,
-                'Link' => $link,
-                'IsMoreDetailsResult' => $this->isMoreDetailsResult,
-                'FullResultsLink' => $fullResultsLink,
-                'NumberOfItemsPerPage' => $this->numberOfResultsPerPage,
-                // 'DebugHTML' => $searchMachine->getDebugString(),
-            ]
-        );
+        $arrayData = ArrayData::create([
+            'SearchedFor' => Convert::raw2xml($data['SearchEngineKeywords']),
+            'Results' => $resultsPaginated,
+            'ResultsGrouped' => GroupedList::create($resultsPaginated),
+            'Count' => $count,
+            'Link' => $link,
+            'IsMoreDetailsResult' => $this->isMoreDetailsResult,
+            'FullResultsLink' => $fullResultsLink,
+            'NumberOfItemsPerPage' => $this->numberOfResultsPerPage,
+            // 'DebugHTML' => $searchMachine->getDebugString(),
+        ]);
         $classGroups = Config::inst()->get(SearchEngineSortByDescriptor::class, 'class_groups');
         if (is_array($classGroups) && count($classGroups)) {
             return $arrayData->renderWith('Sunnysideup\SearchSimpleSmart\Includes\SearchEngineSearchResultsOuterWithSpecialSortGrouping');

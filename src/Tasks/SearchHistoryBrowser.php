@@ -97,6 +97,7 @@ class SearchHistoryBrowser extends BuildTask
                 $this->endDaysAgo = (int) $request->getVar('endDaysAgo');
             }
         }
+
         if (! Director::is_cli()) {
             $html =
             '

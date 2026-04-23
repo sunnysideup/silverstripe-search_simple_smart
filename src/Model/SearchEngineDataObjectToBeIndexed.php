@@ -122,7 +122,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         return $this->Config()->get('singular_name');
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return $this->Config()->get('plural_name');
     }
@@ -229,7 +229,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
 
     public function IndexNow(?SearchEngineDataObject $searchEngineDataObject = null)
     {
-        if (! $searchEngineDataObject instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if (! $searchEngineDataObject instanceof SearchEngineDataObject) {
             $searchEngineDataObject = $this->SearchEngineDataObject();
         }
 

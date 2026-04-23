@@ -79,12 +79,12 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
         }
 
         foreach ($allTables as $table) {
-            DB::alteration_message("Drop \"{$table}\"", 'deleted');
+            DB::alteration_message(sprintf('Drop "%s"', $table), 'deleted');
             if (method_exists(DB::get_conn(), 'clearTable')) {
                 // @DB::query("DROP \"$table\"");
                 DB::get_conn()->clearTable($table);
             } else {
-                DB::query("TRUNCATE \"{$table}\"");
+                DB::query(sprintf('TRUNCATE "%s"', $table));
             }
         }
 

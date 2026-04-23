@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
+use SilverStripe\Core\Extension;
 use DNADesign\Elemental\Models\BaseElement;
 use Exception;
 use SilverStripe\CMS\Model\SiteTree;
@@ -10,13 +11,11 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextareaField;
-use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
-use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -27,7 +26,7 @@ use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
  * Add this DataExtension to any object that you would like to make
  * searchable.
  */
-class SearchEngineMakeSearchable extends DataExtension
+class SearchEngineMakeSearchable extends Extension
 {
     /**
      * @var array
@@ -63,14 +62,14 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         //last check...
-        if (! $searchEngineDataObject instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if (! $searchEngineDataObject instanceof SearchEngineDataObject) {
             $searchEngineDataObject = SearchEngineDataObjectApi::find_or_make($owner);
         } elseif ($this->SearchEngineExcludeFromIndex()) {
             //do nothing
             $searchEngineDataObject = null;
         }
 
-        if ($searchEngineDataObject instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if ($searchEngineDataObject instanceof SearchEngineDataObject) {
             $searchEngineDataObject->doSearchEngineIndex($owner, $withModeChange);
         }
     }
@@ -137,7 +136,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);
-        if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if ($item instanceof SearchEngineDataObject) {
             $field = 'SearchEngineKeywords_Level' . $level;
 
             return $item->{$field}();
@@ -162,7 +161,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);
-        if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if ($item instanceof SearchEngineDataObject) {
             return $item->SearchEngineResultsTemplates($owner, $moreDetails);
         }
 
@@ -210,7 +209,7 @@ class SearchEngineMakeSearchable extends DataExtension
             }
 
             $item = SearchEngineDataObjectApi::find_or_make($owner);
-            if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+            if ($item instanceof SearchEngineDataObject) {
                 $hasBeenIndexed = $this->SearchEngineIsIndexed() ? 'yes' : 'no';
                 $toBeIndexed = $item->toBeIndexed() ? 'yes' : 'no';
                 $re = $item->toBeReIndexed() ? 're' : '';
@@ -240,6 +239,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($item instanceof SearchEngineDataObject) {
             return $item->FieldsForIndexing($owner, $includeExample);
         }
+
         return null;
     }
 
@@ -321,7 +321,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);
-        if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if ($item instanceof SearchEngineDataObject) {
             $item->write();
             // ExportKeywordList::export_keyword_list();
             SearchEngineDataObjectToBeIndexed::add($item);
@@ -357,6 +357,7 @@ class SearchEngineMakeSearchable extends DataExtension
         if ($item instanceof SearchEngineDataObject) {
             return $item->SearchEngineFieldsForIndexing($owner);
         }
+
         return [
             1 => [],
             2 => [],
@@ -372,7 +373,7 @@ class SearchEngineMakeSearchable extends DataExtension
     {
         $owner = $this->getOwner();
         $item = SearchEngineDataObjectApi::find_or_make($owner);
-        if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+        if ($item instanceof SearchEngineDataObject) {
             return $item->SearchEngineFullContents();
         }
 
@@ -407,23 +408,27 @@ class SearchEngineMakeSearchable extends DataExtension
         if (empty($owner->ID) || empty($owner->ClassName)) {
             return true;
         }
+
         if (class_exists(BaseElement::class) && (property_exists($owner, 'ShowTitle') && $owner->ShowTitle !== null) && $owner->ShowTitle === false) {
             return true;
         }
+
         if (! $owner->Title) {
             $owner->Title = $owner->getTitle();
             if ($owner->Title && $owner->Title === '#' . $owner->ID) {
                 $owner->Title = '';
             }
         }
+
         try {
             if (! $owner->exists()) {
                 return true;
             }
-        } catch (Exception $e) {
+        } catch (Exception) {
             return true;
             // do nothing
         }
+
         if (trim((string) $owner->Link()) === '' || trim((string) $owner->Title) === '') {
             return true;
         }

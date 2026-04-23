@@ -53,7 +53,7 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      */
     public function getSqlFilterArray($filterArray): ?array
     {
-        $recentTS = strtotime($this->Config()->get('recent_string'));
+        $recentTS = strtotime((string) $this->Config()->get('recent_string'));
 
         return ['LastEdited:GreaterThan' => date('Y-m-d', $recentTS)];
     }

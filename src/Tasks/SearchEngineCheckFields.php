@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Exception;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
@@ -60,18 +61,20 @@ class SearchEngineCheckFields extends BuildTask
         $start .= PHP_EOL . '    - ExtraClass';
         $start .= PHP_EOL . '  classes_to_exclude: []';
         $start .= PHP_EOL . '  classes_to_include:';
-        $array = (new CheckFieldsApi())->getList();
+        $array = (CheckFieldsApi::create())->getList();
         foreach ($array['AllValidFields'] as $className => $classData) {
             $hasFields = count($classData['Level1']) + count($classData['Level2']) > 0;
             if ($classData['IsBaseClass'] === false && $hasFields === false) {
                 continue;
             }
+
             $end .= PHP_EOL . $className . ':';
             if ($classData['IsBaseClass'] === true) {
                 $start .= PHP_EOL . '    - ' . $className;
                 $end .= PHP_EOL . '  extensions:';
                 $end .= PHP_EOL . '    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable';
             }
+
             if ($hasFields) {
                 $end .= PHP_EOL . '  search_engine_full_contents_fields_array:';
                 for ($i = 1; $i < 3; $i++) {
@@ -84,8 +87,10 @@ class SearchEngineCheckFields extends BuildTask
                     }
                 }
             }
+
             $end .= PHP_EOL;
         }
+
         echo $start . PHP_EOL . PHP_EOL . $end;
 
         $this->runEnd($request);
@@ -104,7 +109,7 @@ class SearchEngineCheckFields extends BuildTask
                 }
 
                 ob_start();
-            } catch (\Exception $exception) {
+            } catch (Exception) {
                 echo ' ';
             }
 

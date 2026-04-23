@@ -61,9 +61,9 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
                 $newKeyword = preg_replace($this->regex2, '', (string) $newKeyword);
                 if ($newKeyword !== $keyword) {
                     $this->flushNow('x', '', false);
-                    $array = str_split($keyword);
+                    $array = str_split((string) $keyword);
                     foreach ($array as $char) {
-                        if (false === strpos($newKeyword, $char)) {
+                        if (!str_contains((string) $newKeyword, $char)) {
                             $this->flushNow('!', '', false);
                             if (! isset($characters[$char])) {
                                 $characters[$char] = $char;

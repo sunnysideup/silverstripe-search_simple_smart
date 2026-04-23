@@ -120,7 +120,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         return $this->Config()->get('singular_name');
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return $this->Config()->get('plural_name');
     }
@@ -177,7 +177,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
             return $this->getField('Keyword');
         }
 
-        return "#{$this->ID}";
+        return '#' . $this->ID;
     }
 
     /**
@@ -207,6 +207,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
 
             self::$_keyword_cache[$keyword] = $obj;
         }
+
         self::add_auto_replace($keyword);
 
         return self::$_keyword_cache[$keyword];
@@ -219,6 +220,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         if ($wordWithoutMacrons === $keyword) {
             return;
         }
+
         $filter = ['Keyword' => $keyword];
         $obj = SearchEngineKeywordFindAndReplace::get()->filter($filter)->first();
         if ($obj) {
@@ -227,6 +229,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
             $obj = SearchEngineKeywordFindAndReplace::create($filter);
             $obj->ReplaceWith = $wordWithoutMacrons;
         }
+
         $obj->Custom = false;
         $obj->write();
     }
@@ -271,7 +274,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->addFieldToTab('Root.Main', new ReadonlyField('Keyword', 'Keyword'));
+        $fields->addFieldToTab('Root.Main', ReadonlyField::create('Keyword', 'Keyword'));
 
         return $fields;
     }

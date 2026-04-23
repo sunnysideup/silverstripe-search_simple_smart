@@ -57,10 +57,12 @@ class SearchEngineFormField extends LiteralField
             $totalCount = (int) DB::query($sql)->value();
             $this->minimumCount = (int) round($totalCount / 10000);
         }
+
         $endWhere = '';
         if ($this->endingDaysBack > 0) {
             $endWhere = 'AND SearchEngineSearchRecordHistory.Created < ( NOW() - INTERVAL ' . $this->endingDaysBack . ' DAY )';
         }
+
         $sql = '
             SELECT COUNT(SearchEngineSearchRecordHistory.ID) myCount, "Phrase" AS Title
                 FROM "SearchEngineSearchRecordHistory"
@@ -109,6 +111,7 @@ class SearchEngineFormField extends LiteralField
                     </td>
                 </tr>';
         }
+
         $content .= '
             </table>';
         asort($list);
@@ -133,6 +136,7 @@ class SearchEngineFormField extends LiteralField
         if ($this->showSource) {
             $content .= '<p><a href="/dev/tasks/searchhistorybrowser">Browse Search History</a></p>';
         }
+
         return $content;
     }
 

@@ -115,9 +115,10 @@ class SearchEngineDataObjectApi
                     }
                 }
             }
+
             $excludeClassNames = array_unique($excludeClassNames);
             foreach ($excludeClassNames as $excludeOne) {
-                $key = array_search($excludeOne, $testArray);
+                $key = array_search($excludeOne, $testArray, true);
                 if ($key !== false) {
                     unset($testArray[$key]);
                 }

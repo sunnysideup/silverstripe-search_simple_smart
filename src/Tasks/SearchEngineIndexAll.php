@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
@@ -71,7 +72,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                             $this->flushNow('Object cannot be indexed: ' . $obj->getTitle() . ' - ' . $obj->ID . ' - ' . $obj->ClassName, 'deleted');
                         } else {
                             $item = SearchEngineDataObjectApi::find_or_make($obj);
-                            if ($item instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject) {
+                            if ($item instanceof SearchEngineDataObject) {
                                 $this->flushNow('Queueing: ' . $obj->getTitle() . ' for indexing', 'created');
                                 SearchEngineDataObjectToBeIndexed::add($item, false);
                             } else {
@@ -84,6 +85,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                 }
             }
         }
+
         DB::alteration_message('==================================', 'created');
         DB::alteration_message('Delete doubles', 'created');
         DB::alteration_message('==================================', 'created');

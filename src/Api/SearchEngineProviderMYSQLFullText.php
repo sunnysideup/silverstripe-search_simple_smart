@@ -37,7 +37,6 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSearchEngineProvider;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 class SearchEngineProviderMYSQLFullText implements SearchEngineSearchEngineProvider
