@@ -88,6 +88,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
                 }
             }
         }
+
         DB::alteration_message('==================================', 'created');
         DB::alteration_message('Delete doubles', 'created');
         DB::alteration_message('==================================', 'created');
@@ -95,7 +96,10 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
         $definition = new InputDefinition($obj->getOptions());
         $input = new ArrayInput([], $definition);
         $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
-        $obj->run($input);
+        $definition = new InputDefinition($obj->getOptions());
+        $input = new ArrayInput([], $definition);
+        $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
+        $obj->run($input, $output);
         DB::alteration_message('==================================', 'created');
         DB::alteration_message('Delete obsoletes', 'created');
         DB::alteration_message('==================================', 'created');
@@ -103,7 +107,10 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
         $definition = new InputDefinition($obj->getOptions());
         $input = new ArrayInput([], $definition);
         $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
-        $obj->run($input);
+        $definition = new InputDefinition($obj->getOptions());
+        $input = new ArrayInput([], $definition);
+        $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
+        $obj->run($input, $output);
         $this->runEnd($request);
         return 0;
     }

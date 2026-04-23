@@ -48,6 +48,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
             $count = $this->limit;
             $sort = true;
         }
+
         for ($i = 0; $i <= $count; $i += $this->step) {
             $timeStart = microtime(true);
             $searchEngineDataObjectsToBeIndexed = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, $this->step);
@@ -89,6 +90,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
             $timeEnd = microtime(true);
             $this->flushNow('Time taken: ' . round(($timeEnd - $timeStart), 2));
         }
+
         SearchEngineDataObjectApi::end_indexing_mode();
         $this->runEnd($request);
         return 0;

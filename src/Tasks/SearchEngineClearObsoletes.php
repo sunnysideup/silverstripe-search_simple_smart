@@ -47,6 +47,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
             $count = $this->limit;
             $sort = true;
         }
+
         $this->flushNow('<h4>Found entries: ' . $count . ', limited to ' . $this->limit . '</h4>');
         for ($i = 0; $i <= $count; $i += $this->step) {
             $objects = SearchEngineDataObject::get()->limit($this->step, $i);
@@ -61,6 +62,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
                 }
             }
         }
+
         $this->runEnd($request);
         return 0;
     }

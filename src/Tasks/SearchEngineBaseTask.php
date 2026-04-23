@@ -86,6 +86,7 @@ class SearchEngineBaseTask extends BuildTask
 
             return Controller::curr()->redirect('/dev/tasks/' . $this->task . '/?' . http_build_query($_GET));
         }
+
         $this->runEnd($request);
         return null;
     }

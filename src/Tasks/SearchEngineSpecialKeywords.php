@@ -51,6 +51,7 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
         if ($count > $this->limit) {
             $count = $this->limit;
         }
+
         $characters = [];
         for ($i = 0; $i < $count; $i += $this->step) {
             $this->flushNow('.', '', true);
@@ -75,9 +76,11 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
                 }
             }
         }
+
         foreach ($characters as $char) {
             $this->flushNow(utf8_encode($char));
         }
+
         $this->runEnd($request);
         return 0;
     }

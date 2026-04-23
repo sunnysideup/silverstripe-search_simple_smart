@@ -92,6 +92,7 @@ class SearchEngineCheckFields extends BuildTask
 
             $end .= PHP_EOL;
         }
+
         echo $start . PHP_EOL . PHP_EOL . $end;
         $this->runEnd($request);
         return 0;

@@ -48,6 +48,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
         if ($count > $this->limit) {
             $count = $this->limit;
         }
+
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
         $ids = SearchEngineDataObjectToBeIndexed::get()
             ->exclude(['Completed' => 1])
@@ -71,6 +72,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
 
             $test[$foreignID][$id] = $id;
         }
+
         $this->runEnd($request);
         return 0;
     }

@@ -49,6 +49,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         if ($count > $this->limit) {
             $count = $this->limit;
         }
+
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
         $objects = SearchEngineDataObject::get()->sort(['ID' => 'ASC']);
         foreach ($objects as $obj) {
@@ -70,6 +71,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
                 $obj->delete();
             }
         }
+
         $this->runEnd($request);
         return 0;
     }
