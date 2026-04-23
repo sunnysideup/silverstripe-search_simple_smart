@@ -207,7 +207,7 @@ class SearchEngineFullContent extends DataObject
         //$content = SearchEngineKeyword::clean_keyword($content);
         $fieldArray = ['SearchEngineDataObjectID' => $item->ID, 'Level' => $level];
         /** @var SearchEngineFullContent $obj */
-        $obj = DataObject::get_one(self::class, $fieldArray);
+        $obj = self::get()->setUseCache(true)->filter($fieldArray)->first();
         if (! $obj) {
             $obj = self::create($fieldArray);
         }

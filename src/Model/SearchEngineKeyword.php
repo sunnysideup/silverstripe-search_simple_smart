@@ -199,7 +199,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         ++self::$_keyword_cache_request_count[$keyword];
         if (! isset(self::$_keyword_cache[$keyword])) {
             $fieldArray = ['Keyword' => $keyword];
-            $obj = DataObject::get_one(self::class, $fieldArray);
+            $obj = self::get()->setUseCache(true)->filter($fieldArray)->first();
             if (! $obj) {
                 $obj = self::create($fieldArray);
                 $obj->write();

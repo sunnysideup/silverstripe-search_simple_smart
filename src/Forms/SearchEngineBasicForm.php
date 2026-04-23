@@ -19,7 +19,6 @@ use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
@@ -427,7 +426,7 @@ class SearchEngineBasicForm extends Form
         $fullResultsLink = '';
         $fullResultsClassName = (string) Config::inst()->get(self::class, 'full_results_page_type');
         if ($fullResultsClassName !== '' && $fullResultsClassName !== '0' && $this->Controller()->dataRecord->ClassName !== $fullResultsClassName && is_subclass_of($fullResultsClassName, SiteTree::class)) {
-            $obj = DataObject::get_one($fullResultsClassName);
+            $obj = $fullResultsClassName::get()->setUseCache(true)->first();
             if ($obj) {
                 unset($data['url']);
                 $fullResultsLink = $obj->Link(self::class) . '?' . http_build_query($data, '', '&amp;');

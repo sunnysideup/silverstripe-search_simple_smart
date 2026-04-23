@@ -198,10 +198,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
                     'SearchEngineDataObjectID' => $searchEngineDataObject->ID,
                     'Completed' => 0,
                 ];
-                $objToBeIndexedRecord = DataObject::get_one(
-                    self::class,
-                    $fieldArray
-                );
+                $objToBeIndexedRecord = self::get()->setUseCache(true)->filter($fieldArray)->first();
                 if ($objToBeIndexedRecord && $objToBeIndexedRecord->exists()) {
                     //do nothing
                 } else {

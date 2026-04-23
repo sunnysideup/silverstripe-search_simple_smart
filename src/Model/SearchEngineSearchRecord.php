@@ -230,7 +230,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         }
 
         /** @var SearchEngineSearchRecord $obj */
-        $obj = DataObject::get_one(self::class, $fieldArray);
+        $obj = self::get()->setUseCache(true)->filter($fieldArray)->first();
         if (! $obj) {
             $obj = self::create($fieldArray);
             if ($filterProvidersEncoded) {
