@@ -2,6 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Forms;
 
+use SilverStripe\Model\ArrayData;
+use SilverStripe\Model\List\GroupedList;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\List\PaginatedList;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
@@ -15,11 +19,7 @@ use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\GroupedList;
-use SilverStripe\ORM\PaginatedList;
-use SilverStripe\View\ArrayData;
 use SilverStripe\View\Requirements;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;

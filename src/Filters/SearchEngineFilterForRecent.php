@@ -2,7 +2,6 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
@@ -49,7 +48,7 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      *     Date => ASC
      *     Title => DESC
      *
-     * @param null|array|SS_List $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
@@ -65,7 +64,7 @@ class SearchEngineFilterForRecent extends SearchEngineFilterForDescriptor
      *
      * @see: getFilterList
      *
-     * @param null|array|SS_List $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      *
      * @return bool
      */

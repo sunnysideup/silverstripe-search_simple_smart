@@ -8,7 +8,6 @@ use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
@@ -96,10 +95,10 @@ abstract class SearchEngineSortByDescriptor
     /**
      * Do any custom sorting.
      *
-     * @param SS_List $objects      - id => ClassName
+     * @param \SilverStripe\Model\List\SS_List $objects - id => ClassName
      * @param mixed $searchRecord
      *
-     * @return DataList|SS_List
+     * @return DataList|\SilverStripe\Model\List\SS_List
      */
     abstract public function doCustomSort($objects, $searchRecord);
 

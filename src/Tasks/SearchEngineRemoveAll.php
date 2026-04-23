@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
@@ -13,7 +15,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Remove All Search Engine Index Data';
+    protected string $title = 'Remove All Search Engine Index Data';
 
     /**
      * Description of the task.
@@ -29,7 +31,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchengineremoveall';
+    protected static string $commandName = 'searchengineremoveall';
 
     /**
      * list of all model tables.
@@ -56,15 +58,13 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
-
         $iAmSure = (bool) $request->getVar('i-am-sure');
         if (! $iAmSure) {
             die('please add the i-am-sure get variable to this task');
         }
-
         if ('all' === $this->type) {
             $allTables = array_merge(
                 // Config::inst()->get(self::class, 'search_history_tables'),
@@ -77,7 +77,6 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
         } else {
             die('Please set type: all|history|indexes - currently set to ' . $this->type . '.');
         }
-
         foreach ($allTables as $table) {
             DB::alteration_message(sprintf('Drop "%s"', $table), 'deleted');
             if (method_exists(DB::get_conn(), 'clearTable')) {
@@ -87,7 +86,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
                 DB::query(sprintf('TRUNCATE "%s"', $table));
             }
         }
-
         $this->runEnd($request);
+        return 0;
     }
 }

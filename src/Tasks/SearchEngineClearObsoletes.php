@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
@@ -12,7 +14,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Remove obsolete entries';
+    protected string $title = 'Remove obsolete entries';
 
     /**
      * description of the task.
@@ -28,25 +30,23 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchengineclearobsoletes';
+    protected static string $commandName = 'searchengineclearobsoletes';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
-
         $count = SearchEngineDataObject::get()->count();
         $sort = false;
         if ($count > $this->limit) {
             $count = $this->limit;
             $sort = true;
         }
-
         $this->flushNow('<h4>Found entries: ' . $count . ', limited to ' . $this->limit . '</h4>');
         for ($i = 0; $i <= $count; $i += $this->step) {
             $objects = SearchEngineDataObject::get()->limit($this->step, $i);
@@ -61,7 +61,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
                 }
             }
         }
-
         $this->runEnd($request);
+        return 0;
     }
 }

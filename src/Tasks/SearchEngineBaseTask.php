@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use Exception;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -37,7 +39,7 @@ class SearchEngineBaseTask extends BuildTask
      *
      * @var string
      */
-    protected $title = 'Base Search Engine Task';
+    protected string $title = 'Base Search Engine Task';
 
     /**
      * description of the task.
@@ -68,24 +70,22 @@ class SearchEngineBaseTask extends BuildTask
      *
      * @var string
      */
-    private static $segment = 'searchenginebasetask';
+    protected static string $commandName = 'searchenginebasetask';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
-
         if ($this->task && 'searchenginebasetask' !== $this->task) {
             unset($_GET['task'], $_GET['submit']);
 
             return Controller::curr()->redirect('/dev/tasks/' . $this->task . '/?' . http_build_query($_GET));
         }
-
         $this->runEnd($request);
         return null;
     }

@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
@@ -13,7 +15,7 @@ class SearchEngineSetSortDate extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Update Sort Date for all Search Engine Data Objects';
+    protected string $title = 'Update Sort Date for all Search Engine Data Objects';
 
     /**
      * title of the task.
@@ -29,25 +31,23 @@ class SearchEngineSetSortDate extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchenginesetsortdate';
+    protected static string $commandName = 'searchenginesetsortdate';
 
     /**
      * this function runs the SearchEngineUpdateSearchIndex task.
      *
      * @param null|HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
         SearchEngineDataObjectApi::start_indexing_mode();
-
         $count = SearchEngineDataObject::get()->count();
         $sort = false;
         if ($count > $this->limit) {
             $count = $this->limit;
             $sort = true;
         }
-
         for ($i = 0; $i <= $count; $i += $this->step) {
             $timeStart = microtime(true);
             $objects = SearchEngineDataObject::get()
@@ -66,9 +66,8 @@ class SearchEngineSetSortDate extends SearchEngineBaseTask
             $timeEnd = microtime(true);
             $this->flushNow('Time taken: ' . round(($timeEnd - $timeStart), 2));
         }
-
         SearchEngineDataObjectApi::end_indexing_mode();
-
         $this->runEnd($request);
+        return 0;
     }
 }

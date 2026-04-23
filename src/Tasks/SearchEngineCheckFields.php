@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use Exception;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
@@ -16,7 +18,7 @@ class SearchEngineCheckFields extends BuildTask
      *
      * @var string
      */
-    protected $title = 'Search Engine: List of All fields that can be indexed';
+    protected string $title = 'Search Engine: List of All fields that can be indexed';
 
     /**
      * description of the task.
@@ -37,14 +39,14 @@ class SearchEngineCheckFields extends BuildTask
      *
      * @var string
      */
-    private static $segment = 'checkfields';
+    protected static string $commandName = 'checkfields';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
@@ -90,10 +92,9 @@ class SearchEngineCheckFields extends BuildTask
 
             $end .= PHP_EOL;
         }
-
         echo $start . PHP_EOL . PHP_EOL . $end;
-
         $this->runEnd($request);
+        return 0;
     }
 
     public function flushNow($message, $type = '', $bullet = true)

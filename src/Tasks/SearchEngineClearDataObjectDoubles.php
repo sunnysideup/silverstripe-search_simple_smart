@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
@@ -14,7 +16,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Remove search engine data object doubles';
+    protected string $title = 'Remove search engine data object doubles';
 
     /**
      * description of the task.
@@ -30,27 +32,24 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchenginecleardataobjectdoubles';
+    protected static string $commandName = 'searchenginecleardataobjectdoubles';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
-
         $count = SearchEngineDataObject::get()
             ->count()
         ;
         if ($count > $this->limit) {
             $count = $this->limit;
         }
-
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
-
         $objects = SearchEngineDataObject::get()->sort(['ID' => 'ASC']);
         foreach ($objects as $obj) {
             $source = $obj->SourceObject();
@@ -71,7 +70,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
                 $obj->delete();
             }
         }
-
         $this->runEnd($request);
+        return 0;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\ExportKeywordList;
@@ -13,7 +15,7 @@ class SearchEngineCreateKeywordJS extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Update Keyword Javascript List';
+    protected string $title = 'Update Keyword Javascript List';
 
     /**
      * description of the task.
@@ -29,20 +31,19 @@ class SearchEngineCreateKeywordJS extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchenginecreatekeywordjs';
+    protected static string $commandName = 'searchenginecreatekeywordjs';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
-
         $outcome = ExportKeywordList::export_keyword_list();
         DB::alteration_message($outcome, 'created');
-
         $this->runEnd($request);
+        return 0;
     }
 }

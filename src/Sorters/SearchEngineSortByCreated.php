@@ -4,7 +4,6 @@ namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\FieldType\DBDate;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
@@ -58,10 +57,10 @@ class SearchEngineSortByCreated extends SearchEngineSortByDescriptor
     /**
      * Does any custom filtering.
      *
-     * @param SS_List|DataList         $objects
+     * @param \SilverStripe\Model\List\SS_List|DataList $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
-     * @return SS_List|DataList
+     * @return \SilverStripe\Model\List\SS_List|DataList
      */
     public function doCustomSort($objects, $searchRecord)
     {

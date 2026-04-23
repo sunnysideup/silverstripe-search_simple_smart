@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
@@ -35,7 +37,7 @@ class SearchHistoryBrowser extends BuildTask
      *
      * @var string
      */
-    protected $title = 'Search Engine: what people searched for';
+    protected string $title = 'Search Engine: what people searched for';
 
     /**
      * description of the task.
@@ -51,14 +53,14 @@ class SearchHistoryBrowser extends BuildTask
      *
      * @var string
      */
-    private static $segment = 'searchhistorybrowser';
+    protected static string $commandName = 'searchhistorybrowser';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
@@ -67,8 +69,8 @@ class SearchHistoryBrowser extends BuildTask
             ->setEndingDaysBack($this->endDaysAgo)
             ->setShowSource(false)
             ->forTemplate();
-
         $this->runEnd($request);
+        return 0;
     }
 
     public function flushNow($message, $type = '', $bullet = true)

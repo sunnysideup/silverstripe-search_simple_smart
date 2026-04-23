@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -13,7 +15,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Remove to be indexed doubles';
+    protected string $title = 'Remove to be indexed doubles';
 
     /**
      * description of the task.
@@ -29,27 +31,24 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchenginecleartobeindexeddoubles';
+    protected static string $commandName = 'searchenginecleartobeindexeddoubles';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
-
         $count = SearchEngineDataObjectToBeIndexed::get()
             ->count()
         ;
         if ($count > $this->limit) {
             $count = $this->limit;
         }
-
         $this->flushNow('<h4>Found entries: ' . $count . '</h4>');
-
         $ids = SearchEngineDataObjectToBeIndexed::get()
             ->exclude(['Completed' => 1])
             ->shuffle()
@@ -72,7 +71,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
 
             $test[$foreignID][$id] = $id;
         }
-
         $this->runEnd($request);
+        return 0;
     }
 }
