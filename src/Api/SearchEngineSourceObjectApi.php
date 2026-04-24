@@ -41,6 +41,7 @@ class SearchEngineSourceObjectApi implements Flushable
                 }
             }
         }
+
         return null;
     }
 
@@ -60,7 +61,7 @@ class SearchEngineSourceObjectApi implements Flushable
                 $levelFields = [SearchEngineKeyword::level_sanitizer(1) => [], SearchEngineKeyword::level_sanitizer(2) => []];
                 foreach ($dbArray as $field => $type) {
                     //get without brackets ...
-                    if (preg_match('#^(\w+)\(#', $type, $match)) {
+                    if (preg_match('#^(\w+)\(#', (string) $type, $match)) {
                         $type = $match[1];
                     }
 
@@ -78,10 +79,12 @@ class SearchEngineSourceObjectApi implements Flushable
                     }
                 }
             }
+
             // add the keyword stuffer!
             if (! isset($levelFields['level1']) || ! is_array($levelFields['level1'])) {
                 $levelFields['level1'] = [];
             }
+
             array_unshift($levelFields['level1'], 'KeywordStuffer');
             self::$_search_engine_fields_for_indexing[$className] = $levelFields;
         }
@@ -98,20 +101,26 @@ class SearchEngineSourceObjectApi implements Flushable
                     unset($array[$level]);
                 }
             }
+
             if (! isset($array['level1']) && ! isset($array['level2'])) {
                 return null;
             }
+
             if (! isset($array['level1'])) {
                 $array['level1'] = [];
             }
+
             if (! isset($array['level2'])) {
                 $array['level2'] = [];
             }
+
             if (count($array) === 2) {
                 return $array;
             }
+
             user_error('You need to provide two levels of fields for indexing (level1 and level2).  You have provided: ' . print_r($array, 1));
         }
+
         return null;
     }
 
@@ -127,12 +136,13 @@ class SearchEngineSourceObjectApi implements Flushable
                 $finalArray[$level] = '';
                 if (is_array($fieldArray) && count($fieldArray)) {
                     foreach ($fieldArray as $field) {
-                        $fields = explode('.', $field);
+                        $fields = explode('.', (string) $field);
                         $finalArray[$level] .= ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
                     }
                 }
             }
         }
+
         return $finalArray;
     }
 
@@ -167,6 +177,7 @@ class SearchEngineSourceObjectApi implements Flushable
                 if (DataObject::class === $parent) {
                     break;
                 }
+
                 $parentShort = ClassInfo::shortName($parent);
                 if ($moreDetails) {
                     $arrayOfTemplates[] = 'Sunnysideup\SearchSimpleSmart\Includes\SearchEngineResultItem_' . $parentShort . '_MoreDetails';
@@ -200,7 +211,7 @@ class SearchEngineSourceObjectApi implements Flushable
                         foreach ($fieldArray as $field) {
                             $title = isset($fieldLabels[$field]) ? $fieldLabels[$field] . ' [' . $field . ']' : $field;
                             if ($includeExample) {
-                                $fields = explode('.', $field);
+                                $fields = explode('.', (string) $field);
                                 $data = ' ' . SearchEngineMakeSearchableApi::make_searchable_rel_object($sourceObject, $fields) . ' ';
                                 $str .= '<li> - <strong>' . $title . '</strong> <em>' . $data . '</em></li>';
                             } else {

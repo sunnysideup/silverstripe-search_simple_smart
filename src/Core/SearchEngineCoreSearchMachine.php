@@ -2,12 +2,12 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Core;
 
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
 use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
@@ -272,9 +272,10 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
      */
     public function run(?string $searchPhrase = '', ?array $filterProviders = [], ?string $sortProvider = '', $sortProviderValues = null)
     {
-        if (strlen(trim($searchPhrase)) < 2) {
+        if (strlen(trim((string) $searchPhrase)) < 2) {
             $searchPhrase = self::NO_KEYWORD_PROVIDED;
         }
+
         // special get vars
         $this->runGetGetVars();
 
@@ -431,7 +432,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
             $this->dataList = $this->searchProvider->getRawResults();
 
             // storing the RAW results.
-            $this->listOfIDsAsArray = explode(',', $this->searchRecord->setListOfIDs($this->dataList, 'RAW'));
+            $this->listOfIDsAsArray = explode(',', (string) $this->searchRecord->setListOfIDs($this->dataList, 'RAW'));
         }
     }
 
@@ -520,6 +521,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
             } elseif (is_string($this->nonCustomSort) && (string) (string) $this->nonCustomSort !== '') {
                 $this->dataList = $this->dataList->orderBy($this->nonCustomSort);
             }
+
             // $this->dataList = SearchEngineDataObject::get()
             // ->filter(['ID' => $this->listOfIDsCustomAsArray])
             // ->orderBy($this->nonCustomSort);
@@ -628,7 +630,7 @@ class SearchEngineCoreSearchMachine implements SearchEngineCoreMachineProvider
         $this->debugArray[] = 'Keywords SQL (excludes keywords that are not in index): <pre> (' . implode(') AND (', $this->keywordArray) . ')</pre>';
         $this->debugArray[] = '---------------- Filters --------------';
         $this->debugArray[] = 'STEP 1: RAW Filter ' . $this->filter1;
-        $this->debugArray[] = "... RAW matches {$this->matches1}";
+        $this->debugArray[] = '... RAW matches ' . $this->matches1;
         $this->debugArray[] = '<hr />';
         $this->debugArray[] = 'STEP 2: SQL Filter ' . $this->filter2;
         $this->debugArray[] = '... SQL matches ' . $this->matches2;

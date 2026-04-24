@@ -2,6 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
+use Exception;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
@@ -15,7 +18,7 @@ class SearchEngineCheckFields extends BuildTask
      *
      * @var string
      */
-    protected $title = 'Search Engine: List of All fields that can be indexed';
+    protected string $title = 'Search Engine: List of All fields that can be indexed';
 
     /**
      * description of the task.
@@ -36,14 +39,14 @@ class SearchEngineCheckFields extends BuildTask
      *
      * @var string
      */
-    private static $segment = 'checkfields';
+    protected static string $commandName = 'checkfields';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
         $this->runStart($request);
@@ -60,18 +63,20 @@ class SearchEngineCheckFields extends BuildTask
         $start .= PHP_EOL . '    - ExtraClass';
         $start .= PHP_EOL . '  classes_to_exclude: []';
         $start .= PHP_EOL . '  classes_to_include:';
-        $array = (new CheckFieldsApi())->getList();
+        $array = (CheckFieldsApi::create())->getList();
         foreach ($array['AllValidFields'] as $className => $classData) {
             $hasFields = count($classData['Level1']) + count($classData['Level2']) > 0;
             if ($classData['IsBaseClass'] === false && $hasFields === false) {
                 continue;
             }
+
             $end .= PHP_EOL . $className . ':';
             if ($classData['IsBaseClass'] === true) {
                 $start .= PHP_EOL . '    - ' . $className;
                 $end .= PHP_EOL . '  extensions:';
                 $end .= PHP_EOL . '    - Sunnysideup\SearchSimpleSmart\Extensions\SearchEngineMakeSearchable';
             }
+
             if ($hasFields) {
                 $end .= PHP_EOL . '  search_engine_full_contents_fields_array:';
                 for ($i = 1; $i < 3; $i++) {
@@ -84,11 +89,13 @@ class SearchEngineCheckFields extends BuildTask
                     }
                 }
             }
+
             $end .= PHP_EOL;
         }
-        echo $start . PHP_EOL . PHP_EOL . $end;
 
+        echo $start . PHP_EOL . PHP_EOL . $end;
         $this->runEnd($request);
+        return 0;
     }
 
     public function flushNow($message, $type = '', $bullet = true)
@@ -104,7 +111,7 @@ class SearchEngineCheckFields extends BuildTask
                 }
 
                 ob_start();
-            } catch (\Exception $exception) {
+            } catch (Exception) {
                 echo ' ';
             }
 

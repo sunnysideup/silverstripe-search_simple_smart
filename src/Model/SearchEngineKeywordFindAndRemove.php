@@ -73,7 +73,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
         return $this->Config()->get('singular_name');
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return $this->Config()->get('plural_name');
     }
@@ -144,7 +144,7 @@ class SearchEngineKeywordFindAndRemove extends DataObject
             $stopwords = SearchEngineStopWords::get_list($size);
             foreach ($stopwords as $stopword) {
                 if (! self::is_listed($stopword)) {
-                    DB::alteration_message("Creating stop word: {$stopword}", 'created');
+                    DB::alteration_message('Creating stop word: ' . $stopword, 'created');
                     $obj = self::create();
                     $obj->Keyword = $stopword;
                     $obj->Custom = false;

@@ -131,7 +131,7 @@ class SearchEngineFullContent extends DataObject
         return $this->Config()->get('singular_name');
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return $this->Config()->get('plural_name');
     }
@@ -207,7 +207,7 @@ class SearchEngineFullContent extends DataObject
         //$content = SearchEngineKeyword::clean_keyword($content);
         $fieldArray = ['SearchEngineDataObjectID' => $item->ID, 'Level' => $level];
         /** @var SearchEngineFullContent $obj */
-        $obj = DataObject::get_one(self::class, $fieldArray);
+        $obj = self::get()->setUseCache(true)->filter($fieldArray)->first();
         if (! $obj) {
             $obj = self::create($fieldArray);
         }
@@ -292,16 +292,18 @@ class SearchEngineFullContent extends DataObject
             if ($removeNonAlphas) {
                 $exclude .= '|' . self::get_pattern_for_alpha_numeric_characters();
             }
+
             $content = trim(
-                preg_replace(
+                (string) preg_replace(
                     '/' . $exclude . '+/u',
                     ' ',
                     (string) $content
                 )
             );
         }
+
         // remove multiple white space
-        return trim(preg_replace('#\s+#', ' ', (string) $content));
+        return trim((string) preg_replace('#\s+#', ' ', (string) $content));
     }
 
     public static function get_pattern_for_alpha_numeric_characters(): string

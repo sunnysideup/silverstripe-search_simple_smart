@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
@@ -12,7 +14,7 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Find special characters in keywords';
+    protected string $title = 'Find special characters in keywords';
 
     /**
      * description of the task.
@@ -34,25 +36,23 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchenginespecialkeywords';
+    protected static string $commandName = 'searchenginespecialkeywords';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         header('Content-Type: text/html; charset=utf-8');
         $this->runStart($request);
-
         $count = SearchEngineKeyword::get()->count();
         if ($count > $this->limit) {
             $count = $this->limit;
         }
 
         $characters = [];
-
         for ($i = 0; $i < $count; $i += $this->step) {
             $this->flushNow('.', '', true);
             $keywords = SearchEngineKeyword::get()->limit($this->step, $i)->column('Keyword');
@@ -61,9 +61,9 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
                 $newKeyword = preg_replace($this->regex2, '', (string) $newKeyword);
                 if ($newKeyword !== $keyword) {
                     $this->flushNow('x', '', false);
-                    $array = str_split($keyword);
+                    $array = str_split((string) $keyword);
                     foreach ($array as $char) {
-                        if (false === strpos($newKeyword, $char)) {
+                        if (!str_contains((string) $newKeyword, $char)) {
                             $this->flushNow('!', '', false);
                             if (! isset($characters[$char])) {
                                 $characters[$char] = $char;
@@ -82,5 +82,6 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
         }
 
         $this->runEnd($request);
+        return 0;
     }
 }

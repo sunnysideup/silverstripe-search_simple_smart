@@ -5,7 +5,6 @@ namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 abstract class SearchEngineFilterForDescriptor
@@ -13,8 +12,6 @@ abstract class SearchEngineFilterForDescriptor
     use Extensible;
     use Injectable;
     use Configurable;
-
-    protected $debug = false;
 
     protected $filterValues;
 
@@ -25,9 +22,8 @@ abstract class SearchEngineFilterForDescriptor
      */
     protected $debugArray = [];
 
-    public function __construct($debug = false)
+    public function __construct(protected $debug = false)
     {
-        $this->debug = $debug;
     }
 
     /**
@@ -69,7 +65,7 @@ abstract class SearchEngineFilterForDescriptor
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param null|array|SS_List $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      */
     abstract public function getSqlFilterArray($filterArray): ?array;
 
@@ -80,7 +76,7 @@ abstract class SearchEngineFilterForDescriptor
      *
      * @see: getFilterList
      *
-     * @param null|array|SS_List $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      *
      * @return bool
      */
@@ -89,11 +85,11 @@ abstract class SearchEngineFilterForDescriptor
     /**
      * Does any custom filtering.
      *
-     * @param SS_List                  $objects
+     * @param \SilverStripe\Model\List\SS_List $objects
      * @param SearchEngineSearchRecord $searchRecord
-     * @param null|array|SS_List       $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      *
-     * @return SS_List
+     * @return \SilverStripe\Model\List\SS_List
      */
     public function doCustomFilter($objects, $searchRecord, $filterArray)
     {

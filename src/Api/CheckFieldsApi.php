@@ -137,6 +137,7 @@ class CheckFieldsApi
                 DB::alteration_message(' ... Skipping ' . $className);
             }
         }
+
         $this->removeDoubles();
 
         $this->saveCache();
@@ -176,6 +177,7 @@ class CheckFieldsApi
             );
             $this->cache['AllDataObjects'][$this->baseClass] = array_unique($this->cache['AllDataObjects'][$this->baseClass]);
         }
+
         return $this->cache['AllDataObjects'][$this->baseClass];
     }
 
@@ -193,9 +195,11 @@ class CheckFieldsApi
                         if (in_array($name, $this->excludedFields, true)) {
                             continue;
                         }
+
                         if (! $this->isValidFieldType($className, $name, $type)) {
                             continue;
                         }
+
                         if (in_array($name, $this->excludedClassFieldCombos[$className] ?? [])) {
                             continue;
                         }
@@ -208,6 +212,7 @@ class CheckFieldsApi
                         $array,
                     );
                 }
+
                 $array = array_diff($array, $arrayIndexed);
                 $rels = (array) Config::inst()->get($className, 'belongs') +
                     (array) Config::inst()->get($className, 'has_one') +
@@ -219,16 +224,20 @@ class CheckFieldsApi
                     if (in_array($relName, $this->excludedFields, true)) {
                         continue;
                     }
+
                     if (in_array($relType, $this->excludedClasses)) {
                         continue;
                     }
+
                     if (in_array($relType, $this->excludedClassFieldCombos[$className] ?? [])) {
                         continue;
                     }
+
                     $hasTitleField = isset($dbFields['Title']) || isset($dbFields['Name']);
                     $msg = ($hasTitleField ? '' : '# no title field present in ' . $relType . ' please add one');
                     $array[] = $relName . '.Title' . $msg;
                 }
+
                 $this->cache['AllValidFields'][$className]['Level1'] = $arrayIndexed;
                 $this->cache['AllValidFields'][$className]['Level2'] = $array;
             }
@@ -247,18 +256,21 @@ class CheckFieldsApi
                     if ($ancestor === DataObject::class) {
                         break;
                     }
+
                     if ($ancestor === $className) {
                         continue;
                     }
+
                     $removeData = $this->cache['AllValidFields'][$ancestor];
                     $toRemove = array_merge($toRemove, $removeData['Level1'], $removeData['Level2']);
                 }
             }
+
             for ($i = 1; $i < 3; $i++) {
                 $level = 'Level' . $i;
                 foreach ($classData[$level] as $key => $field) {
                     if (in_array($field, $toRemove)) {
-                        $pos = array_search($field, $this->cache['AllValidFields'][$className][$level]);
+                        $pos = array_search($field, $this->cache['AllValidFields'][$className][$level], true);
                         unset($this->cache['AllValidFields'][$className][$level][$key], $pos);
                     }
                 }
@@ -274,6 +286,7 @@ class CheckFieldsApi
             foreach (Config::inst()->get(SearchEngineDataObject::class, 'search_engine_default_level_one_fields') as $field) {
                 $indexes[$field] = true;
             }
+
             if (is_array($indexes)) {
                 foreach ($indexes as $key => $field) {
                     if (in_array($key, $possibleFields)) {
@@ -288,7 +301,7 @@ class CheckFieldsApi
                                 }
                             }
 
-                            $testArray = explode(',', $test);
+                            $testArray = explode(',', (string) $test);
                             foreach ($testArray as $testInner) {
                                 $testInner = trim($testInner);
                                 if (in_array($testInner, $possibleFields)) {
@@ -326,6 +339,7 @@ class CheckFieldsApi
                 return true;
             }
         }
+
         return false;
     }
 }

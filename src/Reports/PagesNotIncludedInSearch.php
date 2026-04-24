@@ -17,7 +17,7 @@ class PagesNotIncludedInSearch extends Report
 
     public function group()
     {
-        return _t(__CLASS__ . '.ContentGroupTitle', 'Content reports');
+        return _t(self::class . '.ContentGroupTitle', 'Content reports');
     }
 
     public function sort()

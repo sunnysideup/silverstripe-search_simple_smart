@@ -324,6 +324,7 @@ class SearchEngineDataObject extends DataObject
         if (! $sourceObject) {
             $sourceObject = $this->SourceObject();
         }
+
         return Injector::inst()->get(SearchEngineSourceObjectApi::class)
             ->FieldsForIndexing($sourceObject)
         ;
@@ -351,7 +352,7 @@ class SearchEngineDataObject extends DataObject
     {
         $objectClassName = $this->getObjectClassName();
         $object = $this->SourceObject();
-        $objectName = $object instanceof \SilverStripe\ORM\DataObject ? $object->getTitle() : 'ERROR: NOT FOUND';
+        $objectName = $object instanceof DataObject ? $object->getTitle() : 'ERROR: NOT FOUND';
 
         return $objectClassName . ': ' . $objectName;
     }
@@ -438,7 +439,7 @@ class SearchEngineDataObject extends DataObject
     public function SearchEngineExcludeFromIndex(): bool
     {
         $sourceObject = $this->SourceObject();
-        if ($sourceObject instanceof \SilverStripe\ORM\DataObject) {
+        if ($sourceObject instanceof DataObject) {
             return $sourceObject->SearchEngineExcludeFromIndex();
         } else {
             return true;
@@ -507,11 +508,8 @@ class SearchEngineDataObject extends DataObject
             $fields->addFieldsToTab(
                 'Root.Schema',
                 [
-                    new LiteralField(
-                        'Levels',
-                        '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>' .
-                        $this->SearchEngineFieldsToBeIndexedHumanReadable($object, true)
-                    ),
+                    LiteralField::create('Levels', '<h2>Below are the fields and how they grouped into Level 1 (more important for relevance) and Level 2 (less important for relevance)</h2>' .
+                    $this->SearchEngineFieldsToBeIndexedHumanReadable($object, true)),
                     ReadonlyField::create(
                         'DataObjectClassName',
                         'Class Name'
@@ -523,6 +521,7 @@ class SearchEngineDataObject extends DataObject
                 ]
             );
         }
+
         $firstTab = $fields->fieldByName('Root.SearchEngineKeywords_Level1');
         $secondTab = $fields->fieldByName('Root.SearchEngineKeywords_Level2');
         if ($firstTab && $secondTab) {
@@ -646,6 +645,7 @@ class SearchEngineDataObject extends DataObject
             if ($timeMeasure) {
                 $startTime = microtime(true);
             }
+
             //add the full content
             SearchEngineFullContent::add_data_object_array($this, $fullContentArray);
             if ($timeMeasure) {

@@ -4,7 +4,6 @@ namespace Sunnysideup\SearchSimpleSmart\Extensions;
 
 use SilverStripe\Core\Extension;
 use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\FieldType\DBVarchar;
 use Sunnysideup\SearchSimpleSmart\Forms\SearchEngineBasicForm;
 
 class SearchEngineContentControllerExtension extends Extension
@@ -42,7 +41,7 @@ class SearchEngineContentControllerExtension extends Extension
     public function SearchEngineBasicForm(): SearchEngineBasicForm
     {
         if (! $this->_mySearchEngineBasicForm) {
-            $this->_mySearchEngineBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineBasicForm')
+            $this->_mySearchEngineBasicForm = SearchEngineBasicForm::create($this->getOwner(), 'SearchEngineBasicForm')
                 ->setIsMoreDetailsResult(true)
                 ->setNumberOfResultsPerPage(20)
                 ->setIncludeFilter(true)
@@ -62,7 +61,7 @@ class SearchEngineContentControllerExtension extends Extension
     public function SearchEngineSuperBasicForm(): SearchEngineBasicForm
     {
         if (! $this->_mySearchEngineSuperBasicForm) {
-            $this->_mySearchEngineSuperBasicForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineSuperBasicForm');
+            $this->_mySearchEngineSuperBasicForm = SearchEngineBasicForm::create($this->getOwner(), 'SearchEngineSuperBasicForm');
         }
 
         return $this->_mySearchEngineSuperBasicForm;
@@ -74,7 +73,7 @@ class SearchEngineContentControllerExtension extends Extension
     public function SearchEngineCustomForm(): SearchEngineBasicForm
     {
         if (! $this->_mySearchEngineCustomForm) {
-            $this->_mySearchEngineCustomForm = SearchEngineBasicForm::create($this->owner, 'SearchEngineCustomForm')
+            $this->_mySearchEngineCustomForm = SearchEngineBasicForm::create($this->getOwner(), 'SearchEngineCustomForm')
                 ->setOutputAsJSON(true)
             ;
         }
@@ -87,7 +86,7 @@ class SearchEngineContentControllerExtension extends Extension
      */
     public function SearchEngineKeywordsPhrase()
     {
-        $val = isset($_GET['SearchEngineKeywords']) ? $_GET['SearchEngineKeywords'] : '';
+        $val = $_GET['SearchEngineKeywords'] ?? '';
 
         return DBField::create_field('Varchar', $val);
     }

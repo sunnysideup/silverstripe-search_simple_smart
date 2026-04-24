@@ -62,6 +62,7 @@ class ExportKeywordList
                 return 'no file name specified';
             }
         }
+
         return null;
     }
 
@@ -76,6 +77,7 @@ class ExportKeywordList
         if (! $myFolderName) {
             $myFolderName = 'searchkeywords';
         }
+
         //without folder name we return null!
         if ($myFolderName) {
             $myFolderName = 'public/assets/' . $myFolderName;
@@ -89,6 +91,7 @@ class ExportKeywordList
 
             return rtrim(str_replace('//', '/', $str), '/') . '/' . $fileName;
         }
+
         return null;
     }
 }

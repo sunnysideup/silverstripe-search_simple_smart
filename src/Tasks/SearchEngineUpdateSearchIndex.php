@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -13,7 +15,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Update Search Index. Takes all queued objects and indexes them.';
+    protected string $title = 'Update Search Index. Takes all queued objects and indexes them.';
 
     /**
      * title of the task.
@@ -29,18 +31,17 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchengineupdatesearchindex';
+    protected static string $commandName = 'searchengineupdatesearchindex';
 
     /**
      * this function runs the SearchEngineUpdateSearchIndex task.
      *
      * @param null|HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
         SearchEngineDataObjectApi::start_indexing_mode();
-
         $count = SearchEngineDataObjectToBeIndexed::to_run($this->oldOnesOnly, 99999999)->count();
         $sort = false;
         if ($count > $this->limit) {
@@ -91,7 +92,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
         }
 
         SearchEngineDataObjectApi::end_indexing_mode();
-
         $this->runEnd($request);
+        return 0;
     }
 }

@@ -169,14 +169,16 @@ class SearchEngineSearchRecordHistory extends DataObject
                 if (! $searchEngineSearchRecord->ListOfIDsCUSTOM) {
                     $count = 0;
                 } else {
-                    $count = substr_count($searchEngineSearchRecord->ListOfIDsCUSTOM, ',') + 1;
+                    $count = substr_count((string) $searchEngineSearchRecord->ListOfIDsCUSTOM, ',') + 1;
                 }
             }
+
             $obj->NumberOfResults = $count;
             $obj->write();
 
             return $obj;
         }
+
         return null;
     }
 
@@ -197,6 +199,7 @@ class SearchEngineSearchRecordHistory extends DataObject
 
             return $obj;
         }
+
         return null;
     }
 
@@ -209,6 +212,7 @@ class SearchEngineSearchRecordHistory extends DataObject
             if ($currentUser) {
                 $currentUserID = $currentUser->ID;
             }
+
             $fieldArray = [
                 'MemberID' => $currentUserID,
                 'Session' => self::get_timestamp_based_session_id(),
@@ -217,6 +221,7 @@ class SearchEngineSearchRecordHistory extends DataObject
                 $fieldArray['Phrase'] = $searchEngineSearchRecord->Phrase;
                 $fieldArray['SearchEngineSearchRecordID'] = $searchEngineSearchRecord->ID;
             }
+
             self::$_latest_search_cache = SearchEngineSearchRecordHistory::get()
                 ->filter($fieldArray)
                 ->sort(['ID' => 'DESC'])
@@ -236,6 +241,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         if (! $curr || ($number && $number !== $curr)) {
             $curr = self::set_timestamp_based_session_id($number);
         }
+
         return $curr;
     }
 
@@ -246,10 +252,12 @@ class SearchEngineSearchRecordHistory extends DataObject
             if (! $number) {
                 $number = time();
             }
+
             $session->set('SearchEngineSearchRecordHistorySessionID', $number);
         } else {
             $number = 0;
         }
+
         return $number;
     }
 
@@ -262,8 +270,10 @@ class SearchEngineSearchRecordHistory extends DataObject
             if (! $val || $val < self::get_session_expiry_time()) {
                 $val = self::set_timestamp_based_session_id();
             }
+
             return $val;
         }
+
         return 0;
     }
 
@@ -287,6 +297,7 @@ class SearchEngineSearchRecordHistory extends DataObject
                 }
             }
         }
+
         return self::$_session_cache;
     }
 

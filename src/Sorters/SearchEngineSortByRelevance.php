@@ -3,13 +3,9 @@
 namespace Sunnysideup\SearchSimpleSmart\Sorters;
 
 use SilverStripe\Core\Convert;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineSortByDescriptor;
-use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
-use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecord;
 
 /**
@@ -65,10 +61,10 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
     /**
      * Do any custom sorting.
      *
-     * @param SS_List|DataList         $objects
+     * @param \SilverStripe\Model\List\SS_List|DataList $objects
      * @param SearchEngineSearchRecord $searchRecord
      *
-     * @return SS_List|DataList
+     * @return \SilverStripe\Model\List\SS_List|DataList
      */
     public function doCustomSort($objects, $searchRecord)
     {
@@ -88,7 +84,7 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         RELEVANCE DESC,
                         LENGTH ASC
                 ';
-                $listOfIds = explode(',', $searchRecord->ListOfIDsCUSTOM);
+                $listOfIds = explode(',', (string) $searchRecord->ListOfIDsCUSTOM);
                 $listOfIds = array_combine($listOfIds, $listOfIds);
                 // look for complete phrase if there is more than one word.
                 // exact full match of search phrase becomes relevance, level 1 first
@@ -119,9 +115,11 @@ class SearchEngineSortByRelevance extends SearchEngineSortByDescriptor
                         }
                     }
                 }
+
                 if ($listOfIds === []) {
                     $listOfIds = [-1];
                 }
+
                 // for the ones not found yet, we do a Mysql "Match" query with higher relevance first.
                 $sql = '
                     SELECT

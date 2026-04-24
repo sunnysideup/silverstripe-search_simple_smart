@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\Console\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
@@ -13,7 +17,7 @@ class SearchEngineRemovePagesToBeUpdated extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $title = 'Remove Entries that should be updated';
+    protected string $title = 'Remove Entries that should be updated';
 
     /**
      * Description of the task.
@@ -29,17 +33,18 @@ class SearchEngineRemovePagesToBeUpdated extends SearchEngineBaseTask
      *
      * @var string
      */
-    private static $segment = 'searchengineremovetobeindexed';
+    protected static string $commandName = 'searchengineremovetobeindexed';
 
     /**
      * this function runs the SearchEngineRemoveAll task.
      *
      * @param HTTPRequest $request
      */
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
         DB::query('DELETE FROM "SearchEngineDataObjectToBeIndexed" WHERE Completed = 0');
         $this->runEnd($request);
+        return 0;
     }
 }

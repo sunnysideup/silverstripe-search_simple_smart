@@ -2,9 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\FasterIDLists;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
@@ -41,7 +41,7 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param null|array|SS_List $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
@@ -100,7 +100,7 @@ class SearchEngineFilterForClassNameAndIDs extends SearchEngineFilterForDescript
      *
      * @see: getFilterList
      *
-     * @param null|array|SS_List $filterArray
+     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
      */
     public function hasCustomFilter($filterArray): bool
     {

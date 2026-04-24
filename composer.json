@@ -25,7 +25,7 @@
     "silverstripe/recipe-cms": "^4.0 || ^5.0",
     "sunnysideup/silverstripe-4-5-compatibility": "5.x-dev",
     "silverstripe/errorpage": "*",
-    "wamania/php-stemmer": "^2.2",
+    "wamania/php-stemmer": "^4",
     "silverstripe/textextraction": "*"
   },
   "autoload": {

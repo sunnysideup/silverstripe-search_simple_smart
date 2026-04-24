@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
@@ -11,7 +12,6 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use Sunnysideup\SearchSimpleSmart\Admin\SearchEngineAdmin;
@@ -127,9 +127,10 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     public function getNumberOfResults(): int
     {
         $obj = $this->getLastSearchResult();
-        if ($obj instanceof \Sunnysideup\SearchSimpleSmart\Model\SearchEngineSearchRecordHistory) {
+        if ($obj instanceof SearchEngineSearchRecordHistory) {
             return $obj->NumberOfResults;
         }
+
         return 0;
     }
 
@@ -182,7 +183,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return $this->Config()->get('singular_name');
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return $this->Config()->get('plural_name');
     }
@@ -227,13 +228,15 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         if ($filterProvidersHashed !== '' && $filterProvidersHashed !== '0') {
             $fieldArray['FilterHash'] = $filterProvidersHashed;
         }
+
         /** @var SearchEngineSearchRecord $obj */
-        $obj = DataObject::get_one(self::class, $fieldArray);
+        $obj = self::get()->setUseCache(true)->filter($fieldArray)->first();
         if (! $obj) {
             $obj = self::create($fieldArray);
             if ($filterProvidersEncoded) {
                 $obj->FilterString = $filterProvidersEncoded;
             }
+
             $obj->write();
         } elseif ($clear || self::cachedValuesAreExpired($obj)) {
             $obj->ListOfIDsRAW = '';
@@ -254,6 +257,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         if (Director::isDev()) {
             return true;
         }
+
         $maxAge = Config::inst()->get(static::class, 'max_cache_age_in_minutes');
         return strtotime($obj->LastEdited) < strtotime('-' . $maxAge . ' minutes');
     }
@@ -264,8 +268,8 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $fields->addFieldsToTab(
             'Root.Main',
             [
-                new ReadonlyField('Phrase', 'Phrase'),
-                new ReadonlyField('FinalPhrase', 'Cleaned Phrase'),
+                ReadonlyField::create('Phrase', 'Phrase'),
+                ReadonlyField::create('FinalPhrase', 'Cleaned Phrase'),
             ]
         );
 
@@ -277,12 +281,12 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         $fields->addFieldsToTab(
             'Root.CacheDetails',
             [
-                new ReadonlyField('FilterHash', 'Filter Hash'),
-                new ReadonlyField('FilterString', 'Filter String'),
-                new ReadonlyField('ListOfIDsRAW', 'Step 1 IDs'),
-                new ReadonlyField('ListOfIDsSQL', 'Step 2 IDs'),
-                new ReadonlyField('ListOfIDsCUSTOM', 'Step 3 IDs'),
-                new ReadonlyField('cachedValuesAreExpiredNice', 'Cache valid?', self::cachedValuesAreExpired($this) ? 'NO' : 'YES'),
+                ReadonlyField::create('FilterHash', 'Filter Hash'),
+                ReadonlyField::create('FilterString', 'Filter String'),
+                ReadonlyField::create('ListOfIDsRAW', 'Step 1 IDs'),
+                ReadonlyField::create('ListOfIDsSQL', 'Step 2 IDs'),
+                ReadonlyField::create('ListOfIDsCUSTOM', 'Step 3 IDs'),
+                ReadonlyField::create('cachedValuesAreExpiredNice', 'Cache valid?', self::cachedValuesAreExpired($this) ? 'NO' : 'YES'),
             ]
         );
 
@@ -329,7 +333,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     {
         $field = $this->getListIDField($filterStep);
         if ($this->{$field}) {
-            return explode(',', $this->{$field});
+            return explode(',', (string) $this->{$field});
         }
 
         return null;
@@ -370,7 +374,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     protected function getListIDField(string $filterStep): string
     {
         if (! in_array($filterStep, ['RAW', 'SQL', 'CUSTOM'], true)) {
-            user_error("{$filterStep} Filterstep Must Be in RAW / SQL / CUSTOM");
+            user_error($filterStep . ' Filterstep Must Be in RAW / SQL / CUSTOM');
         }
 
         return 'ListOfIDs' . $filterStep;
@@ -380,12 +384,14 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     {
         $rel = $this->SearchEngineKeywords();
         $rel->removeAll();
+
         $keywordArray = explode(' ', $this->FinalPhrase);
         foreach ($keywordArray as $position => $keyword) {
             $language = substr(i18n::get_locale(), 0, 2);
             if (! strlen($language) === 2) {
                 $language = 'en';
             }
+
             $stemmer = StemmerFactory::create($language);
             $stem = $stemmer->stem($keyword);
             $realPosition = $position + 1;

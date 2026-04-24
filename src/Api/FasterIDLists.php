@@ -34,16 +34,6 @@ class FasterIDLists
     /**
      * @var string
      */
-    protected $field = 'ID';
-
-    /**
-     * @var bool
-     */
-    protected $isNumber = true;
-
-    /**
-     * @var string
-     */
     protected $tableName = '';
 
     /**
@@ -57,12 +47,10 @@ class FasterIDLists
      * @param string $field     usually the ID field, but could be another field
      * @param bool   $isNumber  is the field a number type (so that we can do ranges OR something else)
      */
-    public function __construct(string $className, array $idList, $field = 'ID', $isNumber = true)
+    public function __construct(string $className, array $idList, protected $field = 'ID', protected $isNumber = true)
     {
         $this->className = $className;
         $this->idList = $idList;
-        $this->field = $field;
-        $this->isNumber = $isNumber;
     }
 
     public function setIdList(array $idList): FasterIDLists
