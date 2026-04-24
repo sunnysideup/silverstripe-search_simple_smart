@@ -1,7 +1,7 @@
 {
   "name": "sunnysideup/search_simple_smart",
   "type": "silverstripe-vendormodule",
-  "description": "Silverstripe Module that allows you to set up complex search algorythms in an easyway",
+  "description": "Silverstripe Module that allows you to set up complex search algorythms in an easy way",
   "keywords": [
     "Silverstripe-CMS",
     "CMS",
