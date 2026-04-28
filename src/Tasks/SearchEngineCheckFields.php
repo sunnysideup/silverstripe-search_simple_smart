@@ -5,7 +5,6 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use SilverStripe\PolyExecution\PolyOutput;
-use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use Sunnysideup\SearchSimpleSmart\Api\CheckFieldsApi;

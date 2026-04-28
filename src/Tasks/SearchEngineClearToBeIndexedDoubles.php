@@ -76,7 +76,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
             $test[$foreignID][$id] = $id;
         }
 
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

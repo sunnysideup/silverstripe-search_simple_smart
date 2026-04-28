@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -60,6 +63,7 @@ class SearchHistoryBrowser extends BuildTask
      */
     protected PolyOutput $polyOutput;
 
+    #[Override]
     public function getOptions(): array
     {
         return [

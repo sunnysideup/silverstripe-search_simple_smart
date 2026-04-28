@@ -46,7 +46,7 @@ class SearchEngineCreateKeywordJS extends SearchEngineBaseTask
         $this->runStart($request);
         $outcome = ExportKeywordList::export_keyword_list();
         DB::alteration_message($outcome, 'created');
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

@@ -114,7 +114,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
         $input = new ArrayInput([], $definition);
         $output = PolyOutput::create(PolyOutput::FORMAT_ANSI);
         $obj->run($input, $output);
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

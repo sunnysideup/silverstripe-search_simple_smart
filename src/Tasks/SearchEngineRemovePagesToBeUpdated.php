@@ -47,7 +47,7 @@ class SearchEngineRemovePagesToBeUpdated extends SearchEngineBaseTask
     {
         $this->runStart($request);
         DB::query('DELETE FROM "SearchEngineDataObjectToBeIndexed" WHERE Completed = 0');
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

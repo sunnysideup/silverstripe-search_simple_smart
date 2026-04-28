@@ -72,7 +72,7 @@ class SearchEngineSetSortDate extends SearchEngineBaseTask
         }
 
         SearchEngineDataObjectApi::end_indexing_mode();
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

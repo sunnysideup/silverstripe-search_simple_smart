@@ -75,7 +75,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
             }
         }
 
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

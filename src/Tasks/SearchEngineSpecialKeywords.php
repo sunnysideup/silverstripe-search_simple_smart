@@ -84,7 +84,7 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
             $this->flushNow(mb_convert_encoding($char, 'UTF-8', 'ISO-8859-1'));
         }
 
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

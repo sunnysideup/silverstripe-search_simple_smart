@@ -92,7 +92,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
             }
         }
 
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 }

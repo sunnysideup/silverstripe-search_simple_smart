@@ -2,14 +2,13 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use SilverStripe\PolyExecution\PolyOutput;
-use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
-use SilverStripe\ORM\DB;
 
 class SearchEngineBaseTask extends BuildTask
 {
@@ -76,6 +75,7 @@ class SearchEngineBaseTask extends BuildTask
      */
     protected PolyOutput $polyOutput;
 
+    #[Override]
     public function getOptions(): array
     {
         return [
