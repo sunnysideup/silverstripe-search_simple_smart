@@ -4,11 +4,9 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use SilverStripe\PolyExecution\PolyOutput;
 use Exception;
-use SilverStripe\Control\Controller;
-use SilverStripe\Control\Director;
-use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
@@ -74,55 +72,62 @@ class SearchEngineBaseTask extends BuildTask
     protected static string $commandName = 'searchenginebasetask';
 
     /**
+     * Stored PolyOutput instance for use in helper methods.
+     */
+    protected PolyOutput $polyOutput;
+
+    public function getOptions(): array
+    {
+        return [
+            new InputOption('verbose', null, InputOption::VALUE_REQUIRED, 'on or off', 'on'),
+            new InputOption('limit', null, InputOption::VALUE_REQUIRED, 'Maximum number of items to process', 100000),
+            new InputOption('step', null, InputOption::VALUE_REQUIRED, 'Step size', 10),
+            new InputOption('type', null, InputOption::VALUE_REQUIRED, 'Type: history, indexes, or all', ''),
+            new InputOption('oldonesonly', null, InputOption::VALUE_REQUIRED, 'on or off', 'off'),
+            new InputOption('unindexedonly', null, InputOption::VALUE_REQUIRED, 'on or off', 'off'),
+            new InputOption('task', null, InputOption::VALUE_REQUIRED, 'Sub-task name to redirect to', ''),
+        ];
+    }
+
+    /**
      * this function runs the SearchEngineRemoveAll task.
-     *
-     * @param HTTPRequest $request
      */
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
-        //set basics
-        $this->runStart($request);
-        if ($this->task && 'searchenginebasetask' !== $this->task) {
-            unset($_GET['task'], $_GET['submit']);
+        $this->polyOutput = $output;
 
-            return Controller::curr()->redirect('/dev/tasks/' . $this->task . '/?' . http_build_query($_GET));
+        //set basics
+        $this->runStart($input);
+
+        if ($this->task && 'searchenginebasetask' !== $this->task) {
+            // @TODO (SS6 upgrade): In SS5 this redirected to another task via HTTP. In SS6 CLI context,
+            // sub-task redirection via Controller::curr()->redirect() is not available.
+            // Run the correct task directly using sake tasks:<task-name> instead.
+            $output->writeln('Please run the sub-task directly: sake tasks:' . $this->task);
+            return Command::SUCCESS;
         }
 
-        $this->runEnd($request);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 
     public function flushNow($message, $type = '', $bullet = true)
     {
         if ($this->verbose) {
-            echo '';
-            // check that buffer is actually set before flushing
-            try {
-                if (ob_get_length()) {
-                    ob_flush();
-                    flush();
-                    ob_end_flush();
-                }
-
-                ob_start();
-            } catch (Exception) {
-                echo ' ';
-            }
-
             if ($bullet) {
-                DB::alteration_message($message, $type);
+                $this->polyOutput->writeForHtml($message);
             } else {
-                echo $message;
+                $this->polyOutput->writeln(strip_tags((string) $message));
             }
         }
     }
 
     public function Link()
     {
-        return '/dev/tasks/' . $this->Config()->get('segment');
+        return '/dev/tasks/' . static::$commandName;
     }
 
-    public function runStart($request)
+    public function runStart(InputInterface $input)
     {
         ini_set('memory_limit', '512M');
         Environment::increaseMemoryLimitTo();
@@ -131,35 +136,31 @@ class SearchEngineBaseTask extends BuildTask
 
         $this->flushNow('<h2>Starting</h2>', false);
 
-        if ($request) {
-            if ($request->getVar('verbose')) {
-                $this->verbose = 'on' === $request->getVar('verbose');
-            }
-
-            if ($request->getVar('limit')) {
-                $this->limit = (int) $request->getVar('limit');
-            }
-
-            if ($request->getVar('step')) {
-                $this->step = (int) $request->getVar('step');
-            }
-
-            if ($request->getVar('type')) {
-                $this->type = $request->getVar('type');
-            }
-
-            if ($request->getVar('oldonesonly')) {
-                $this->oldOnesOnly = 'on' === $request->getVar('oldonesonly');
-            }
-
-            if ($request->getVar('unindexedonly')) {
-                $this->unindexedOnly = 'on' === $request->getVar('unindexedonly');
-            }
-
-            $this->task = $request->getVar('task');
-        } else {
-            $this->task = self::$segment;
+        if ($input->getOption('verbose') !== null) {
+            $this->verbose = 'on' === $input->getOption('verbose');
         }
+
+        if ($input->getOption('limit')) {
+            $this->limit = (int) $input->getOption('limit');
+        }
+
+        if ($input->getOption('step')) {
+            $this->step = (int) $input->getOption('step');
+        }
+
+        if ($input->getOption('type')) {
+            $this->type = (string) $input->getOption('type');
+        }
+
+        if ($input->getOption('oldonesonly') !== null) {
+            $this->oldOnesOnly = 'on' === $input->getOption('oldonesonly');
+        }
+
+        if ($input->getOption('unindexedonly') !== null) {
+            $this->unindexedOnly = 'on' === $input->getOption('unindexedonly');
+        }
+
+        $this->task = (string) ($input->getOption('task') ?? '');
 
         $this->flushNow('<strong>verbose</strong>: ' . ($this->verbose ? 'yes' : 'no'));
         $this->flushNow('<strong>limit</strong>: ' . $this->limit);
@@ -171,46 +172,10 @@ class SearchEngineBaseTask extends BuildTask
         $this->flushNow('==========================', false);
     }
 
-    public function runEnd($request)
+    public function runEnd()
     {
         $this->flushNow('<h2>======================</h2>');
-
-        if (! Director::is_cli()) {
-            $html =
-            '
-            <style>
-                div {padding: 20px;}
-            </style>
-            <form method="get" action="/dev/tasks/searchenginebasetask/">
-                <fieldset>
-                    ' . $this->createOptionList() . '
-
-                    ' . $this->onOffInput('verbose', 'verbose', 'verbose') . '
-                    <div><input name="limit" value="100000" type="number" /> limit</div>
-                    <div><input name="step" value="10" type="number" /> step</div>
-                    ' . $this->onOffInput('unindexedonly', 'unindexedOnly', 'Unindexed Only') . '
-                    ' . $this->onOffInput('oldonesonly', 'oldOnesOnly', 'Old Ones Only') . '
-                    <div>
-                        <select name="type">
-                            <option value="">--- choose type ---</option>
-                            <option value="history">history</option>
-                            <option value="indexes">indexes</option>
-                            <option value="all">all</option>
-                        </select>
-                        type (only applicable to deletes)
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <div><input name="submit" value="go" type="submit"/></div>
-                </fieldset>
-            </form>
-
-            ';
-
-            $this->flushNow($html);
-        }
-
+        $this->polyOutput->writeln('Available sub-tasks: sake tasks:searchengineremoveall | sake tasks:searchengineindexall | sake tasks:searchengineupdatesearchindex | sake tasks:searchengineremovetobeindexed');
         $this->flushNow('<h2>------ END -----------</h2>');
         $this->flushNow('<h2>======================</h2>');
     }

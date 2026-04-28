@@ -4,9 +4,8 @@ namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use SilverStripe\PolyExecution\PolyOutput;
-use SilverStripe\Control\Director;
-use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use Sunnysideup\SearchSimpleSmart\Forms\Fields\SearchEngineFormField;
@@ -57,76 +56,50 @@ class SearchHistoryBrowser extends BuildTask
     protected static string $commandName = 'searchhistorybrowser';
 
     /**
-     * this function runs the SearchEngineRemoveAll task.
-     *
-     * @param HTTPRequest $request
+     * Stored PolyOutput instance for use in helper methods.
+     */
+    protected PolyOutput $polyOutput;
+
+    public function getOptions(): array
+    {
+        return [
+            new InputOption('startDaysAgo', 's', InputOption::VALUE_REQUIRED, 'From how many days ago to start (e.g. 365 = one year ago)', 365),
+            new InputOption('endDaysAgo', 'e', InputOption::VALUE_REQUIRED, 'How many days ago to end (e.g. 0 = up to today)', 0),
+        ];
+    }
+
+    /**
+     * this function runs the SearchHistoryBrowser task.
      */
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
-        //set basics
-        $this->runStart($request);
-        echo SearchEngineFormField::create('SearchEngineFormField', 'Search History')
+        $this->polyOutput = $output;
+
+        Environment::increaseMemoryLimitTo();
+        //20 minutes
+        Environment::increaseTimeLimitTo(7200);
+
+        $this->startDaysAgo = (int) ($input->getOption('startDaysAgo') ?? 365);
+        $this->endDaysAgo   = (int) ($input->getOption('endDaysAgo') ?? 0);
+
+        $html = SearchEngineFormField::create('SearchEngineFormField', 'Search History')
             ->setNumberOfDays($this->startDaysAgo - $this->endDaysAgo)
             ->setEndingDaysBack($this->endDaysAgo)
             ->setShowSource(false)
             ->forTemplate();
-        $this->runEnd($request);
+
+        $output->writeForHtml((string) $html);
+
         return Command::SUCCESS;
     }
 
     public function flushNow($message, $type = '', $bullet = true)
     {
-        echo '<div style="padding: 20px;">' . $message . '</div>';
+        $this->polyOutput->writeForHtml('<div style="padding: 20px;">' . $message . '</div>');
     }
 
     public function Link()
     {
-        return '/dev/tasks/' . $this->Config()->get('segment');
-    }
-
-    public function runStart($request)
-    {
-        ini_set('memory_startDaysAgo', '512M');
-        Environment::increaseMemoryLimitTo();
-        //20 minutes
-        Environment::increaseTimeLimitTo(7200);
-
-        if ($request) {
-            if ($request->getVar('startDaysAgo')) {
-                $this->startDaysAgo = (int) $request->getVar('startDaysAgo');
-            }
-
-            if ($request->getVar('endDaysAgo')) {
-                $this->endDaysAgo = (int) $request->getVar('endDaysAgo');
-            }
-        }
-
-        if (! Director::is_cli()) {
-            $html =
-            '
-            <style>
-                div {padding: 20px;}
-            </style>
-            <form method="get" action="' . $this->Link() . '">
-                <fieldset>
-
-                    <div><input name="startDaysAgo" value="' . $this->startDaysAgo . '" type="number" /> FROM Days Ago (e.g. 365 = starting one year ago)</div>
-                    <div><input name="endDaysAgo" value="' . $this->endDaysAgo . '" type="number" /> UNTIL Days Ago (e.g. 0 = up to today)</div>
-
-                </fieldset>
-
-                <fieldset>
-                    <div><input name="submit" value="go" type="submit"/></div>
-                </fieldset>
-            </form>
-
-            ';
-
-            $this->flushNow($html);
-        }
-    }
-
-    public function runEnd($request)
-    {
+        return '/dev/tasks/' . static::$commandName;
     }
 }

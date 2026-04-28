@@ -6,10 +6,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use SilverStripe\PolyExecution\PolyOutput;
 use Exception;
-use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
-use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Api\CheckFieldsApi;
 
 class SearchEngineCheckFields extends BuildTask
@@ -43,14 +41,19 @@ class SearchEngineCheckFields extends BuildTask
     protected static string $commandName = 'checkfields';
 
     /**
-     * this function runs the SearchEngineRemoveAll task.
-     *
-     * @param HTTPRequest $request
+     * Stored PolyOutput instance for use in helper methods.
+     */
+    protected PolyOutput $polyOutput;
+
+    /**
+     * this function runs the SearchEngineCheckFields task.
      */
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
+        $this->polyOutput = $output;
+
         //set basics
-        $this->runStart($request);
+        $this->runStart();
         $end = '';
         $start = '';
         $start .= 'Sunnysideup\SearchSimpleSmart\Api\CheckFieldsApi:';
@@ -94,42 +97,28 @@ class SearchEngineCheckFields extends BuildTask
             $end .= PHP_EOL;
         }
 
-        echo $start . PHP_EOL . PHP_EOL . $end;
-        $this->runEnd($request);
+        $output->writeln($start . PHP_EOL . PHP_EOL . $end);
+        $this->runEnd();
         return Command::SUCCESS;
     }
 
     public function flushNow($message, $type = '', $bullet = true)
     {
         if ($this->verbose) {
-            echo '';
-            // check that buffer is actually set before flushing
-            try {
-                if (ob_get_length()) {
-                    ob_flush();
-                    flush();
-                    ob_end_flush();
-                }
-
-                ob_start();
-            } catch (Exception) {
-                echo ' ';
-            }
-
             if ($bullet) {
-                DB::alteration_message($message, $type);
+                $this->polyOutput->writeForHtml($message);
             } else {
-                echo $message;
+                $this->polyOutput->writeln(strip_tags((string) $message));
             }
         }
     }
 
     public function Link()
     {
-        return '/dev/tasks/' . $this->Config()->get('segment');
+        return '/dev/tasks/' . static::$commandName;
     }
 
-    public function runStart($request)
+    public function runStart()
     {
         ini_set('memory_limit', '512M');
         Environment::increaseMemoryLimitTo();
@@ -137,14 +126,11 @@ class SearchEngineCheckFields extends BuildTask
         Environment::increaseTimeLimitTo(7200);
 
         $this->flushNow('<h2>Starting</h2>', false);
-        echo '<pre>';
     }
 
-    public function runEnd($request)
+    public function runEnd()
     {
-        echo '</pre>';
         $this->flushNow('<h2>======================</h2>');
-
         $this->flushNow('<h2>------ END -----------</h2>');
         $this->flushNow('<h2>======================</h2>');
     }
