@@ -172,7 +172,7 @@ class SearchEngineBasicForm extends Form
     }
 
     #[Override]
-    public function forTemplate()
+    public function forTemplate(): string
     {
         if (! self::$_for_template_completed) {
             $this->addFields();
