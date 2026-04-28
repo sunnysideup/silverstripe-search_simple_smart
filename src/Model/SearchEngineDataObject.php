@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\VirtualPage;
@@ -264,6 +265,7 @@ class SearchEngineDataObject extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -274,6 +276,7 @@ class SearchEngineDataObject extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return parent::canEdit($member) && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -284,6 +287,7 @@ class SearchEngineDataObject extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return parent::canDelete($member) && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -294,6 +298,7 @@ class SearchEngineDataObject extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -348,6 +353,7 @@ class SearchEngineDataObject extends DataObject
     /**
      * @casted variable
      */
+    #[Override]
     public function getTitle(): string
     {
         $objectClassName = $this->getObjectClassName();
@@ -455,6 +461,7 @@ class SearchEngineDataObject extends DataObject
      *
      * @return FieldList
      */
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -729,6 +736,7 @@ class SearchEngineDataObject extends DataObject
     /**
      * make sure all the references are deleted as well.
      */
+    #[Override]
     protected function onBeforeDelete()
     {
         ///DataObject to be Indexed
@@ -756,6 +764,7 @@ class SearchEngineDataObject extends DataObject
     /**
      * Event handler called before writing to the database.
      */
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -768,6 +777,7 @@ class SearchEngineDataObject extends DataObject
     /**
      * Event handler called after writing to the database.
      */
+    #[Override]
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
@@ -792,6 +802,7 @@ class SearchEngineDataObject extends DataObject
         $obj->IndexNow();
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

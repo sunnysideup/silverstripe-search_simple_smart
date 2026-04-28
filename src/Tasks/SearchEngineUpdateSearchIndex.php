@@ -2,8 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -22,7 +24,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Updates all the search indexes. Boolean GET parameter available: ?oldonesonly';
+    protected static string $description = 'Updates all the search indexes. Boolean GET parameter available: ?oldonesonly';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -38,6 +40,7 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
      *
      * @param null|HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
@@ -93,6 +96,6 @@ class SearchEngineUpdateSearchIndex extends SearchEngineBaseTask
 
         SearchEngineDataObjectApi::end_indexing_mode();
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

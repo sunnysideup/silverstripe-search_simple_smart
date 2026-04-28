@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Forms;
 
+use Override;
 use SilverStripe\Model\ArrayData;
 use SilverStripe\Model\List\GroupedList;
 use SilverStripe\Model\List\ArrayList;
@@ -170,6 +171,7 @@ class SearchEngineBasicForm extends Form
         $this->customScript[] = "SearchEngineInitFunctions.formSelector = '#" . $this->FormName() . "';";
     }
 
+    #[Override]
     public function forTemplate()
     {
         if (! self::$_for_template_completed) {

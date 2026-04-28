@@ -2,8 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use Exception;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
@@ -25,7 +26,7 @@ class SearchEngineCheckFields extends BuildTask
      *
      * @var string
      */
-    protected $description = 'Goes through all DataObjects and lists the fields that can be indexed. ';
+    protected static string $description = 'Goes through all DataObjects and lists the fields that can be indexed. ';
 
     /**
      * @var bool
@@ -95,7 +96,7 @@ class SearchEngineCheckFields extends BuildTask
 
         echo $start . PHP_EOL . PHP_EOL . $end;
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function flushNow($message, $type = '', $bullet = true)

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\SearchSimpleSmart\Reports;
 
+use Override;
 use SilverStripe\CMS\Model\RedirectorPage;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Model\VirtualPage;
@@ -10,6 +13,7 @@ use SilverStripe\Reports\Report;
 
 class PagesNotIncludedInSearch extends Report
 {
+    #[Override]
     public function title()
     {
         return 'Pages not included in search';
@@ -41,6 +45,7 @@ class PagesNotIncludedInSearch extends Report
             ->sort(['Title' => 'ASC']);
     }
 
+    #[Override]
     public function columns()
     {
         return [

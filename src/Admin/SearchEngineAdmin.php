@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Admin;
 
+use Override;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
@@ -53,6 +54,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
     // @var string
     private static $menu_title = 'Keyword Search';
 
+    #[Override]
     public function providePermissions()
     {
         return [
@@ -63,6 +65,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         ];
     }
 
+    #[Override]
     public function getList()
     {
         $list = parent::getList();
@@ -73,6 +76,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         return $list;
     }
 
+    #[Override]
     public function getEditForm($id = null, $fields = null)
     {
         $form = parent::getEditForm();
@@ -233,6 +237,7 @@ class SearchEngineAdmin extends ModelAdmin implements PermissionProvider
         return $out . '</ul>';
     }
 
+    #[Override]
     public function canView($member = null)
     {
         return SiteConfig::current_site_config()->SearchEngineDebug || Permission::check('SEARCH_ENGINE_ADMIN');

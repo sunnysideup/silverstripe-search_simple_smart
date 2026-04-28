@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Model\List\SS_List;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
@@ -178,31 +179,37 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return $result->numRecords() > 0;
     }
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
     }
 
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
+    #[Override]
     public function canEdit($member = null)
     {
         return false;
     }
 
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
     }
 
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -262,6 +269,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return strtotime($obj->LastEdited) < strtotime('-' . $maxAge . ' minutes');
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -339,6 +347,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return null;
     }
 
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -361,6 +370,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         return implode(' ', $finalKeyWordArray);
     }
 
+    #[Override]
     protected function onAfterWrite()
     {
         parent::onAfterWrite();
@@ -435,6 +445,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
         }
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

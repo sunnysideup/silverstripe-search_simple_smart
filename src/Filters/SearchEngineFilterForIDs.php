@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
+use Override;
+use SilverStripe\Model\List\SS_List;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 
 class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
@@ -21,6 +23,7 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      *
      * @return string
      */
+    #[Override]
     public function getDescription()
     {
         return $this->getShortTitle();
@@ -47,7 +50,7 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      * return an array like
      *     "ClassName" => array("A", "B", "C"),
      *
-     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
+     * @param null|array|SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
@@ -61,7 +64,7 @@ class SearchEngineFilterForIDs extends SearchEngineFilterForDescriptor
      *
      * @see: getFilterList
      *
-     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
+     * @param null|array|SS_List $filterArray
      *
      * @return bool
      */

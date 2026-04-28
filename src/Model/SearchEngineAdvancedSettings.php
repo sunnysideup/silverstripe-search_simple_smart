@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
@@ -30,11 +31,13 @@ class SearchEngineAdvancedSettings extends DataObject
      */
     private static $plural_name = 'Advanced Settings';
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -46,6 +49,7 @@ class SearchEngineAdvancedSettings extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -56,6 +60,7 @@ class SearchEngineAdvancedSettings extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return false;
@@ -66,6 +71,7 @@ class SearchEngineAdvancedSettings extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
@@ -76,11 +82,13 @@ class SearchEngineAdvancedSettings extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

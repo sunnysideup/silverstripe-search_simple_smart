@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
@@ -23,7 +25,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Go through all searcheable objects and clear double-ups';
+    protected static string $description = 'Go through all searcheable objects and clear double-ups';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -39,6 +41,7 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
@@ -73,6 +76,6 @@ class SearchEngineClearDataObjectDoubles extends SearchEngineBaseTask
         }
 
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

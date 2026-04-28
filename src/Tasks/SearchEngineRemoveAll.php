@@ -2,8 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
@@ -22,7 +24,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Careful - remove all the search engine index data.';
+    protected static string $description = 'Careful - remove all the search engine index data.';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -58,6 +60,7 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
@@ -90,6 +93,6 @@ class SearchEngineRemoveAll extends SearchEngineBaseTask
         }
 
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

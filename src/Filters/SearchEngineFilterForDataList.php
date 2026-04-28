@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
+use Override;
 use SilverStripe\Model\List\SS_List;
 
 class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
@@ -11,6 +12,7 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
     /**
      * @return string
      */
+    #[Override]
     public function getShortTitle()
     {
         return _t('SearchEngineFilterForDataList.TITLE', 'Custom Selection');
@@ -25,6 +27,7 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      *
      * @return array
      */
+    #[Override]
     public function getFilterList()
     {
         return ['CUSTOM' => 'Custom selection of items'];
@@ -38,8 +41,9 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      *     "ClassName" => array("A", "B", "C"),
      *     "LastEdited:GreaterThan" => "10-10-2001"
      *
-     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
+     * @param null|array|SS_List $filterArray
      */
+    #[Override]
     public function getSqlFilterArray($filterArray): ?array
     {
         if ($filterArray instanceof SS_List) {
@@ -72,8 +76,9 @@ class SearchEngineFilterForDataList extends SearchEngineFilterForClassNameAndIDs
      *
      * @see: getFilterList
      *
-     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
+     * @param null|array|SS_List $filterArray
      */
+    #[Override]
     public function hasCustomFilter($filterArray): bool
     {
         return false;

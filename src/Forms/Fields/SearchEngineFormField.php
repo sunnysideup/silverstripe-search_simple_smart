@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Forms\Fields;
 
+use Override;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\DB;
 use Sunnysideup\SearchSimpleSmart\Core\SearchEngineCoreSearchMachine;
@@ -37,11 +38,13 @@ class SearchEngineFormField extends LiteralField
         $this->title = $title;
     }
 
+    #[Override]
     public function FieldHolder($properties = [])
     {
         return $this->Field();
     }
 
+    #[Override]
     public function Field($properties = [])
     {
         $totalNumberOfDaysBack = $this->numberOfDays + $this->endingDaysBack;

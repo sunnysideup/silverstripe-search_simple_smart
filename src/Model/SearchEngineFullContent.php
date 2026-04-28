@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
@@ -126,11 +127,13 @@ class SearchEngineFullContent extends DataObject
      */
     private static $remove_all_non_letters = true;
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -142,6 +145,7 @@ class SearchEngineFullContent extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -152,6 +156,7 @@ class SearchEngineFullContent extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return false;
@@ -162,6 +167,7 @@ class SearchEngineFullContent extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -172,6 +178,7 @@ class SearchEngineFullContent extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -337,6 +344,7 @@ class SearchEngineFullContent extends DataObject
      *
      * @return FieldList
      */
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -358,6 +366,7 @@ class SearchEngineFullContent extends DataObject
         return $fields;
     }
 
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -367,6 +376,7 @@ class SearchEngineFullContent extends DataObject
         $this->forceChange();
     }
 
+    #[Override]
     protected function onAfterWrite()
     {
         parent::onAfterWrite();

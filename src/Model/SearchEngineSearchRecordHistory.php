@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
@@ -97,6 +98,7 @@ class SearchEngineSearchRecordHistory extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -107,6 +109,7 @@ class SearchEngineSearchRecordHistory extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return false;
@@ -117,6 +120,7 @@ class SearchEngineSearchRecordHistory extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
@@ -127,11 +131,13 @@ class SearchEngineSearchRecordHistory extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -290,7 +296,7 @@ class SearchEngineSearchRecordHistory extends DataObject
     {
         if (! self::$_session_cache) {
             $controller = Controller::curr();
-            if ($controller) {
+            if ($controller instanceof Controller) {
                 $request = $controller->getRequest();
                 if ($request) {
                     self::$_session_cache = $request->getSession();
@@ -301,6 +307,7 @@ class SearchEngineSearchRecordHistory extends DataObject
         return self::$_session_cache;
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

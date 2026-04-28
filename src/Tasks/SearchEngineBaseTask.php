@@ -2,8 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use Exception;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
@@ -46,7 +47,7 @@ class SearchEngineBaseTask extends BuildTask
      *
      * @var string
      */
-    protected $description = 'Does not do anything special, just sets up the task.';
+    protected static string $description = 'Does not do anything special, just sets up the task.';
 
     /**
      * @var bool
@@ -88,7 +89,7 @@ class SearchEngineBaseTask extends BuildTask
         }
 
         $this->runEnd($request);
-        return null;
+        return Command::SUCCESS;
     }
 
     public function flushNow($message, $type = '', $bullet = true)

@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
@@ -89,11 +90,13 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         'Custom' => 'Manually Entered',
     ];
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -105,6 +108,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -115,6 +119,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -125,6 +130,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -135,11 +141,13 @@ class SearchEngineKeywordFindAndReplace extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -189,6 +197,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
     /**
      * clean up entries.
      */
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -218,6 +227,7 @@ class SearchEngineKeywordFindAndReplace extends DataObject
         return explode($delimiters[0], $ready);
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

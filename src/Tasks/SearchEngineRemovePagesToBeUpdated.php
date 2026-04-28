@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\ORM\DB;
@@ -24,7 +26,7 @@ class SearchEngineRemovePagesToBeUpdated extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Goes through all objects marked as to be indexed and removes them from this list so that you can just run a couple (added after you add this one).';
+    protected static string $description = 'Goes through all objects marked as to be indexed and removes them from this list so that you can just run a couple (added after you add this one).';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -40,11 +42,12 @@ class SearchEngineRemovePagesToBeUpdated extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
         DB::query('DELETE FROM "SearchEngineDataObjectToBeIndexed" WHERE Completed = 0');
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Flushable;
@@ -115,11 +116,13 @@ class SearchEngineKeyword extends DataObject implements Flushable
         }
     }
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -131,6 +134,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -141,6 +145,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return false;
@@ -151,6 +156,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -161,6 +167,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -171,6 +178,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
      *
      * @return string
      */
+    #[Override]
     public function getTitle()
     {
         if ($this->hasDatabaseField('Keyword')) {
@@ -271,6 +279,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         return $level;
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -279,6 +288,7 @@ class SearchEngineKeyword extends DataObject implements Flushable
         return $fields;
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

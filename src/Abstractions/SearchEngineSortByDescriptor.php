@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Abstractions;
 
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Extensible;
@@ -95,10 +96,10 @@ abstract class SearchEngineSortByDescriptor
     /**
      * Do any custom sorting.
      *
-     * @param \SilverStripe\Model\List\SS_List $objects - id => ClassName
+     * @param SS_List $objects - id => ClassName
      * @param mixed $searchRecord
      *
-     * @return DataList|\SilverStripe\Model\List\SS_List
+     * @return DataList|SS_List
      */
     abstract public function doCustomSort($objects, $searchRecord);
 

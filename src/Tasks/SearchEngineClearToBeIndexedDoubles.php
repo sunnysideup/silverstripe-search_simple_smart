@@ -2,8 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObjectToBeIndexed;
@@ -22,7 +24,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Go through all searchable objects to be indexed and clear and double-ups';
+    protected static string $description = 'Go through all searchable objects to be indexed and clear and double-ups';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -38,6 +40,7 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
@@ -74,6 +77,6 @@ class SearchEngineClearToBeIndexedDoubles extends SearchEngineBaseTask
         }
 
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

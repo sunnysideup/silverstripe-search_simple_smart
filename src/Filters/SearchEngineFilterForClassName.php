@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Filters;
 
+use Override;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Core\ClassInfo;
 use Sunnysideup\SearchSimpleSmart\Abstractions\SearchEngineFilterForDescriptor;
 use Sunnysideup\SearchSimpleSmart\Api\SearchEngineDataObjectApi;
@@ -28,6 +30,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      *
      * @return string
      */
+    #[Override]
     public function getDescription()
     {
         return $this->getShortTitle();
@@ -83,7 +86,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      * return an array like
      *     "DataObjectClassName" => array("A", "B", "C"),
      *
-     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
+     * @param null|array|SS_List $filterArray
      */
     public function getSqlFilterArray($filterArray): ?array
     {
@@ -110,7 +113,7 @@ class SearchEngineFilterForClassName extends SearchEngineFilterForDescriptor
      *
      * @see: getFilterList
      *
-     * @param null|array|\SilverStripe\Model\List\SS_List $filterArray
+     * @param null|array|SS_List $filterArray
      *
      * @return bool
      */

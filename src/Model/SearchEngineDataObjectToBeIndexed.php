@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
@@ -117,11 +118,13 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      */
     private static $cron_job_running = false;
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -133,6 +136,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -143,6 +147,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return false;
@@ -153,6 +158,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -163,6 +169,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -173,6 +180,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      *
      * @return string
      */
+    #[Override]
     public function getTitle()
     {
         if ($this->SearchEngineDataObjectID) {
@@ -274,6 +282,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
      *
      * @return FieldList
      */
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -298,6 +307,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
     /**
      * Event handler called before deleting from the database.
      */
+    #[Override]
     protected function onBeforeDelete()
     {
         $this->flushCache();
@@ -305,6 +315,7 @@ class SearchEngineDataObjectToBeIndexed extends DataObject
         $this->flushCache();
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

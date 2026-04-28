@@ -2,8 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\ArrayInput;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
@@ -26,7 +28,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Add all pages and other objects to be indexed in the future. You need to run the update tasks after this to actually index them.';
+    protected static string $description = 'Add all pages and other objects to be indexed in the future. You need to run the update tasks after this to actually index them.';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -42,6 +44,7 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         $this->runStart($request);
@@ -95,10 +98,10 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
         $obj = SearchEngineClearDataObjectDoubles::create();
         $definition = new InputDefinition($obj->getOptions());
         $input = new ArrayInput([], $definition);
-        $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
+        $output = PolyOutput::create(PolyOutput::FORMAT_ANSI);
         $definition = new InputDefinition($obj->getOptions());
         $input = new ArrayInput([], $definition);
-        $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
+        $output = PolyOutput::create(PolyOutput::FORMAT_ANSI);
         $obj->run($input, $output);
         DB::alteration_message('==================================', 'created');
         DB::alteration_message('Delete obsoletes', 'created');
@@ -106,12 +109,12 @@ class SearchEngineIndexAll extends SearchEngineBaseTask
         $obj = SearchEngineClearObsoletes::create();
         $definition = new InputDefinition($obj->getOptions());
         $input = new ArrayInput([], $definition);
-        $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
+        $output = PolyOutput::create(PolyOutput::FORMAT_ANSI);
         $definition = new InputDefinition($obj->getOptions());
         $input = new ArrayInput([], $definition);
-        $output = \SilverStripe\PolyExecution\PolyOutput::create(\SilverStripe\PolyExecution\PolyOutput::FORMAT_ANSI);
+        $output = PolyOutput::create(PolyOutput::FORMAT_ANSI);
         $obj->run($input, $output);
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

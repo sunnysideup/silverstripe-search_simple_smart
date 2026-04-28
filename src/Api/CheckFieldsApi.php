@@ -27,10 +27,7 @@ class CheckFieldsApi
     use Configurable;
     use Injectable;
 
-    /**
-     * @var string
-     */
-    private const CACHE_NAME = 'checkFieldsCache';
+    private const string CACHE_NAME = 'checkFieldsCache';
 
     protected $debug = false;
 

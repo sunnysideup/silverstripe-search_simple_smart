@@ -2,8 +2,9 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Environment;
@@ -44,7 +45,7 @@ class SearchHistoryBrowser extends BuildTask
      *
      * @var string
      */
-    protected $description = 'Goes through the search history and shows what people searched for.';
+    protected static string $description = 'Goes through the search history and shows what people searched for.';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -70,7 +71,7 @@ class SearchHistoryBrowser extends BuildTask
             ->setShowSource(false)
             ->forTemplate();
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 
     public function flushNow($message, $type = '', $bullet = true)

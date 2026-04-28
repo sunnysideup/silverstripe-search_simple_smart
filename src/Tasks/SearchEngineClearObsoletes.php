@@ -2,8 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineDataObject;
 
@@ -21,7 +23,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Go through all searchable objects and remove obsolete ones';
+    protected static string $description = 'Go through all searchable objects and remove obsolete ones';
 
     /**
      * Set a custom url segment (to follow dev/tasks/).
@@ -37,6 +39,7 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         //set basics
@@ -64,6 +67,6 @@ class SearchEngineClearObsoletes extends SearchEngineBaseTask
         }
 
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Model;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
@@ -74,11 +75,13 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
         'Custom.Nice' => 'Manually Entered',
     ];
 
+    #[Override]
     public function i18n_singular_name()
     {
         return $this->Config()->get('singular_name');
     }
 
+    #[Override]
     public function plural_name()
     {
         return $this->Config()->get('plural_name');
@@ -90,6 +93,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -100,6 +104,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -110,6 +115,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return parent::canDelete() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -120,6 +126,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null)
     {
         return parent::canView() && Permission::check('SEARCH_ENGINE_ADMIN');
@@ -134,6 +141,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
             ->filter(['Character' => $character])->count();
     }
 
+    #[Override]
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
@@ -151,6 +159,7 @@ class SearchEnginePunctuationFindAndRemove extends DataObject
         }
     }
 
+    #[Override]
     public function CMSEditLink()
     {
         return '/' . Injector::inst()->get(SearchEngineAdmin::class)->getCMSEditLinkForManagedDataObject($this);

@@ -2,8 +2,10 @@
 
 namespace Sunnysideup\SearchSimpleSmart\Tasks;
 
+use Override;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\Console\PolyOutput;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Control\HTTPRequest;
 use Sunnysideup\SearchSimpleSmart\Model\SearchEngineKeyword;
 
@@ -21,7 +23,7 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
      *
      * @var string
      */
-    protected $description = 'Go through all the keywords and work out what keywords have special characters.';
+    protected static string $description = 'Go through all the keywords and work out what keywords have special characters.';
 
     protected $regex1 = '/[^A-Za-z0-9 ]/';
 
@@ -43,6 +45,7 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
      *
      * @param HTTPRequest $request
      */
+    #[Override]
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         header('Content-Type: text/html; charset=utf-8');
@@ -78,10 +81,10 @@ class SearchEngineSpecialKeywords extends SearchEngineBaseTask
         }
 
         foreach ($characters as $char) {
-            $this->flushNow(utf8_encode($char));
+            $this->flushNow(mb_convert_encoding($char, 'UTF-8', 'ISO-8859-1'));
         }
 
         $this->runEnd($request);
-        return 0;
+        return Command::SUCCESS;
     }
 }
