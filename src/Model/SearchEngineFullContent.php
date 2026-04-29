@@ -74,10 +74,11 @@ class SearchEngineFullContent extends DataObject
             'name' => 'SearchFields',
             'columns' => ['Content'],
         ],
+        'Content' => false
     ];
 
     // @var string
-    private static $default_sort = '"Level" ASC, "Content" ASC';
+    private static $default_sort = '"Level" ASC, "ID" ASC';
 
     // @var array
     private static $required_fields = [
