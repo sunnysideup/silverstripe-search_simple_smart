@@ -47,6 +47,12 @@ class SearchEngineMakeSearchable extends Extension
         'KeywordStuffer' => 'Text',
     ];
 
+    private static array $scaffold_cms_fields_settings = [
+        'ignoreFields' => [
+            'KeywordStuffer',
+        ]
+    ];
+
     //###########################
     // do stuff ....
     //###########################
