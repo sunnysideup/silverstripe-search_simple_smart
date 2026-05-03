@@ -314,7 +314,7 @@ class SearchEngineSearchRecord extends DataObject implements Flushable
     {
         $field = $this->getListIDField($filterStep);
         //default to nothing
-        $this->{$field} = -1;
+        $this->{$field} = (string) "-1";
         if ($list) {
             if ($list instanceof SS_List && $list->count()) {
                 return $this->setListOfIDs($list->column('ID'), $filterStep);
