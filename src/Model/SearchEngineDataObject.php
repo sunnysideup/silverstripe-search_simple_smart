@@ -178,7 +178,9 @@ class SearchEngineDataObject extends DataObject
      * @var array
      */
     private static $many_many_extraFields = [
-        'SearchEngineKeywords_Level2' => ['Count' => 'Int'],
+        'SearchEngineKeywords_Level2' => [
+            'Count' => 'Int'
+        ],
         //'SearchEngineDataObjects_Level3' => array('Count' => 'Int')
     ];
 
