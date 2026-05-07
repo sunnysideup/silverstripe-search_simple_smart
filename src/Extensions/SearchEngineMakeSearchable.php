@@ -195,11 +195,11 @@ class SearchEngineMakeSearchable extends Extension
                     'Root.Keywords',
                     LiteralField::create(
                         'SearchEngineHeader',
-                        '<h2>
+                        '<p style="font-weight: bold;">
                                 See
                                 <a href="/admin/pages/settings/show/' . $owner->ID . '#Root_KeywordSearch">Settings Tab</a>
                                 for Keyword Search Details
-                            </h2>'
+                            </p>'
                     )
                 );
             }
