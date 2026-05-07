@@ -100,6 +100,12 @@ class SearchEngineKeyword extends DataObject implements Flushable
         ],
     ];
 
+    private static array $field_labels = [
+        'SearchEngineDataObjects_Level1' => 'Level 1 Mentions',
+        'SearchEngineDataObjects_Level2' => 'Level 2 Mentions',
+        'SearchEngineSearchRecords' => 'Included In Results',
+    ];
+
     /**
      * this is very important to allow Mysql FullText Searches.
      *
